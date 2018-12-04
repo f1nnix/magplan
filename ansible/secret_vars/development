@@ -1,0 +1,11 @@
+# In a real life repository, you would want to create a file called
+# "development.example" or something similar, so that individual developers
+# have a template to use their own individual secrets and do not have to
+# memorize a shared password to develop locally.
+#
+# This file exists as a matter of convenience, so the repository will
+# provision successfully without any changes.
+django_secret_key: "This needs to be both unique and kept secret."
+# We don't need to use a secret token in development.
+github_secret_token: ""
+postgresql_password: "PostgreSQL rules, never use MySQL if you don't have to."

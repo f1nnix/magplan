@@ -1,0 +1,46 @@
+{% extends "layout_plan.html" %}
+{% block title %}Этапы{% endblock %}
+{% block content %}
+    <h1>Этапы</h1>
+    {#    {% include 'stages/_postypes_filter.html' %}#}
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Название</th>
+                <th scope="col">Ответственный</th>
+                <th scope="col">Предыдущий</th>
+                <th scope="col">Следующий</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for stage in stages %}
+                <tr>
+                    <th scope="row">{{ stage.id }}</th>
+                    <td>{{ stage.title }}</td>
+                    <td>
+                        {% if stage.assignee is none %}
+                            <em>Редактор</em>
+                        {% else %}
+                            <strong>{{ stage.assignee }}</strong>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if stage.prev_stage is not none %}
+                            {{ stage.prev_stage.title }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if stage.next_stage is not none %}
+                            {{ stage.next_stage.title }}
+                        {% endif %}
+                    </td>
+
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,117 @@
+{% extends "layout_plan.html" %}
+{% block title %}{{ post.title }}{% endblock %}
+{% load i18n %}
+{% load filters %}
+{% block styles %}
+    <style type="text/css">
+        #progress, #info, #lead, #stages {
+            margin-bottom: 1rem;
+        }
+
+        #kicker h1 {
+            display: inline;
+            font-weight: bold;
+        }
+
+        #authors, #meta {
+            font-weight: bold;
+        }
+
+        #meta {
+            text-align: right;
+        }
+
+        figure img {
+            max-width: 100%;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    {% with stages=stages %}{% include 'plan/posts/_progress.html' %}{% endwith %}
+
+    <h1>{{ post }}</h1>
+
+
+
+    <a class="btn btn-warning btn-sm" href="{% url 'posts_edit' post.id %}">{% trans "edit" %}</a>
+
+    <div id="info" class="row">
+        <div id="authors" class="col-9">
+            {% if post.authors.all|length > 0 %}
+                {% trans "writes" %}
+                {% for author in post.authors.all %}
+                    <a href="{% url 'authors_edit' author.id %}">{{ author }}</a>
+                {% endfor %}.
+            {% else %}
+                {% trans "no_author" %}.
+            {% endif %}
+            {% trans "edits" %} <a href="{% url 'authors_edit' post.editor.id %}">{{ post.editor }}</a>
+
+            <br/>
+            <a class="" data-toggle="collapse" href="#description" role="button"
+               aria-expanded="false" aria-controls="description">
+                {% trans "show_article_description" %}
+            </a>
+        </div>
+
+        <div id="meta" class="col-3">
+            {% if post.issues.all|length > 0 %}
+                {% for issue in post.issues.all %}
+                    <a href="{% url 'issues_show' issue.id %}">{{ issue }}</a>
+                    ,
+                {% endfor %}
+            {% endif %}
+
+            {% if post.section %}
+                <br/>{{ post.section.title }}
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="collapse" id="description">
+        <div class="card card-body">
+
+            {{ post.description_html|safe }}
+        </div>
+        <br/>
+    </div>
+
+    {% include 'plan/posts/_stages.html' %}
+
+    <div class="row">
+        <div class="col-12">
+            <a href="#comments" class="float-right">К комментариям ({{ post.comments|length }})</a>
+        </div>
+    </div>
+
+    <section id="attachments" style="margin-bottom: 1rem;">
+        {% with pdfs=post.pdfs files=post.files hide_images=True %}
+            {% include 'plan/posts/_attachments.html' %}
+        {% endwith %}
+    </section>
+
+    {% if post.html %}
+        <section class="article-preview"
+                 style="padding-top: 1rem; padding-bottom: 1rem; margin-bottom: 1rem;"
+                 id="preview">
+            <link rel='stylesheet' id='Ubuntu-css'
+                  href='https://fonts.googleapis.com/css?family=Ubuntu%3A300%2C300italic%2Cregular%2Citalic%2C500%2C500italic%2C700%2C700italic&#038;subset=latin%2Ccyrillic'
+                  type='text/css' media='all'/>
+            <div class="inner">
+                {{ post.html|safe }}
+            </div>
+
+
+        </section>
+    {% endif %}
+    {% with comments=post.comments_ add_comment_url=post|url_for_post_comments TYPE_SYSTEM=TYPE_SYSTEM SYSTEM_ACTION_SET_STAGE=SYSTEM_ACTION_SET_STAGE SYSTEM_ACTION_UPDATE=SYSTEM_ACTION_UPDATE %}
+        {% include 'plan/partials/comments.html' %}
+    {% endwith %}
+
+{% endblock %}
+{% block scripts %}
+    <script type="text/javascript">
+        {#window.DELETE_ATTACHMENT_URL = "{{ app.router['posts_delete_attachment'].url_for(post_id=post.id|string) }}";#}
+        {#window.DELETE_ATTACHMENT_URL = "{{ app.router['posts_delete_attachment'].url_for(post_id=post.id|string) }}";#}
+    </script>
+{% endblock %}

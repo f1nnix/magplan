@@ -1,0 +1,29 @@
+{% extends "layout_plan.html" %}
+{% block title %}Авторы{% endblock %}
+{% block content %}
+    <h1>Авторы</h1>
+
+        <a href="{% url 'authors_new' %}" class="btn btn-success">Добавить</a>
+    <br>
+    <br>
+    <div class="table-responsive">
+
+
+        <table class="table table-striped table-bordered table-interactive">
+            <thead>
+            <th>Имя</th>
+            <th>Почта</th>
+            </thead>
+            <tbody>
+            {% for author in users %}
+                <tr>
+                    <td>
+                        <a href="{% url 'authors_edit' author.id %}">{{ author.str_employee }}</a>
+                    </td>
+                    <td><a href="mailto:{{ author.email }}">{{ author.email }}</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

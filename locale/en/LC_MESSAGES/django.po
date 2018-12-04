@@ -1,0 +1,233 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-12-04 14:26+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: templates/plan/issues/show.html:13
+msgid "scheduled"
+msgstr "Scheduled"
+
+#: templates/plan/issues/show.html:13
+msgid "of"
+msgstr "of"
+
+#: templates/plan/issues/show.html:14
+msgid "no_text"
+msgstr "No text"
+
+#: templates/plan/issues/show.html:15
+#: templates/plan/partials/posts_table.html:26
+msgid "has_text"
+msgstr "Has text"
+
+#: templates/plan/issues/show.html:16
+msgid "in_progress"
+msgstr "In progress"
+
+#: templates/plan/issues/show.html:17
+msgid "done"
+msgstr "Done"
+
+#: templates/plan/issues/show.html:20
+msgid "articles_in_issue"
+msgstr "Articles"
+
+#: templates/plan/partials/navbar.html:4
+msgid "dashboard"
+msgstr "Dashboard"
+
+#: templates/plan/partials/navbar.html:12
+#: templates/plan/partials/posts_table.html:9
+msgid "authors"
+msgstr "Authors"
+
+#: templates/plan/partials/navbar.html:16
+msgid "issues"
+msgstr "Issues"
+
+#: templates/plan/partials/navbar.html:23
+msgid "Все выпуски"
+msgstr "All issues"
+
+#: templates/plan/partials/navbar.html:27
+msgid "ideas"
+msgstr "Ideas"
+
+#: templates/plan/partials/navbar.html:30
+msgid "articles"
+msgstr "Articles"
+
+#: templates/plan/partials/navbar.html:33
+msgid "sections"
+msgstr "Sections"
+
+#: templates/plan/partials/navbar.html:36
+msgid "stages"
+msgstr "Stages"
+
+#: templates/plan/partials/navbar.html:42
+msgid "search_articles"
+msgstr "Search articles..."
+
+#: templates/plan/partials/navbar.html:49
+msgid "logout"
+msgstr "Logout"
+
+#: templates/plan/partials/posts_table.html:7
+#, fuzzy
+#| msgid "sections"
+msgid "section"
+msgstr "Sections"
+
+#: templates/plan/partials/posts_table.html:8
+msgid "title"
+msgstr "Title"
+
+#: templates/plan/partials/posts_table.html:10
+msgid "editor"
+msgstr "Editor"
+
+#: templates/plan/partials/posts_table.html:11
+msgid "deadline"
+msgstr "Deadline"
+
+#: templates/plan/partials/posts_table.html:12
+#, fuzzy
+#| msgid "stages"
+msgid "stage"
+msgstr "Stages"
+
+#: templates/plan/partials/posts_table.html:24
+#: templates/plan/posts/show.html:36
+msgid "edit"
+msgstr "Edit article"
+
+#: templates/plan/posts/_attachments.html:5
+msgid "attachments"
+msgstr "Attachments"
+
+#: templates/plan/posts/_attachments.html:12
+msgid "images"
+msgstr "Images"
+
+#: templates/plan/posts/_attachments.html:66
+msgid "No PDF uploaded yet"
+msgstr "No PDF uploaded yet"
+
+#: templates/plan/posts/_stages.html:14
+#, python-format
+msgid ""
+"\n"
+"                    Вернуть на этап <strong>%(prev_stage)s</strong> может "
+"только %(assignee)s\n"
+"                "
+msgstr ""
+"\n"
+"Only <strong>%(assignee)s</strong> can bring back to stage <strong>"
+"%(prev_stage)s</strong>"
+
+#: templates/plan/posts/_stages.html:24
+#, fuzzy, python-format
+#| msgid ""
+#| "\n"
+#| "                    Вернуть на этап <strong>%(prev_stage)s</strong> может "
+#| "только %(assignee)s\n"
+#| "                "
+msgid ""
+"\n"
+"            Сейчас на <strong>%(stage)s</strong> (%(assignee)s) до "
+"%(published_at)s\n"
+"        "
+msgstr ""
+"\n"
+"Now — <strong>%(stage)s</strong> (%(assignee)s) till %(published_at)s\n"
+""
+
+#: templates/plan/posts/show.html:41
+msgid "writes"
+msgstr "Written by"
+
+#: templates/plan/posts/show.html:46
+msgid "no_author"
+msgstr "No author"
+
+#: templates/plan/posts/show.html:48
+msgid "edits"
+msgstr "Edited by"
+
+#: templates/plan/posts/show.html:53
+msgid "show_article_description"
+msgstr "Show article decription"
+
+#: venv/lib/python3.6/site-packages/django/views/templates/default_urlconf.html:6
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr ""
+
+#: venv/lib/python3.6/site-packages/django/views/templates/default_urlconf.html:345
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+
+#: venv/lib/python3.6/site-packages/django/views/templates/default_urlconf.html:367
+msgid "The install worked successfully! Congratulations!"
+msgstr ""
+
+#: venv/lib/python3.6/site-packages/django/views/templates/default_urlconf.html:368
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+
+#: venv/lib/python3.6/site-packages/django/views/templates/default_urlconf.html:383
+msgid "Django Documentation"
+msgstr ""
+
+#: venv/lib/python3.6/site-packages/django/views/templates/default_urlconf.html:384
+msgid "Topics, references, &amp; how-to's"
+msgstr ""
+
+#: venv/lib/python3.6/site-packages/django/views/templates/default_urlconf.html:395
+msgid "Tutorial: A Polling App"
+msgstr ""
+
+#: venv/lib/python3.6/site-packages/django/views/templates/default_urlconf.html:396
+msgid "Get started with Django"
+msgstr ""
+
+#: venv/lib/python3.6/site-packages/django/views/templates/default_urlconf.html:407
+msgid "Django Community"
+msgstr ""
+
+#: venv/lib/python3.6/site-packages/django/views/templates/default_urlconf.html:408
+msgid "Connect, get help, or contribute"
+msgstr ""
+
+#: venv/lib/python3.6/site-packages/django_admin_listfilter_dropdown/templates/django_admin_listfilter_dropdown/dropdown_filter.html:3
+#, python-format
+msgid " By %(filter_title)s "
+msgstr ""
+
+#~ msgid "stages_push_back_denied"
+#~ msgstr ""
+#~ "Вернуть на этап <strong>{{ post.stage.prev_stage }}</strong> может только "
+#~ "{{ post.assignee }}"

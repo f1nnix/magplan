@@ -1,0 +1,25 @@
+{% extends "layout_plan.html" %}
+{% block title %}{{ issue }}{% endblock %}
+{% load filters %}
+{% load i18n %}
+{% block styles %}
+{% endblock %}
+{% block content %}
+
+    <h1>{{ issue }}</h1>
+
+    <div id="stats">
+        <ul>
+            <li>{% trans "scheduled" %}: {{ posts|length }} {% trans "of" %} 30+</li>
+            <li>{% trans "no_text" %}: {{ posts|length|sub:stats.has_text }}</li>
+            <li>{% trans "has_text" %}: {{ stats.has_text }}</li>
+            <li>{% trans "in_progress" %}: {{ stats.incomplete }}</li>
+            <li>{% trans "done" %}: {{ posts|length|sub:stats.incomplete }}</li>
+        </ul>
+    </div>
+    <h3>{% trans "articles_in_issue" %} ({{ posts | length }})</h3>
+
+    {% with posts=posts interactive=True %}
+        {% include 'plan/partials/posts_table.html' %}
+    {% endwith %}
+{% endblock %}

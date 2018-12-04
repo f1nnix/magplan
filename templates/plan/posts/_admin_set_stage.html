@@ -1,0 +1,22 @@
+<a class="" data-toggle="collapse" href="#admin_move" role="button" aria-expanded="false"
+   aria-controls="admin_move">
+    Изменить этап
+</a>
+
+
+<div class="admin_move collapse" id="admin_move">
+    <hr/>
+    <form action="{% url 'posts_set_stage' post.id %}" method="post" accept-charset="utf-8">
+        <div class="form-group">
+            {% csrf_token %}
+            <label for="exampleFormControlSelect1">Подвинуть на произвольный этап как админ:</label>
+            <select class="form-control" name="new_stage_id">
+                {% for stage in stages %}
+                    <option value="{{ stage.id }}"
+                            {% if stage.id == post.stage.id %}selected{% endif %}>{{ stage.title }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <input type="submit" class="btn btn-block btn-primary" value="Изменить этап"/>
+    </form>
+</div>

@@ -1,0 +1,7 @@
+- name: restart supervisor
+  service: name=supervisor state=restarted
+  become: true
+
+- name: restart gunicorn
+  supervisorctl: name=gunicorn state=restarted
+  become: true

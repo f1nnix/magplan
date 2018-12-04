@@ -1,0 +1,40 @@
+- name: install supervisor
+  apt: cache_valid_time={{ apt_cache_seconds }}
+       name=supervisor
+       state=latest
+       update_cache=yes
+  become: true
+
+- name: add supervisor configuration file for gunicorn
+  template: src=supervisor-gunicorn.conf
+            dest=/etc/supervisor/conf.d/gunicorn.conf
+  become: true
+  notify:
+    - restart gunicorn
+  tags: gunicorn
+
+- name: database migrate
+  django_manage: command=migrate
+                 app_path={{ srv_directory }}
+                 settings={{ project_name }}.settings
+                 virtualenv={{ virtualenv_folder_root }}/current
+  environment:
+    DB_HOST: localhost
+    DB_PORT: 5432
+    DB_NAME: "{{ project_name }}"
+    DB_USER: "{{ project_name }}"
+    DB_PASSWORD: "{{ postgresql_password }}"
+    APP_ENV: PRODUCTION
+  notify:
+    - restart gunicorn
+
+- name: collect static files
+  django_manage: command=collectstatic
+                 app_path={{ srv_directory }}
+                 settings={{ project_name }}.settings
+                 virtualenv={{ virtualenv_folder_root }}/current
+  environment:
+    BASE_DIR: "{{ srv_directory }}"
+  notify:
+    - restart nginx
+  tags: test2

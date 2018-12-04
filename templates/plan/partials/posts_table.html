@@ -1,0 +1,49 @@
+{% load filters %}
+{% load i18n %}
+
+<div class="table-responsive">
+    <table class="table table-striped table-sm{% if interactive is True %} table-interactive{% endif %}">
+        <thead>
+        <th>{% trans "section" %}</th>
+        <th>{% trans "title" %}</th>
+        <th>{% trans "authors" %}</th>
+        <th>{% trans "editor" %}</th>
+        <th>{% trans "deadline" %}</th>
+        <th>{% trans "stage" %}</th>
+        </thead>
+        <tbody>
+
+        {% for post in posts %}
+            <tr class="">
+                <td><span class="badge badge-custom" style="background-color: #{{ post.section.color }};">
+                    <span style="visibility: hidden; font-size: 1px;">{{ post.section.sort }}</span>{{ post.section.title }}</span>
+                </td>
+                <td>
+
+                    <a href="{% url 'posts_show' post.id %}">{{ post }}</a> (<a
+                        href="{% url 'posts_edit' post.id %}">{% trans "edit" %}</a>)
+                    {% if post.has_text == True %}
+                        <span class="badge badge-success">{% trans "has_text" %}</span>
+                    {% endif %}
+                    {% if post.meta.wpid %}
+                        <a href="https://xakep.ru?p={{ post.meta.wpid }}"><span
+                                class="badge badge-light">&#128279;</span></a>
+                    {% endif %}
+
+                </td>
+                <td>
+                    {% for author in post.authors.all %}{{ author }}{% endfor %}
+                </td>
+                <td>{{ post.editor }}</td>
+                <td class="{% if post.is_overdue is True %}table-danger{% endif %}">
+                    <nobr>{{ post.published_at }}</nobr>
+                </td>
+                <td><span class="badge badge-custom" style="background-color: #{{ post.stage.meta.background }};">
+                    <span style="visibility: hidden; font-size: 1px;">{{ post.stage.sort }}</span>{{ post.stage.title }}</span>
+                </td>
+            </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+</div>

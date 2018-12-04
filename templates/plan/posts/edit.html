@@ -1,0 +1,161 @@
+{% extends "layout_plan.html" %}
+{% block title %}Редактирование «{{ post.title }}»{% endblock %}
+{% block styles %}
+    <style>
+        .attachment-image {
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+            height: 8rem;
+        }
+
+        span.twitter-typeahead {
+            width: auto !important;
+        }
+
+        section {
+            padding-bottom: 2rem;
+        }
+
+        #editor {
+            position: relative;
+            height: 40rem;
+        }
+
+        .select2-container {
+            width: 100% !important;
+        }
+
+        #header h1 {
+            display: inline;
+            font-weight: bold;
+        }
+
+        .edit_hidden {
+            display: none;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <h2>Редактирование «<a href="{% url 'posts_show' post.id %}">{{ post }}</a>»</h2>
+    <div class="meta">
+        <p>В номерах: {% for issue in post.issues.all %}
+            <a href="{% url 'issues_show' issue.id %}">{{ issue }}</a>{% if loop.last == false %}, {% else %}.
+            {% endif %}
+        {% endfor %}</p>
+    </div>
+    <form id="save_post_form"
+          action="{% url 'posts_edit' post.id %}"
+          method="post"
+          accept-charset="utf-8"
+          enctype='multipart/form-data'>
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-12">
+                <div class="form-group">
+                    {{ form.kicker.label }}
+                    {% if form.kicker.errors %}
+                        <ul class="errors">
+                            {% for error in form.kicker.err %}
+                                <li>{{ error }}</li>{% endfor %}
+                        </ul>
+                    {% endif %}
+                    {{ form.kicker }}
+                </div>
+            </div>
+        </div>
+        {% include 'plan/posts/_form_base.html' %}
+        <br/>
+        <section id="attachments" style="margin-bottom: 1rem;">
+            {% with images=post.images pdfs=post.pdfs files=post.files %}
+                {% include 'plan/posts/_attachments.html' %}
+            {% endwith %}
+        </section>
+
+        {% include 'plan/posts/_form_extended.html' %}
+        <div class="row">
+            <div class="col-12">
+                <div class="form-group">
+                    {{ form.wp_id.label }}
+                    {% if form.wp_id.errors %}
+                        <ul class="errors">
+                            {% for error in form.kicker.err %}
+                                <li>{{ error }}</li>{% endfor %}
+                        </ul>
+                    {% endif %}
+                    {{ form.wp_id }}
+                </div>
+            </div>
+        </div>
+
+
+    </form>
+{% endblock %}
+
+{% block footer %}
+    <footer class="footer">
+        <div class="container">
+            <span></span>
+            <div class="float-right"><input type="submit" id="save_post" form="save_post_form" class="btn btn-success"
+                                            value="Сохранить"></div>
+        </div>
+    </footer>
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript">
+        window.DELETE_ATTACHMENT_URL = "{% url 'posts_attachment_delete' post.id %}";
+    </script>
+    <script type="text/javascript">
+        function alarm_unbound_images() {
+            var text = window.editor.getSession().getValue();
+            var required_images = text.match(/^!\[(.*?)\]\(.+?\)$/gm).map(function (currentValue, index, array) {
+                var img = currentValue.match(/\((.*?)\)$/igm)[0].slice(1, -1);
+
+                // if its a video with preview
+                if (img.indexOf(' ' > -1)) {
+                    var chunks = img.split(' ');
+                    if (chunks[0].indexOf('youtube.com') > -1) return chunks[1];
+                    if (chunks[0].indexOf('vimeo.com') > -1) return chunks[1]
+                }
+
+                // if its a gallery
+                if (img.indexOf(',') > -1) return img.split(',');
+
+                return img
+            });
+
+            var attached_images = [
+                {% for image in images %}
+                    {#'{{ image["original_filename"] }}',#}
+                {% endfor %}
+            ];
+
+
+            var missing_images = required_images.filter(x => !attached_images.includes(x));
+            var extra_images = attached_images.filter(x => !required_images.includes(x));
+
+            if (missing_images.length > 0) {
+                $('#missing_images').show();
+                var container = $('#missing_images .card-text');
+
+                for (var i = missing_images.length - 1; i >= 0; i--) {
+                    $('<li>' + missing_images[i] + '</li>').appendTo(container)
+                }
+
+            }
+
+            if (extra_images.length > 0) {
+                $('#extra_images').show();
+                var container = $('#extra_images .card-text');
+
+                for (var i = extra_images.length - 1; i >= 0; i--) {
+                    $('<li>' + extra_images[i] + '</li>').appendTo(container)
+                }
+
+            }
+        }
+
+        {#alarm_unbound_images()#}
+    </script>
+{% endblock %}

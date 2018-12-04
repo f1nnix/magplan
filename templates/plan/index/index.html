@@ -1,0 +1,41 @@
+{% extends "layout_plan.html" %}
+{% block title %}Сводка{% endblock %}
+{% block styles %}
+    <style type="text/css">
+        table > tbody > tr > td {
+            padding: 0rem 1rem;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    {% if opened_issues|length > 0 %}
+        <h4>Открытые выпуски:
+            {% for issue in opened_issues  %}
+                <a href="{% url 'issues_show' issue.id %}">{{ issue }}</a>{% if loop.last == false %}, {% else %}.{% endif %}
+            {% endfor %}
+        </h4>
+    {% endif %}
+
+    <br>
+
+    {% if need_to_vote|length > 0 %}
+        <div class="alert alert-warning" role="alert">
+            <h5>Нужен твой голос!</h5>
+            <ol>
+                {% for idea in need_to_vote %}
+                    <li>
+                        <a href="{% url 'ideas_show' idea.id %}">{{ idea.title }}</a>
+                    </li>
+                {% endfor %}
+            </ol>
+        </div>
+    {% endif %}
+
+    <!-- <h5>сегодня</h5>
+    <h5>завтра</h5>
+    <h5>Статьи на неделю</h5> -->
+    <h4>Материалы на мне</h4>
+    {% with posts=self_posts %}
+        {% include 'plan/partials/posts_table.html' %}
+    {% endwith %}
+{% endblock %}

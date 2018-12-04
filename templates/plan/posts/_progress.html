@@ -1,0 +1,22 @@
+{% load filters %}
+<div class="row" id="progress">
+    <div class="col-12">
+        <div class="progress" style="height: 1.6rem;">
+            {% with stages_count=stages|length %}
+                {% with barwidth=100|divide:stages_count current_rendered=False %}
+                    {% for stage in stages %}
+                        {% if current_rendered == False %}
+                            <div class="progress-bar progress-bar progress-bar-striped" role="progressbar"
+                                 style="width: {{ barwidth }}%; background-color: #{{ stage.meta.background }};
+                                         color: #{{ stage.meta.foreground }}; font-weight: bold;"
+                                 aria-valuenow="15" aria-valuemin="0" aria-valuemax="100">{{ stage.title }}</div>
+                        {% endif %}
+                        {% if stage.id == post.stage.id %}{% set current_rendered = True %}{% endif %}
+                    {% endfor %}
+                {% endwith %}
+            {% endwith %}
+
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,94 @@
+{% load filters %}
+
+<div class="row">
+    <div class="col-12"><h4>Голосование за идею <span
+            class="text-muted">(проголосовало {{ idea.votes.all|length }})</span>
+    </h4></div>
+</div>
+<div class="row">
+    {# if user already voted #}
+    {% if idea|voted:request.user %}
+        <div class="col-6">
+            <strong>Вы уже голосовали.</strong>
+
+            <hr>
+            {% with current_score=idea.score %}
+                <h4>Текущая оценка {{ current_score }}%</h4>
+
+
+                <h6>Как принимаются решения</h6>
+                <ul>
+                    <li><strong>75%–100%:</strong> идея принимается;</li>
+                    <li><strong>50%–74%:</strong> решает ответственный;</li>
+                    <li><strong>0%–49%:</strong> идея отклоняется.</li>
+                </ul>
+                <h6>
+                    Текущая рекомендация:
+                    {% if current_score < 50 %}
+                        отклонить статью.
+                    {% elif current_score > 49 and current_score < 75 %}
+                        решает ответственный.
+                    {% else %}
+                        принять статью.
+                    {% endif %}
+                </h6>
+            {% endwith %}
+
+
+            {% if perms.main.approve_ideas %}
+                <h4>Аппрув идеи</h4>
+                <form action="{% url 'ideas_approve' idea.id %}"
+                      method="POST"
+                      accept-charset="utf-8">
+                    <div class="row">
+                        {% csrf_token %}
+                        <div class="col-6">
+                            <select name="approve" class="form-control">
+                                <option value="1">Принять идею</option>
+                                <option value="0">Отклонить идею</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <button type="submit" class="btn btn-success btn-block">Изменить</button>
+                        </div>
+
+                    </div>
+                </form>
+            {% endif %}
+
+        </div>
+        <div class="col-6">
+            <table class="table table-bordered">
+                <thead>
+                <th>Голосующий</th>
+                <th>Мнение</th>
+                </thead>
+                <tbody>
+                {% for vote in idea.votes.all %}
+                    <tr>
+                        <td>{{ vote.user }}</td>
+                        <td>{{ vote.score|humanize_score }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+    {% else %}
+        <div class="col-6">
+            <strong>Выбери один из пунктов:</strong>
+        </div>
+        <div class="col-6">
+            {% for i in 3|times %}
+                <form method="POST" action="{% url 'ideas_vote' idea.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="score" value="{{ i }}"/>
+                    <input style="margin-bottom: 0.5rem;" type="submit" class="btn btn-block btn-secondary"
+                           value="{{ i|humanize_score }} — {{ i }}"/>
+                </form>
+            {% endfor %}
+        </div>
+
+    {% endif %}
+
+</div>

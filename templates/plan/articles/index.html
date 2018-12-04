@@ -1,0 +1,72 @@
+{% extends "layout_plan.html" %}
+{% block title %}Статьи{% endblock %}
+{% block styles %}
+    <style>
+        .select2-container {
+            width: 100% !important;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    {% if q %}
+        <h1>Поиск: «{{ q }}»</h1>
+    {% else %}
+        <h1>Все статьи</h1>
+    {% endif %}
+    <div class="row">
+        <div class="col-12">
+            <a class="btn btn-light" href="{% url 'articles_whitelisted' %}">Добавить статью из регулярной
+                рубрики</a>
+            <a class="btn btn-light" href="{% url 'articles_advert' %}">Добавить рекламный материал</a>
+        </div>
+    </div>
+
+
+    {#    <div class="collapse" id="create_ad_post_form">#}
+    {#        <br/>#}
+    {#        {% with form=regular_post_form %}#}
+    {#            <div class="card card-body">#}
+    {#                {% with form=ad_post_form %}#}
+    {#                <form action="{% url 'posts_create' %}"#}
+    {#                      method="POST"#}
+    {#                      accept-charset="utf-8">#}
+    {#                    {% csrf_token %}#}
+    {#                    {% include 'plan/posts/_form_base.html' %}#}
+    {#                    <button type="submit" class="btn btn-success float-right">Создать рекламный материал</button>#}
+    {#                </form>#}
+    {#            {% endwith %}#}
+    {#            </div>#}
+    {#        {% endwith %}#}
+    {#    </div>#}
+
+    <hr/>
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link {% if filter_ == none %}active{% endif %}" href="{% url 'articles_index' %}">Все</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if filter_ == 'self' %}active{% endif %}"
+               href="{% url 'articles_index' %}?filter=self">Свои</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if filter_ == 'overdue' %}active{% endif %}"
+               href="{% url 'articles_index' %}?filter=overdue">Просрочено</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if filter_ == 'vault' %}active{% endif %}"
+               href="{% url 'articles_index' %}?filter=vault">Копилка</a>
+        </li>
+    </ul>
+    <br/>
+
+
+    <p>Страница {{ posts.number }} из {{ posts.paginator.num_pages }}</p>
+    {% with posts=posts interactive=True %}
+        {% include 'plan/partials/posts_table.html' %}
+    {% endwith %}
+
+    {% with objects=posts %}
+        {% include 'plan/partials/paginator.html' %}
+    {% endwith %}
+
+{% endblock %}

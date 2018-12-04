@@ -1,0 +1,84 @@
+<div class="row">
+    <div class="col-12">
+        <div class="form-group">
+            {{ form.title.label }}
+            {% if form.title.errors %}
+                <ul class="errors">
+                    {% for error in form.title.errors %}
+                        <li>{{ error }}</li>{% endfor %}
+                </ul>
+            {% endif %}
+            {{ form.title }}
+        </div>
+    </div>
+</div>
+<div class="row edit_hidden">
+    <div class="col-12">
+        <div class="form-group">
+            {{ form.description.label }}
+            {% if form.description.errors %}
+                <ul class="errors">
+                    {% for error in form.description.errors %}
+                        <li>{{ error }}</li>{% endfor %}
+                </ul>
+            {% endif %}
+            {{ form.description }}
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+        <div class="form-group">
+            {{ form.section.label }}
+            {% if form.section.errors %}
+                <ul class="errors">
+                    {% for error in form.section_id.errors %}
+                        <li>{{ error }}</li>{% endfor %}
+                </ul>
+            {% endif %}
+            {{ form.section }}
+        </div>
+    </div>
+    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+        <div class="form-group">
+            {{ form.issues.label }}
+            {% if form.issues.errors %}
+                <ul class="errors">
+                    {% for error in form.issues.errors %}
+                        <li>{{ error }}</li>{% endfor %}
+                </ul>
+            {% endif %}
+            {{ form.issues }}
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xl-8 col-lg-8 col-md-8 col-sm-12">
+        <div class="form-group">
+            {{ form.authors.label }}
+            {% if form.authors.errors %}
+                <ul class="errors">
+                    {% for error in form.authors.errors %}
+                        <li>{{ error }}</li>{% endfor %}
+                </ul>
+            {% endif %}
+            {{ form.authors }}
+        </div>
+    </div>
+    <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12">
+        <div class="form-group">
+            {{ form.published_at.label }}
+            {% if form.published_at.errors %}
+                <ul class="errors">
+                    {% for error in form.published_at.errors %}
+                        <li>{{ error }}</li>{% endfor %}
+                </ul>
+            {% endif %}
+            <input type="text" name="published_at" value="{{ form.published_at.value|date:'d.m.Y' }}"
+                   class="form-control date_picker" required="" id="id_published_at">
+            {#            {{ form.published_at }}#}
+        </div>
+    </div>
+</div>

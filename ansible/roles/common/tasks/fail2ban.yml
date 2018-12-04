@@ -1,0 +1,8 @@
+# Install fail2ban, so that we can automatically block other servers that
+# try to brute force logins.
+- name: install fail2ban
+  apt: cache_valid_time={{ apt_cache_seconds }}
+       name=fail2ban
+       state=present
+       update_cache=yes
+  become: true

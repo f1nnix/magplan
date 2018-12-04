@@ -1,0 +1,4 @@
+repo_name: "f1nnix/magplan"
+github_secret_token: ""
+postgresql_password: ""
+secret_key: ""

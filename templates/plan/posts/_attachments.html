@@ -1,0 +1,105 @@
+{% load filters %}
+{% load i18n %}
+
+<div>
+    <h2 style="display: inline-block;">{% trans "attachments" %}</h2>
+    <input type="file" name="attachments" id="customFile" multiple="true" style="float: right"/>
+</div>
+<div style="clear: both"></div>
+
+{% if hide_images is not True %}
+    <section id="images">
+    <h4 style="display: inline-block;">{% trans "images" %}</h4>
+    <div class="row">
+
+        {% if images|length > 0 %}
+            {% for image in images %}
+                <div class="col-6 col-sm-3 col-md-2 col-lg-2 col-xl-2" style="margin-bottom: 1rem;">
+                    <div class="card">
+                        <div class="card-img-top"
+                             style="height: 5rem; background: url({{ image.file.url }}) 100% 100% no-repeat; background-size: cover;"
+                             alt="Card image cap"></div>
+                        <div class="card-body  bg-light" style="padding: 0.5rem;">
+                            <p class="card-text">
+                                <a href="{{ image.file.url }}"
+                                   class="attachment-link"
+                                   data-id="{{ image.id }}"
+                                   data-filename="{{ image.original_filename }}"
+                                >{{ image.original_filename|trim_filename }}</a>
+                                <a href="#" class="attachment-delete-link">&#10060;</a>
+                                <small style="display: block">{{ image.created_at }}</small>
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">Изображений пока не загружено</div>
+        {% endif %}
+    </div>
+{% endif %}
+</section>
+
+<div class="row">
+    <div class="col-6">
+        <h4>PDF</h4>
+        {% if pdfs|length > 0 %}
+            <table class="table table-sm">
+                <tbody>
+                {% for pdf in pdfs %}
+                    <tr>
+                        <td><a href="{{ pdf.file.url }}"
+                               class="attachment-link"
+                               data-id="{{ pdf.id }}"
+                               data-filename="{{ pdf.original_filename }}"
+                        >{{ pdf.original_filename|trim_filename }}</a>
+                            <a href="#" class="attachment-delete-link">&#10060;</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+            </table>
+
+        {% else %}
+            {% trans "No PDF uploaded yet" %}
+        {% endif %}
+    </div>
+    <div class="col-6">
+        <h4>Файлы</h4>
+        {% if files|length > 0 %}
+            <table class="table table-sm">
+                <tbody>
+                {% for file in files %}
+                    <tr>
+                        <td><a href="{{ file.file.url }}"
+                               class="attachment-link"
+                               data-id="{{ file.id }}"
+                               data-filename="{{ file.original_filename }}"
+                        >{{ file.original_filename|trim_filename }}</a>
+                            <a href="#" class="attachment-delete-link">&#10060;</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+            </table>
+        {% else %}Файлов пока не загружено
+        {% endif %}
+    </div>
+</div>
+
+
+<div id='missing_images' class="row" style="display: none; margin-bottom: 1rem;">
+    <div class="card-header text-white bg-danger">Не хватает картинок!</div>
+    <div class="card-body">
+        <ul class="card-text" style="padding-left: 20px;"></ul>
+    </div>
+</div>
+<div id='extra_images' class="row" style="display: none; margin-bottom: 1rem;">
+    <div class="card-header text-white bg-success">Лишние картинки</div>
+    <div class="card-body">
+        <ul class="card-text" style="padding-left: 20px;"></ul>
+    </div>
+</div>

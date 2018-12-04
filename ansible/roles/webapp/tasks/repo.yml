@@ -1,0 +1,67 @@
+# Create a deploy key and pull repository from Github when in staging or
+# production. Note that none of these tasks run in local development.
+# See https://github.com/ansible/ansible-modules-core/issues/2626#issuecomment-225712799
+
+# Create
+# Note that we generate a futuristic ED25519 key instead of a normal RSA key.
+- name: generate a new SSH key if one does not exist
+  user:
+    name: "{{ ansible_user }}"
+    generate_ssh_key: yes
+    ssh_key_bits: 2048
+    ssh_key_file: .ssh/id_rsa
+  #  command: >
+  #    ssh-keygen -a 100 -t ed25519
+  #    -C "ansible@{{ ansible_hostname }}"
+  #    -f {{ ssh_key_path }}
+  #  args:
+#    creates: "{{ ssh_key_path }}.pub"
+  when: environment_type != "development"
+  tags: test
+# Register the contents of the keys in a "public_ssh_key" variable.
+- name: read public SSH key
+  shell: cat ~/.ssh/id_rsa.pub
+  register: public_ssh_key
+  when: environment_type != "development"
+  tags: test
+
+# We ignore errors because this will fail if the key already exists.
+# This is not a big deal because if this task fails in a critical way,
+# the next task will as well.
+- name: add SSH key to repository as a deploy key
+  uri:
+    url: https://api.github.com/repos/{{ repo_name }}/keys
+    method: POST
+    status_code: 201
+    body:
+      read_only: true
+      key: "{{ public_ssh_key.stdout }}"
+    body_format: json
+    headers:
+      Content-Type: application/json
+      Authorization: token {{ github_secret_token }}
+  when: environment_type != "development"
+  ignore_errors: yes
+  tags: test
+
+- name: pull repository from Github to /srv/ directory
+  git: accept_hostkey=yes
+       dest="/srv/{{ project_name }}"
+       key_file="/home/{{ ansible_user }}/.ssh/id_rsa"
+       repo="git@github.com:{{ repo_name }}.git"
+       update=yes
+       # version={{ git_version }}
+  become: true
+  when: environment_type != "development"
+  tags: test
+  notify:
+    - restart nginx
+
+- name: fix permissions for cloned repo
+  file:
+    path: "/srv/{{ project_name }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    recurse: yes
+  become: true
+  tags: test2

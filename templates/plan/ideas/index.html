@@ -1,0 +1,83 @@
+{% extends "layout_plan.html" %}
+{% block title %}Идеи{% endblock %}
+{% block content %}
+    <h1>Идеи</h1>
+    <div class="card border-success">
+
+        <div class="card-header text-white bg-success">Предложить идею статьи</div>
+        <div class="card-body">
+            <form action="{% url 'ideas_index' %}"
+                  method="post"
+                  accept-charset="utf-8">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-success float-right">На голосование!</button>
+            </form>
+        </div>
+    </div>
+    <br/>
+    <br/>
+
+    <h2>На голосовании и ожидании</h2>
+
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link {% if filter_ == none %}active{% endif %}"
+               href="{% url 'ideas_index' %}">Все</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if filter_ == 'voted' %}active{% endif %}"
+               href="{% url 'ideas_index' %}?filter=voted">На голосовании</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if filter_ == 'self' %}active{% endif %}" href="{% url 'ideas_index' %}?filter=self">Свои</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if filter_ == 'approved' %}active{% endif %}"
+               href="{% url 'ideas_index' %}?filter=approved">Принятые</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if filter_ == 'rejected' %}active{% endif %}"
+               href="{% url 'ideas_index' %}?filter=rejected">Отклоненные</a>
+        </li>
+    </ul>
+    <br/>
+
+
+    {% if ideas|length > 0 %}
+        {% for idea in ideas %}
+            <div class="row">
+                <div class="col-xl-2 col-lg-2 col-md-2 col-sm-12"><strong>{{ idea.editor }}</strong></div>
+                <div class="col-xl-8 col-lg-8 col-md-8 col-sm-12">
+                    <a href="{% url 'ideas_show' idea.id %}">{{ idea.title }}</a>
+                    <p>{{ idea.description }}</p>
+                </div>
+                <div class="col-xl-2 col-lg-2 col-md-2 col-sm-12">
+                    {% if idea.approved == True %}
+                        <span class="badge badge-success">Одобрено</span>
+                    {% elif idea.approved == False %}
+                        <span class="badge badge-danger">Отклонено</span>
+                    {% else %}
+                        <strong>Идет голосование. Проголосовали {{ idea.voted }}</strong>
+                    {% endif %}
+
+                    {% if idea.post %}
+                        <br/>
+                        <br/>
+                        <a class="btn btn-primary btn-sm" href="{% url 'posts_show' idea.post.id %}">Посмотреть
+                            статью</a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+
+        {% with objects=ideas %}
+            {% include 'plan/partials/paginator.html' %}
+        {% endwith %}
+    {% else %}
+        <p>Идей с выбранными параметрами пока нет</p>
+    {% endif %}
+
+
+
+{% endblock %}

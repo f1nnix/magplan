@@ -1,0 +1,35 @@
+{% extends "layout_plan.html" %}
+{% block title %}Выпуски{% endblock %}
+{% block content %}
+    <h1>Выпуски</h1>
+    <a href="#" class="btn btn-success">Добавить новый выпуск</a>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">Номер</th>
+                <th scope="col">Название</th>
+                <th scope="col">Статей</th>
+                <th scope="col">Журнал</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for issue in issues %}
+                <tr>
+                    <td>{{ issue.number }}</td>
+                    <td>
+                        <a href="{%  url 'issues_show' issue.id %}">{{ issue }}
+                    </td>
+                    <td>{{ issue.count }}</td>
+                    <td>{{ issue.magazine.title }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {#  {% with meta=meta, node='issues' %}#}
+    {#      {% include 'partials/_page_nav.html' %}#}
+    {#  {% endwith %}#}
+
+{% endblock %}

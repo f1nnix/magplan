@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker.css"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet"/>
+    <link href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet"/>
+    <link href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css"/>
+    <title>{% block title %}{% endblock %} — Magplan</title>
+    <style>
+        .form-group label {
+            font-weight: bold;
+        }
+
+        html {
+            position: relative;
+            min-height: 100%;
+        }
+
+        body {
+            /* Margin bottom by footer height */
+            margin-top: 70px;
+            margin-bottom: 60px;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 60px;
+            line-height: 60px; /* Vertically center the text there */
+            background-color: #f5f5f5;
+        }
+
+        .dataTables_filter input {
+            margin-left: 0em !important;
+        }
+
+        .attachment-delete-link {
+            font-size: 0.6rem;
+            position: relative;
+        {#top: 1px;#}
+        }
+
+        .badge-custom {
+            color: #fff;
+            padding: 3px 5px;
+            width: 100%;
+            display: block;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .article-preview {
+            font-family: 'HelveticaNeue', 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif;
+            color: #222;
+            font-size: 18px;
+            line-height: 26px;
+        }
+
+        .article-preview .inner {
+            max-width: 800px;
+            margin: 0px auto;
+        }
+
+        .article-preview p {
+            margin-bottom: 26px;
+        }
+
+        .article-preview p:first-child {
+            font-size: 20px;
+            border-bottom: dotted 1px #ddd;
+            padding-bottom: 26px;
+            margin-bottom: 26px;
+        }
+
+        .article-preview a {
+            color: #dd2200;
+        }
+
+        .article-preview h1,
+        .article-preview h2 {
+            font-family: 'Ubuntu';
+        }
+
+        .article-preview figure {
+            text-align: center;
+        }
+
+        .article-preview figure figcaption {
+            text-align: right;
+            margin: 4px 0px 17px 0px;
+            font-size: 14px;
+            font-style: italic;
+            font-weight: normal;
+            line-height: 17px;
+            color: #444;
+        }
+
+        .article-preview pre {
+            border: 1px solid #888;
+            overflow: auto;
+            word-wrap: normal;
+            -moz-tab-size: 2;
+            -o-tab-size: 2;
+            tab-size: 2;
+
+            font-size: 15px;
+            background-color: #f5f5f5;
+            padding: 10px;
+            margin: 15px auto;
+        }
+
+    </style>
+    {% block styles %}{% endblock %}
+</head>
+<body>
+{% include 'plan/partials/navbar.html' %}
+
+<div class="container">
+    {% if messages %}
+        <div class="flash_messages">
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %}" role="alert">
+                    {{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+</div>
+
+{% block footer %}{% endblock %}
+
+<script
+        src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/locales/bootstrap-datepicker.ru.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+<script src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
+<!-- custom -->
+{#<script src="/assets/js/admin/widgets.js?22"></script>#}
+<script>
+    $(document).ready(function () {
+        $(".date_picker").each(function (index) {
+            let initialDate = $($(this).siblings('.default_value')[0]).val();
+            let opts = {
+                language: 'ru',
+                format: 'dd.mm.yyyy',
+                {#defaultViewDate: '20.10.2018',#}
+            }
+
+            {#debugger#}
+            $(this).datepicker(opts);
+        })
+
+        $(".live_multiselect").each(function (index) {
+            let url = $(this).data('url');
+            console.log(url);
+            let tags = $(this).data('tags') == '1';
+            let placeholder = $(this).data('placeholder');
+
+            $(this).select2({
+                tags: tags,
+                placeholder: placeholder,
+                minimumInputLength: 2,
+                ajax: {
+                    url: url,
+                    delay: 1000,
+                    dataType: 'json',
+                    processResults: function (data) {
+                        var querySet = {
+                            results: data
+                        };
+                        return querySet
+                    }
+                }
+            });
+        });
+
+        $(".table-interactive").DataTable({
+            // searching: false,
+            paging: false,
+            // aaSorting: [],
+            language: {
+                search: '',
+                searchPlaceholder: "Фильтровать записи"
+            }
+        });
+
+        $('.attachment-delete-link').click(function (event) {
+            event.preventDefault();
+
+            if (!window.DELETE_ATTACHMENT_URL) return false;
+
+            $links = $(this).siblings(".attachment-link");
+            if ($links.length = 0) return false;
+            $link = $links[0]
+            attachment_id = $($link).data('id');
+            attachment_filename = $($link).data('filename');
+
+            confirm_result = confirm('Вы действительно хотите удалить ' + attachment_filename + '?');
+            if (confirm_result == false) return false;
+
+
+            $.post(window.DELETE_ATTACHMENT_URL, {
+                attachment_id: attachment_id,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            })
+                .done(function (data) {
+                    location.reload();
+                });
+        });
+    });
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

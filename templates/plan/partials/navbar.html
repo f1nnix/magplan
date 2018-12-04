@@ -1,0 +1,53 @@
+{% load i18n %}
+<nav class="navbar navbar-expand-md fixed-top navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'index_index' %}">{% trans 'dashboard' %}</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item {% if navbar_current == 'authors' %}active{% endif %}">
+                    <a class="nav-link" href="{% url 'authors_index' %} ">{% trans "authors" %}</a>
+                </li>
+                <li class="nav-item dropdown {% if navbar_current == 'issues' %}active{% endif %}">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{% trans "issues" %}</a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        {% for issue in navbar_issues %}
+                            <a class="dropdown-item"
+                               href="{% url 'issues_show' issue.id %}">{{ issue }}</a>
+                        {% endfor %}
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'issues_index' %}">{% trans "Все выпуски" %}</a>
+                    </div>
+                </li>
+                <li class="nav-item {% if navbar_current == 'ideas' %}active{% endif %}">
+                    <a class="nav-link" href="{% url 'ideas_index' %} ">{% trans "ideas" %}</a>
+                </li>
+                <li class="nav-item {% if navbar_current == 'articles' %}active{% endif %}">
+                    <a class="nav-link" href="{% url 'articles_index' %} ">{% trans "articles" %}</a>
+                </li>
+                <li class="nav-item {% if navbar_current == 'stages' %}active{% endif %}">
+                    <a class="nav-link" href="{% url 'sections_index' %} ">{% trans "sections" %}</a>
+                </li>
+                <li class="nav-item {% if navbar_current == 'stages' %}active{% endif %}">
+                    <a class="nav-link" href="{% url 'stages_index' %} ">{% trans "stages" %}</a>
+                </li>
+            </ul>
+
+            <form class="form-inline" action="{% url 'articles_search' %}" method="post">
+                {% csrf_token %}
+                <input class="form-control mr-sm-2" type="search" placeholder="{% trans "search_articles" %}" aria-label="Search"
+                       name="search_query">
+                {#                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Искать!</button>#}
+            </form>
+
+
+            <span class="navbar-text">
+        <a href="{% url 'logout' %}?next={% url 'login' %}">{% trans "logout" %}</a>
+      </span>
+        </div>
+    </div>
+</nav>

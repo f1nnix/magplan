@@ -1,0 +1,60 @@
+<h2>Комментарии</h2>
+<div class='comments' id="comments">
+    {% for comment in comments %}
+        <div class="comment" style="margin-bottom: 1rem;">
+            {% if comment.type == TYPE_SYSTEM %}
+                <small style="color: #777777;">
+                    <strong style="padding-right: 1rem;">{{ comment.created_at }}</strong>
+                    {% if comment.meta.comment.action == SYSTEM_ACTION_SET_STAGE %}
+                        <div>
+                            {{ comment.meta.comment.user.str }} передвинул пост на
+                            этап {{ comment.meta.comment.stage.str }}
+                        </div>
+                    {% endif %}
+                    {% if comment.meta.comment.action == SYSTEM_ACTION_UPDATE %}
+                        <div>
+                            {{ comment.meta.comment.user.str }} отредактировал пост.
+                            {% if comment.meta.comment.files|length > 0 %}
+                                Загружены файлы:
+                                <ul>
+                                    {% for f in comment.meta.comment.files %}
+                                        <li>{{ f.str }} ({{ f.id }})</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </small>
+
+            {% else %}
+                <div><strong>{{ comment.user }}</strong></div>
+                <div>
+                    <small>{{ comment.created_at }}</small>
+                </div>
+                <p>{{ comment.html|safe }}</p>
+            {% endif %}
+        </div>
+    {% endfor %}
+</div>
+
+<form id="add_comment_form"
+      action="{{ add_comment_url }}"
+      method="post"
+      accept-charset="utf-8">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-12">
+            <div class="form-group">
+                {% if form.text.errors %}
+                    <ul class="errors">
+                        {% for error in form.text.errors %}
+                            <li>{{ error }}</li>{% endfor %}
+                    </ul>
+                {% endif %}
+                {{ form.text }}
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-success float-right">Запостить комментарий</button>
+</form>

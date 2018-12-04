@@ -1,0 +1,13 @@
+<h1>Новый комментарий</h1>
+
+<p>{{ comment.user }} оставил новый комментарий к {% if commentable_type == 'post' %}
+    посту{% elif commentable_type == 'idea' %}идее{% endif %} «{{ comment.commentable }}»:</p>
+
+<blockquote>{{ comment.text }}</blockquote>
+
+
+<p>Вы можете посмотреть и ответить на этот комментарий
+    <a
+        href="{{ APP_URL }}{% if commentable_type == 'post' %}{% url 'posts_show' comment.commentable.id %}{% else %}{% url 'ideas_show' comment.commentable.id %}{% endif %}"
+        >по этой ссылке</a>.
+</p>

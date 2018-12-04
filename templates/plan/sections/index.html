@@ -1,0 +1,30 @@
+{% extends "layout_plan.html" %}
+{% block title %}Рубрики{% endblock %}
+{% block content %}
+  <h1>Разделы</h1>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Слаг</th>
+        <th scope="col">Название</th>
+        <th scope="col">Описание</th>
+        <th scope="col">Сортировка</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for section in sections %}
+        <tr>
+          <th scope="row">{{ section.id }}</th>
+          <td>{{ section.slug }}</td>
+          <td>{{ section.title }}</td>
+          <td>{{ section.description }}</td>
+          <td>{{ section.sort }}</td>
+          <td></td>
+          <td></td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+{% endblock %}
