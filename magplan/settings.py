@@ -24,7 +24,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.getenv('SECRET_KEY', '-6w*l1-u(9gy8gnp%e#1nf8-!*8j)e@%l%^ct)77r^6(cixj2v')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True if os.getenv('APP_ENV', None) == 'DEVELOPMENT' else False
+DEBUG = True if os.getenv('APP_ENV', None) in ('DEVELOPMENT', 'TEST',) else False
 
 ALLOWED_HOSTS = [] if DEBUG is True else [os.getenv('APP_HOST', None)]
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-03 19:00+0300\n"
+"POT-Creation-Date: 2018-12-12 13:31+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,13 +20,52 @@ msgstr ""
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
+#: templates/plan/issues/show.html:13
+msgid "scheduled"
+msgstr "Запланировано"
+
+#: templates/plan/issues/show.html:13
+msgid "of"
+msgstr "из"
+
+#: templates/plan/issues/show.html:14
+msgid "no_text"
+msgstr "Нет текста"
+
+#: templates/plan/issues/show.html:15
+#: templates/plan/partials/posts_table.html:26
+msgid "has_text"
+msgstr "Есть текст"
+
+#: templates/plan/issues/show.html:16
+msgid "in_progress"
+msgstr "В работе"
+
+#: templates/plan/issues/show.html:17
+msgid "done"
+msgstr "Готово"
+
+#: templates/plan/issues/show.html:20
+#| msgid "articles"
+msgid "articles_in_issue"
+msgstr "Статьи в выпуске"
+
+#: templates/plan/partials/navbar.html:4
+msgid "dashboard"
+msgstr "Сводка"
+
 #: templates/plan/partials/navbar.html:12
+#: templates/plan/partials/posts_table.html:9
 msgid "authors"
 msgstr "Авторы"
 
 #: templates/plan/partials/navbar.html:16
 msgid "issues"
 msgstr "Выпуски"
+
+#: templates/plan/partials/navbar.html:23
+msgid "Все выпуски"
+msgstr "Все выпуски"
 
 #: templates/plan/partials/navbar.html:27
 msgid "ideas"
@@ -51,6 +90,89 @@ msgstr "Поиск статей..."
 #: templates/plan/partials/navbar.html:49
 msgid "logout"
 msgstr "Выход"
+
+#: templates/plan/partials/posts_table.html:7
+msgid "section"
+msgstr "Раздел"
+
+#: templates/plan/partials/posts_table.html:8
+msgid "title"
+msgstr "Название"
+
+#: templates/plan/partials/posts_table.html:10
+msgid "editor"
+msgstr "Редактор"
+
+#: templates/plan/partials/posts_table.html:11
+msgid "deadline"
+msgstr "Дедлайн"
+
+#: templates/plan/partials/posts_table.html:12
+msgid "stage"
+msgstr "Этап"
+
+#: templates/plan/partials/posts_table.html:24
+#: templates/plan/posts/show.html:36
+msgid "edit"
+msgstr "редактировать"
+
+#: templates/plan/posts/_attachments.html:5
+msgid "attachments"
+msgstr "Аттачи"
+
+#: templates/plan/posts/_attachments.html:12
+#, fuzzy
+#| msgid "stages"
+msgid "images"
+msgstr "Этапы"
+
+#: templates/plan/posts/_attachments.html:66
+msgid "No PDF uploaded yet"
+msgstr "PDF пока не загружено"
+
+#: templates/plan/posts/_stages.html:14
+#, python-format
+msgid ""
+"\n"
+"                    Вернуть на этап <strong>%(prev_stage)s</strong> может "
+"только %(assignee)s\n"
+"                "
+msgstr ""
+"\n"
+"                    Вернуть на этап <strong>%(prev_stage)s</strong> может "
+"только %(assignee)s\n"
+"                "
+
+#: templates/plan/posts/_stages.html:24
+#, python-format
+msgid ""
+"\n"
+"            Сейчас на <strong>%(stage)s</strong> (%(assignee)s) до "
+"%(published_at)s\n"
+"        "
+msgstr ""
+"\n"
+"            Сейчас на <strong>%(stage)s</strong> (%(assignee)s) до "
+"%(published_at)s\n"
+"        "
+
+#: templates/plan/posts/show.html:41
+msgid "writes"
+msgstr "Пишет"
+
+#: templates/plan/posts/show.html:46
+#, fuzzy
+#| msgid "authors"
+msgid "no_author"
+msgstr "Нет автора"
+
+#: templates/plan/posts/show.html:48
+msgid "edits"
+msgstr "редактирует"
+
+#: templates/plan/posts/show.html:53
+msgid "show_article_description"
+msgstr "Показать описание статьи"
 
 #: venv/lib/python3.6/site-packages/django/views/templates/default_urlconf.html:6
 msgid "Django: the Web framework for perfectionists with deadlines."
