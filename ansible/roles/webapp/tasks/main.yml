@@ -1,0 +1,10 @@
+# Install and configure nginx.
+- include: nginx.yml
+# Pull the repository from Github.
+- include: repo.yml
+# Create a Python virtualenv on the server.
+- include: virtualenv.yml
+# Run Django management commands.
+- include: django.yml
+# Install and configure supervisor.
+#- include: supervisor.yml

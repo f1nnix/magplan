@@ -294,11 +294,9 @@ pip-selfcheck.json
 
 # End of https://www.gitignore.io/api/macos,python,django,pycharm
 .idea/
-venv/
 temp/
+
 uploads/
 static/
 media/
 __pycache__
-# deploy/
-main.yml
