@@ -11,6 +11,7 @@ from constance import config
 from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
 from collections import deque
+from django.template import Template, Context
 
 
 # Create your views here.
@@ -18,10 +19,18 @@ from collections import deque
 def show(request, post_id):
     post = Post.objects.prefetch_related('editor', 'authors', 'stage', 'section', 'issues', 'comments__user').get(
         id=post_id)
+
+    # redner instance specific template code
+    intance_template = Template(config.PLAN_POSTS_INSTANCE_CHUNK)
+    instance_chunk = intance_template.render(Context({
+        'post': post,
+    }))
+    pass
     return render(request, 'plan/posts/show.html', {
         'post': post,
         'stages': Stage.objects.order_by('sort').all(),
         'form': CommentModelForm(),
+        'instance_chunk': instance_chunk,
 
         'TYPE_SYSTEM': Comment.TYPE_SYSTEM,
         'SYSTEM_ACTION_SET_STAGE': Comment.SYSTEM_ACTION_SET_STAGE,

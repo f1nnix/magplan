@@ -5,6 +5,7 @@ from main.models import Post, Comment
 from plan.tests import _User, _Sections, _Section, _Stages, _Post, _Postype, _Issue
 from constance import config
 from django.core import mail
+from django.template import Template, Context
 
 
 class TestSetStage(TestCase):
@@ -89,8 +90,8 @@ class TestSetStage(TestCase):
         response = self.client.post(reverse(self.ROUTE_NAME, kwargs={
             'post_id': self.post.id,
         }), {
-                                        'new_stage_id': stage.id,
-                                    })
+            'new_stage_id': stage.id
+        })
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len(mail.outbox), 1)
 
@@ -252,3 +253,41 @@ class TestEdit(TestCase):
         }
         self.assertEqual('comment' in comment.meta.keys(), True)
         self.assertEqual(comment.meta['comment'], meta)
+
+
+class TestShow(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = _User()
+        cls.system_user = _User()
+        cls.stages = _Stages()
+        cls.sections = _Sections()
+        cls.postype = _Postype()
+        cls.post = _Post()
+
+    def setUp(self):
+        self.ROUTE_NAME = 'posts_show'
+        self.client = Client()
+        self.client.force_login(user=self.user)
+
+        self.instance_template = '<h1>{post.title}</h1>'
+        config.PLAN_POSTS_INSTANCE_CHUNK = self.instance_template
+
+    def test_show(self):
+        response = self.client.get(reverse(self.ROUTE_NAME, kwargs={
+            'post_id': self.post.id,
+        }))
+        self.assertEqual(response.status_code, 200)
+
+    def test_intance_template_code_should_be_rendered_from_config(self):
+        intance_template = Template(config.PLAN_POSTS_INSTANCE_CHUNK)
+        instance_chunk = intance_template.render(Context({
+            'post': self.post,
+        }))
+
+        response = self.client.get(reverse(self.ROUTE_NAME, kwargs={
+            'post_id': self.post.id,
+        }))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, instance_chunk)

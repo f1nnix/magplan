@@ -25,11 +25,6 @@
                     {% if post.has_text == True %}
                         <span class="badge badge-success">{% trans "has_text" %}</span>
                     {% endif %}
-                    {% if post.meta.wpid %}
-                        <a href="https://xakep.ru?p={{ post.meta.wpid }}"><span
-                                class="badge badge-light">&#128279;</span></a>
-                    {% endif %}
-
                 </td>
                 <td>
                     {% for author in post.authors.all %}{{ author }}{% endfor %}
