@@ -156,6 +156,7 @@ CONSTANCE_CONFIG = {
     'PLAN_EMAIL_PORT': (587, '', int),
     'PLAN_EMAIL_FROM': ('', '', str),
     'PLAN_EMAIL_SUBJECT_PREFIX': ('[magplan]', '', str),
+    'PLAN_POSTS_INSTANCE_CHUNK': ('', 'Instance-specific arbitrary template code', str),
 
     'FINANCE_EMAIL_USE_TLS': (True, '', bool),
     'FINANCE_EMAIL_HOST': ('smtp.gmail.com', '', str),
@@ -169,7 +170,7 @@ CONSTANCE_CONFIG = {
 }
 
 CONSTANCE_CONFIG_FIELDSETS = OrderedDict({
-    'General settings': ('SYSTEM_USER_ID',),
+    'General settings': ('SYSTEM_USER_ID','PLAN_POSTS_INSTANCE_CHUNK',),
     'Plan email settings': ('PLAN_EMAIL_HOST', 'PLAN_EMAIL_PORT', 'PLAN_EMAIL_USE_TLS',
                             'PLAN_EMAIL_USER', 'PLAN_EMAIL_PASSWORD',
                             'PLAN_EMAIL_FROM', 'PLAN_EMAIL_SUBJECT_PREFIX'),

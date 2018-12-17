@@ -84,6 +84,10 @@
         </div>
     </div>
 
+    <section id="intance_chunk">
+        {{ instance_chunk | safe }}
+    </section>
+
     <section id="attachments" style="margin-bottom: 1rem;">
         {% with pdfs=post.pdfs files=post.files hide_images=True %}
             {% include 'plan/posts/_attachments.html' %}
