@@ -65,7 +65,7 @@ coverage.xml
 .pytest_cache/
 
 # Translations
-*.mo
+# *.mo
 
 # Django stuff:
 
@@ -293,6 +293,7 @@ pip-selfcheck.json
 
 
 # End of https://www.gitignore.io/api/macos,python,django,pycharm
+main.retry
 .idea/
 temp/
 
@@ -300,3 +301,4 @@ uploads/
 static/
 media/
 __pycache__
+production

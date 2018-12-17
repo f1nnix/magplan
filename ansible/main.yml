@@ -4,5 +4,5 @@
   - postgresql
   - webapp
   vars_files:
-  - group_vars/production.sample
-  - secret_vars/production.sample
+  - group_vars/production
+  - secret_vars/production
