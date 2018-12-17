@@ -1,0 +1,8 @@
+- hosts: all
+  gather_facts: true
+  roles:
+  - postgresql
+  - webapp
+  vars_files:
+  - group_vars/production.sample
+  - secret_vars/production.sample

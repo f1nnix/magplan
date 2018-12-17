@@ -17,13 +17,13 @@ from collections import OrderedDict
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Quick-start development settings - unsuitable for production
+# Quick-start development settings - unsuitable for production.sample
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# SECURITY WARNING: keep the secret key used in production.sample secret!
 SECRET_KEY = os.getenv('SECRET_KEY', '-6w*l1-u(9gy8gnp%e#1nf8-!*8j)e@%l%^ct)77r^6(cixj2v')
 
-# SECURITY WARNING: don't run with debug turned on in production!
+# SECURITY WARNING: don't run with debug turned on in production.sample!
 DEBUG = True if os.getenv('APP_ENV', None) in ('DEVELOPMENT', 'TEST',) else False
 
 ALLOWED_HOSTS = [] if DEBUG is True else [os.getenv('APP_HOST', None)]

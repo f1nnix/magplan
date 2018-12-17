@@ -1,5 +1,5 @@
 # Create a deploy key and pull repository from Github when in staging or
-# production. Note that none of these tasks run in local development.
+# production.sample. Note that none of these tasks run in local development.
 # See https://github.com/ansible/ansible-modules-core/issues/2626#issuecomment-225712799
 
 # Create
