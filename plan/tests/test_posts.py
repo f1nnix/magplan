@@ -150,6 +150,7 @@ class TestEdit(TestCase):
         new_description = self.post.description + APPEND
         new_kicker = self.post.kicker + APPEND
         new_published_at = str(datetime.datetime.now())
+        new_wp_id = '123'
 
         # authors;published_at;xmd;wp_id
         response = self.client.post(reverse(self.ROUTE_NAME, kwargs={'post_id': self.post.id}), {
@@ -160,7 +161,7 @@ class TestEdit(TestCase):
             'issues': str(self.new_issue.id),
             'authors': str(self.new_author.id),
             'published_at': str(new_published_at),
-
+            'wp_id': new_wp_id,
         })
 
         self.assertEqual(response.status_code, 200)
@@ -168,6 +169,7 @@ class TestEdit(TestCase):
         post = Post.objects.get(id=self.post.id)
         self.assertEqual(post.title, new_title)
         self.assertEqual(post.description, new_description)
+        self.assertEqual(post.meta.get('wpid', None), new_wp_id)
 
     def test_system_comment_should_be_created_after_stage_change(self):
         # test comment exists
