@@ -102,7 +102,7 @@ def edit(request, post_id):
             post.meta['wpid'] = request.POST.get('wp_id', None)
             form.save()
 
-            messages.add_message(request, messages.SUCCESS, 'Пост «%s» успешно отредактирован' % post)
+            # messages.add_message(request, messages.SUCCESS, 'Пост «%s» успешно отредактирован' % post)
 
             # create system comment
             if config.SYSTEM_USER_ID:
@@ -129,6 +129,12 @@ def edit(request, post_id):
                 comment.meta['comment'] = meta
 
                 comment.save()
+
+                return redirect('posts_edit', post_id)
+
+        else:
+            messages.add_message(request, messages.ERROR, 'При обновлении поста произошла ошибка ввода')
+
 
     else:
         form = PostExtendedModelForm(initial={

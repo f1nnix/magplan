@@ -90,8 +90,8 @@ class TestSetStage(TestCase):
         response = self.client.post(reverse(self.ROUTE_NAME, kwargs={
             'post_id': self.post.id,
         }), {
-            'new_stage_id': stage.id
-        })
+                                        'new_stage_id': stage.id
+                                    })
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len(mail.outbox), 1)
 
@@ -121,6 +121,11 @@ class TestEdit(TestCase):
         cls.new_editor = _User()
         cls.new_author = _User()
         cls.new_section = _Section()
+        # queryset filters
+        cls.new_section.is_archived = False
+        cls.new_section.is_whitelisted = False
+        cls.new_section.save()
+
         cls.new_issue = _Issue()
 
     def setUp(self):
@@ -146,29 +151,32 @@ class TestEdit(TestCase):
 
     def test_post_should_be_updated(self):
         APPEND = 'lorem ipsum'
+
+
         new_title = self.post.title + APPEND
         new_description = self.post.description + APPEND
         new_kicker = self.post.kicker + APPEND
-        new_published_at = str(datetime.datetime.now())
+        new_published_at = datetime.datetime.now()
         new_wp_id = '123'
 
-        # authors;published_at;xmd;wp_id
-        response = self.client.post(reverse(self.ROUTE_NAME, kwargs={'post_id': self.post.id}), {
+        payload = {
             'title': new_title,
             'description': new_description,
             'kicker': new_kicker,
-            'section': str(self.new_section.id),
-            'issues': str(self.new_issue.id),
-            'authors': str(self.new_author.id),
-            'published_at': str(new_published_at),
+            'section': self.new_section.id,
+            'issues': self.new_issue.id,
+            'authors': self.new_author.id,
+            'published_at': new_published_at.strftime('%d.%m.%Y'),
             'wp_id': new_wp_id,
-        })
+        }
+        response = self.client.post(reverse(self.ROUTE_NAME, kwargs={'post_id': self.post.id}), payload)
 
         self.assertEqual(response.status_code, 200)
 
         post = Post.objects.get(id=self.post.id)
         self.assertEqual(post.title, new_title)
         self.assertEqual(post.description, new_description)
+        self.assertEqual(post.published_at, new_published_at.strftime('%d.%m.%Y'))
         self.assertEqual(post.meta.get('wpid', None), new_wp_id)
 
     def test_system_comment_should_be_created_after_stage_change(self):
