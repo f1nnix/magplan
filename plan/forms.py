@@ -40,18 +40,18 @@ class IdeaModelForm(ModelForm):
 
 
 class PostBaseModelForm(ModelForm):
-    section = forms.ModelChoiceField(queryset=Section.objects.filter(is_archived=False, is_whitelisted=False),
-                                     label="Рубрика",
-                                     empty_label=None,
-                                     widget=forms.Select(attrs={'class': 'form-control', 'rows': 5}))
+    # section = forms.ModelChoiceField(queryset=Section.objects.filter(is_archived=False, is_whitelisted=False),
+    #                                  label="Рубрика",
+    #                                  empty_label=None,
+    #                                  widget=forms.Select(attrs={'class': 'form-control', 'rows': 5}))
 
     class Meta:
         model = Post
-        fields = ('title', 'description', 'section', 'issues', 'authors', 'published_at',)
+        fields = ('title', 'description', 'issues', 'authors', 'published_at', 'section',)
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', }),
             'description': forms.Textarea(attrs={'class': 'form-control', }),
-            'section': forms.Select(attrs={'class': 'form-control', }, ),
+            'section': forms.Select(attrs={'class': 'form-control', 'rows': 5}),
             'issues': forms.SelectMultiple(attrs={
                 'class': 'form-control live_multiselect',
                 'data-url': '/admin/api/issues/search',
@@ -60,7 +60,7 @@ class PostBaseModelForm(ModelForm):
                 'class': 'form-control live_multiselect',
                 'data-url': '/admin/api/users/search',
             }),
-            'published_at': forms.DateTimeInput(attrs={'class': 'form-control date_picker', }),
+            'published_at': forms.DateInput(attrs={'class': 'form-control date_picker', }),
         }
 
     def __init__(self, *args, **kwargs):
@@ -85,10 +85,10 @@ class PostExtendedModelForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(PostExtendedModelForm, self).__init__(*args, **kwargs)
-        self.fields['section'].empty_label = None
         self.fields['kicker'].required = False
         self.fields['wp_id'].required = False
         self.fields['xmd'].required = False
+        self.fields['section'].empty_label = None
 
 
 class WhitelistedPostExtendedModelForm(PostBaseModelForm):
