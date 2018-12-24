@@ -1,0 +1,53 @@
+<div class="row">
+    <div class="col-4">
+        <div class="form-group">
+            {{ form.number.label }}
+            {% if form.number.errors %}
+                <ul class="errors">
+                    {% for error in form.title.errors %}
+                        <li>{{ error }}</li>{% endfor %}
+                </ul>
+            {% endif %}
+            {{ form.number }}
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="form-group">
+            {{ form.title.label }}
+            {% if form.title.errors %}
+                <ul class="errors">
+                    {% for error in form.title.errors %}
+                        <li>{{ error }}</li>{% endfor %}
+                </ul>
+            {% endif %}
+            {{ form.title }}
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="form-group">
+            {{ form.published_at.label }}
+            {% if form.published_at.errors %}
+                <ul class="errors">
+                    {% for error in form.published_at.errors %}
+                        <li>{{ error }}</li>{% endfor %}
+                </ul>
+            {% endif %}
+            <input type="text" name="published_at" value="{{ form.published_at.value|date:'Y-m-d' }}"
+                   class="form-control date_picker" required="" id="id_published_at">
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="form-group">
+            {{ form.description.label }}
+            {% if form.description.errors %}
+                <ul class="errors">
+                    {% for error in form.published_at.errors %}
+                        <li>{{ error }}</li>{% endfor %}
+                </ul>
+            {% endif %}
+            {{ form.description }}
+        </div>
+    </div>
+</div>
