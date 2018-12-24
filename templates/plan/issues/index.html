@@ -2,7 +2,7 @@
 {% block title %}Выпуски{% endblock %}
 {% block content %}
     <h1>Выпуски</h1>
-    <a href="#" class="btn btn-success">Добавить новый выпуск</a>
+    <a href="{% url 'issues_create' %}" class="btn btn-success">Добавить новый выпуск</a>
     <div class="table-responsive">
         <table class="table table-striped">
             <thead>

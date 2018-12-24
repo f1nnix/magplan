@@ -1,6 +1,8 @@
 from django.shortcuts import render
-from main.models import Issue
+from main.models import Issue, Magazine
 from django.contrib.auth.decorators import login_required
+from plan.forms import IssueModelForm
+from django.shortcuts import render, HttpResponse, redirect
 
 
 # Create your views here.
@@ -10,6 +12,22 @@ def index(request):
 
     return render(request, 'plan/issues/index.html', {
         'issues': issues,
+    })
+
+
+@login_required
+def create(request):
+    form = IssueModelForm()
+    if request.method == 'POST':
+        form = IssueModelForm(request.POST)
+        if form.is_valid():
+            issue = form.save(commit=False)
+            issue.magazine = Magazine.objects.first()
+            issue.save()
+            return redirect('issues_index')
+
+    return render(request, 'plan/issues/new.html', {
+        'form': form,
     })
 
 

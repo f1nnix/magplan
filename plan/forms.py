@@ -39,6 +39,18 @@ class IdeaModelForm(ModelForm):
         }
 
 
+class IssueModelForm(ModelForm):
+    class Meta:
+        model = Issue
+        fields = ('number', 'title', 'description', 'published_at',)
+        widgets = {
+            'number': forms.TextInput(attrs={'class': 'form-control', }),
+            'title': forms.TextInput(attrs={'class': 'form-control', }),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
+            'published_at': forms.DateInput(attrs={'class': 'form-control date_picker', }),
+        }
+
+
 class PostBaseModelForm(ModelForm):
     # section = forms.ModelChoiceField(queryset=Section.objects.filter(is_archived=False, is_whitelisted=False),
     #                                  label="Рубрика",

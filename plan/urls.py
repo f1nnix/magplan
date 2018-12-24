@@ -29,6 +29,7 @@ urlpatterns = [
     path('articles/', articles.index, name='articles_index'),
 
     path('issues/<int:issue_id>/', issues.show, name='issues_show'),
+    path('issues/new/', issues.create, name='issues_create'),
     path('issues/', issues.index, name='issues_index'),
 
     path('posts/<int:post_id>/attachments/delete/', posts.attachment_delete, name='posts_attachment_delete'),
