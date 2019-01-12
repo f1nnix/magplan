@@ -31,6 +31,7 @@ class PostAdmin(admin.ModelAdmin):
 
     list_filter = (
         ('stage', RelatedDropdownFilter),
+        ('editor', RelatedDropdownFilter),
     )
 
     def admin_post_display_name(self, obj):

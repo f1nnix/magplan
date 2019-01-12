@@ -50,7 +50,7 @@ class PeriodListFilter(admin.SimpleListFilter):
 
 
 class PeriodAdmin(admin.ModelAdmin):
-
+    list_display = ('__str__', 'is_finished',)
     def get_ordering(self, request):
         return ['-year', '-month', ]
 
