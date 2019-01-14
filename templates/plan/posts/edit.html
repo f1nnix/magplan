@@ -74,7 +74,19 @@
 
         {% include 'plan/posts/_form_extended.html' %}
         <div class="row">
-            <div class="col-12">
+            <div class="col-6">
+                <div class="form-group">
+                    {{ form.editor.label }}
+                    {% if form.editor.errors %}
+                        <ul class="errors">
+                            {% for error in form.editor.err %}
+                                <li>{{ error }}</li>{% endfor %}
+                        </ul>
+                    {% endif %}
+                    {{ form.editor }}
+                </div>
+            </div>
+            <div class="col-3">
                 <div class="form-group">
                     {{ form.wp_id.label }}
                     {% if form.wp_id.errors %}

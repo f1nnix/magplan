@@ -86,12 +86,13 @@ class PostExtendedModelForm(ModelForm):
     class Meta(PostBaseModelForm.Meta):
         model = Post
 
-        fields = PostBaseModelForm.Meta.fields + ('kicker', 'xmd',)
+        fields = PostBaseModelForm.Meta.fields + ('kicker', 'xmd', 'editor',)
 
         widgets = PostBaseModelForm.Meta.widgets.copy()
         widgets.update({
             'kicker': forms.TextInput(attrs={'class': 'form-control', }, ),
             'xmd': forms.Textarea(attrs={'class': 'form-control', 'rows': 20, }),
+            'editor': forms.Select(attrs={'class': 'form-control', }),
             'wp_id': forms.TextInput(attrs={'class': 'form-control', }),
         })
 
