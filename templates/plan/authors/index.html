@@ -18,7 +18,7 @@
             {% for author in users %}
                 <tr>
                     <td>
-                        <a href="{% url 'authors_edit' author.id %}">{{ author.str_employee }}</a>
+                        <a href="{% url 'authors_show' author.id %}">{{ author.str_employee }}</a>
                     </td>
                     <td><a href="mailto:{{ author.email }}">{{ author.email }}</a></td>
                 </tr>
