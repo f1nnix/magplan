@@ -1,0 +1,32 @@
+{% extends "layout_plan.html" %}
+{% block title %}{{ user }}{% endblock %}
+{% block content %}
+    <h1>{{ user }}</h1>
+    <table class="table table-stripped table-bordered">
+        <tbody>
+        <tr>
+            <td>Имя</td>
+            <td>{{ user.profile.f_name }}</td>
+        </tr>
+        <tr>
+            <td>Фамилия</td>
+            <td>{{ user.profile.l_name }}</td>
+        </tr>
+        <tr>
+            <td>Отчество</td>
+            <td>{{ user.profile.m_name }}</td>
+        </tr>
+        <tr>
+            <td>Почта</td>
+            <td><a href="mailto:{{ user.email }}">{{ user.email }}</a></td>
+        </tr>
+        </tbody>
+    </table>
+    <h4>Материалы автора</h4>
+    <p>
+        <small>Сортировка по времени фактического создания статьи</small>
+    </p>
+    {% with posts=posts %}
+        {% include 'plan/partials/posts_table.html' %}
+    {% endwith %}
+{% endblock %}

@@ -43,7 +43,8 @@ urlpatterns = [
     path('api/users/search/', api.authors_search, name='api_authors_search'),
 
     path('authors/new/', authors.new, name='authors_new'),
-    path('authors/<int:user_id>/', authors.edit, name='authors_edit'),
+    path('authors/<int:user_id>/edit/', authors.edit, name='authors_edit'),
+    path('authors/<int:user_id>/', authors.show, name='authors_show'),
     path('authors/', authors.index, name='authors_index'),
 
     path('', index.index, name='index_index'),
