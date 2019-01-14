@@ -27,9 +27,11 @@
                     {% endif %}
                 </td>
                 <td>
-                    {% for author in post.authors.all %}{{ author }}{% endfor %}
+                    {% for author in post.authors.all %}
+                        <a href="{% url 'authors_show' author.id %}">{{ author }}</a>
+                    {% endfor %}
                 </td>
-                <td>{{ post.editor }}</td>
+                <td><a href="{% url 'authors_show' post.editor.id %}">{{ post.editor }}</a></td>
                 <td class="{% if post.is_overdue is True %}table-danger{% endif %}">
                     <nobr>{{ post.published_at }}</nobr>
                 </td>

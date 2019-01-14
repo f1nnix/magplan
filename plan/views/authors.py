@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
-from main.models import User
+from main.models import User, Post
 from django.contrib.auth.decorators import login_required
 from plan.forms import UserModelForm, ProfileModelForm
 from django.contrib import messages
+from django.db.models import Q
 
 
 @login_required
@@ -36,6 +37,19 @@ def new(request):
     return render(request, 'plan/authors/new.html', {
         'user_form': user_form,
         'profile_form': profile_form,
+    })
+
+
+@login_required
+def show(request, user_id):
+    user = User.objects.get(id=user_id)
+    posts = (Post.objects.filter(Q(authors=user) | Q(editor=user))
+             .prefetch_related('authors', 'editor', 'stage', 'section')
+             .exclude(stage__slug='vault')
+             .order_by('created_at'))
+    return render(request, 'plan/authors/show.html', {
+        'user': user,
+        'posts': posts,
     })
 
 

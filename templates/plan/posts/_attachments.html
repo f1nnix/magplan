@@ -3,7 +3,9 @@
 
 <div>
     <h2 style="display: inline-block;">{% trans "attachments" %}</h2>
-    <input type="file" name="attachments" id="customFile" multiple="true" style="float: right"/>
+    {% if hide_upload_form is not True %}
+        <input type="file" name="attachments" id="customFile" multiple="true" style="float: right"/>
+    {% endif %}
 </div>
 <div style="clear: both"></div>
 

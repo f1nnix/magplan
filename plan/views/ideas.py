@@ -29,6 +29,10 @@ def index(request):
             idea = form.save(commit=False)
             idea.editor = request.user
             idea.save()
+
+            # clear idea form to prevent rendering prefilled form
+            form = IdeaModelForm()
+
             messages.add_message(request, messages.SUCCESS, 'Идея «%s» успешно выдвинута на голосование!' % idea.title)
     else:
         form = IdeaModelForm()

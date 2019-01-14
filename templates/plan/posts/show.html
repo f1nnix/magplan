@@ -89,7 +89,7 @@
     </section>
 
     <section id="attachments" style="margin-bottom: 1rem;">
-        {% with pdfs=post.pdfs files=post.files hide_images=True %}
+        {% with pdfs=post.pdfs files=post.files hide_images=True hide_upload_form=True %}
             {% include 'plan/posts/_attachments.html' %}
         {% endwith %}
     </section>
