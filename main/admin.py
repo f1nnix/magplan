@@ -65,12 +65,17 @@ class StageAdmin(admin.ModelAdmin):
     list_display = ['title', 'duration', 'sort', 'skip_notification', ]
 
 
+class SectionAdmin(admin.ModelAdmin):
+    list_display = ['title', 'slug', 'sort', 'is_archived', 'is_whitelisted', ]
+    list_filter = ['is_archived', 'is_whitelisted', ]
+
+
 admin.site.register(User, UserAdmin)
 admin.site.register(Post, PostAdmin)
 admin.site.register(Comment, CommentAdmin)
 admin.site.register(Issue)
 admin.site.register(Stage, StageAdmin)
 admin.site.register(Magazine)
-admin.site.register(Section)
+admin.site.register(Section, SectionAdmin)
 admin.site.register(Idea, IdeaAdmin)
 admin.site.register(Attachment, AttachmentAdmin)
