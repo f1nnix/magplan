@@ -8,9 +8,11 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item {% if navbar_current == 'authors' %}active{% endif %}">
-                    <a class="nav-link" href="{% url 'authors_index' %} ">{% trans "authors" %}</a>
-                </li>
+                {% if perms.main.manage_authors %}
+                    <li class="nav-item {% if navbar_current == 'authors' %}active{% endif %}">
+                        <a class="nav-link" href="{% url 'authors_index' %} ">{% trans "authors" %}</a>
+                    </li>
+                {% endif %}
                 <li class="nav-item dropdown {% if navbar_current == 'issues' %}active{% endif %}">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{% trans "issues" %}</a>
@@ -43,7 +45,7 @@
                        name="search_query">
                 {#                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Искать!</button>#}
             </form>
-
+m
 
             <span class="navbar-text">
         <a href="{% url 'logout' %}?next={% url 'login' %}">{% trans "logout" %}</a>
