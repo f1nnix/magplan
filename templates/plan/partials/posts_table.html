@@ -19,7 +19,6 @@
                     <span style="visibility: hidden; font-size: 1px;">{{ post.section.sort }}</span>{{ post.section.title }}</span>
                 </td>
                 <td>
-
                     <a href="{% url 'posts_show' post.id %}">{{ post }}</a> (<a
                         href="{% url 'posts_edit' post.id %}">{% trans "edit" %}</a>)
                     {% if post.has_text == True %}
@@ -28,10 +27,20 @@
                 </td>
                 <td>
                     {% for author in post.authors.all %}
-                        <a href="{% url 'authors_show' author.id %}">{{ author }}</a>
+                        {% if perms.main.manage_authors %}
+                            <a href="{% url 'authors_show' author.id %}">{{ author }}</a>
+                        {% else %}
+                            {{ author }}
+                        {% endif %}
                     {% endfor %}
                 </td>
-                <td><a href="{% url 'authors_show' post.editor.id %}">{{ post.editor }}</a></td>
+                <td>
+                    {% if perms.main.manage_authors %}
+                        <a href="{% url 'authors_show' post.editor.id %}">{{ post.editor }}</a>
+                    {% else %}
+                        {{ post.editor }}
+                    {% endif %}
+                </td>
                 <td class="{% if post.is_overdue is True %}table-danger{% endif %}">
                     <nobr>{{ post.published_at }}</nobr>
                 </td>

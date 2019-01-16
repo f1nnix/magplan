@@ -40,12 +40,22 @@
             {% if post.authors.all|length > 0 %}
                 {% trans "writes" %}
                 {% for author in post.authors.all %}
-                    <a href="{% url 'authors_show' author.id %}">{{ author }}</a>
+                    {% if perms.main.manage_authors %}
+                        <a href="{% url 'authors_show' author.id %}">{{ author }}</a>
+                    {% else %}
+                        {{ author }}
+                    {% endif %}
                 {% endfor %}.
             {% else %}
                 {% trans "no_author" %}.
             {% endif %}
-            {% trans "edits" %} <a href="{% url 'authors_show' post.editor.id %}">{{ post.editor }}</a>
+
+            {% if perms.main.manage_authors %}
+                {% trans "edits" %} <a href="{% url 'authors_show' post.editor.id %}">{{ post.editor }}</a>
+            {% else %}
+                {% trans "edits" %} {{ post.editor }}
+            {% endif %}
+
 
             <br/>
             <a class="" data-toggle="collapse" href="#description" role="button"
