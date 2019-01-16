@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import permission_required
 
 
 @login_required
-@permission_required('manage_authors')
+@permission_required('main.manage_authors')
 def index(request):
     users = User.objects.prefetch_related('profile').order_by('profile__l_name').all()
     return render(request, 'plan/authors/index.html', {
@@ -17,7 +17,7 @@ def index(request):
 
 
 @login_required
-@permission_required('manage_authors')
+@permission_required('main.manage_authors')
 def new(request):
     if request.method == 'POST':
         user_form = UserModelForm(request.POST)
@@ -44,7 +44,7 @@ def new(request):
 
 
 @login_required
-@permission_required('manage_authors')
+@permission_required('main.manage_authors')
 def show(request, user_id):
     user = User.objects.get(id=user_id)
     posts = (Post.objects.filter(Q(authors=user) | Q(editor=user))
@@ -58,7 +58,7 @@ def show(request, user_id):
 
 
 @login_required
-@permission_required('manage_authors')
+@permission_required('main.manage_authors')
 def edit(request, user_id):
     user = User.objects.get(id=user_id)
 
