@@ -42,6 +42,11 @@ class User(AbstractEmailUser, AbstractBase):
     def str_employee(self):
         return self.__str__()
 
+    class Meta:
+        permissions = (
+            ("manage_authors", "Can manage authors"),
+        )
+
 
 class Profile(AbstractBase):
     is_public = models.BooleanField(null=False, blank=False, default=False)
