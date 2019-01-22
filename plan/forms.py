@@ -52,10 +52,10 @@ class IssueModelForm(ModelForm):
 
 
 class PostBaseModelForm(ModelForm):
-    # section = forms.ModelChoiceField(queryset=Section.objects.filter(is_archived=False, is_whitelisted=False),
-    #                                  label="Рубрика",
-    #                                  empty_label=None,
-    #                                  widget=forms.Select(attrs={'class': 'form-control', 'rows': 5}))
+    section = forms.ModelChoiceField(queryset=Section.objects.filter(is_whitelisted=False, is_archived=False),
+                                     label="Рубрика",
+                                     empty_label=None,
+                                     widget=forms.Select(attrs={'class': 'form-control', 'rows': 5}))
 
     class Meta:
         model = Post
@@ -63,7 +63,6 @@ class PostBaseModelForm(ModelForm):
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', }),
             'description': forms.Textarea(attrs={'class': 'form-control', }),
-            'section': forms.Select(attrs={'class': 'form-control', 'rows': 5}),
             'issues': forms.SelectMultiple(attrs={
                 'class': 'form-control live_multiselect',
                 'data-url': '/admin/api/issues/search',
@@ -82,6 +81,10 @@ class PostBaseModelForm(ModelForm):
 
 class PostExtendedModelForm(ModelForm):
     wp_id = forms.IntegerField()
+    section = forms.ModelChoiceField(queryset=Section.objects.filter(is_archived=False),
+                                     label="Рубрика",
+                                     empty_label=None,
+                                     widget=forms.Select(attrs={'class': 'form-control', 'rows': 5}))
 
     class Meta(PostBaseModelForm.Meta):
         model = Post
