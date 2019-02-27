@@ -1,8 +1,11 @@
 import datetime
+
+from django.db.models import Q
 from django.shortcuts import render, redirect
-from main.models import Post, Postype, Stage
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+
+from main.models import Post, Postype, Stage
 from plan.forms import WhitelistedPostExtendedModelForm, AdPostExtendedModelForm
 
 
@@ -87,7 +90,7 @@ def search(request):
         q = request.POST['search_query']
         posts = (Post.objects
                  .prefetch_related('section', 'stage', 'issues__magazine', 'editor__profile')
-                 .filter(title__icontains=q))
+                 .filter(Q(title__icontains=q) | Q(kicker__icontains=q)))
 
         return render(request, 'plan/articles/index.html', {
             'posts': posts,
