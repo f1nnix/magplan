@@ -76,7 +76,7 @@ class PostBaseModelForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(PostBaseModelForm, self).__init__(*args, **kwargs)
-        self.fields['section'].empty_label = None
+        self.fields['section'].empty_label = '---'
 
 
 class PostExtendedModelForm(ModelForm):
