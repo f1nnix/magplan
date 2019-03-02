@@ -41,19 +41,19 @@
                 {% trans "writes" %}
                 {% for author in post.authors.all %}
                     {% if perms.main.manage_authors %}
-                        <a href="{% url 'authors_show' author.id %}">{{ author }}</a>
+                        <a href="{% url 'authors_show' author.id %}">{{ author }}</a>{% if forloop.last is False %}, {% else %}.{% endif %}
                     {% else %}
-                        {{ author }}
+                        {{ author }}{% if forloop.last is False %}, {% else %}.{% endif %}
                     {% endif %}
-                {% endfor %}.
+                {% endfor %}
             {% else %}
                 {% trans "no_author" %}.
             {% endif %}
 
             {% if perms.main.manage_authors %}
-                {% trans "edits" %} <a href="{% url 'authors_show' post.editor.id %}">{{ post.editor }}</a>
+                {% trans "edits" %} <a href="{% url 'authors_show' post.editor.id %}">{{ post.editor }}</a>{% if forloop.last is False %}, {% else %}.{% endif %}
             {% else %}
-                {% trans "edits" %} {{ post.editor }}
+                {% trans "edits" %} {{ post.editor }}{% if forloop.last is False %}, {% else %}.{% endif %}
             {% endif %}
 
 
@@ -67,8 +67,7 @@
         <div id="meta" class="col-3">
             {% if post.issues.all|length > 0 %}
                 {% for issue in post.issues.all %}
-                    <a href="{% url 'issues_show' issue.id %}">{{ issue }}</a>
-                    ,
+                    <a href="{% url 'issues_show' issue.id %}">{{ issue }}</a>{% if forloop.last is False %}, {% else %}.{% endif %}
                 {% endfor %}
             {% endif %}
 
