@@ -11,7 +11,7 @@
     {% if opened_issues|length > 0 %}
         <h4>Открытые выпуски:
             {% for issue in opened_issues  %}
-                <a href="{% url 'issues_show' issue.id %}">{{ issue }}</a>{% if loop.last == false %}, {% else %}.{% endif %}
+                <a href="{% url 'issues_show' issue.id %}">{{ issue }}</a>{% if forloop.last is False %}, {% else %}.{% endif %}
             {% endfor %}
         </h4>
     {% endif %}
