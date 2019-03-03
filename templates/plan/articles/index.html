@@ -65,7 +65,7 @@
         {% include 'plan/partials/posts_table.html' %}
     {% endwith %}
 
-    {% with objects=posts %}
+    {% with objects=posts filter=filter_ %}
         {% include 'plan/partials/paginator.html' %}
     {% endwith %}
 

@@ -8,6 +8,20 @@ from django.core.paginator import Paginator
 from main.models import Post, Postype, Stage
 from plan.forms import WhitelistedPostExtendedModelForm, AdPostExtendedModelForm
 
+POSTS_PER_PAGE = 20
+
+
+def get_filtered_queryset(queryset, filter, user=None):
+    if filter == 'self':
+        return queryset.filter(editor=user)
+    elif filter == 'overdue':
+        return queryset.filter(published_at__lte=datetime.datetime.now()).exclude(stage__slug='vault').exclude(
+            stage__slug='published')
+    elif filter == 'vault':
+        return queryset.filter(stage__slug='vault')
+    else:
+        return queryset.all()
+
 
 @login_required
 def index(request):
@@ -16,23 +30,16 @@ def index(request):
 
     # filters
     filter = request.GET.get('filter', None)
-    if filter == 'self':
-        posts = posts.filter(editor=request.user)
-    elif filter == 'overdue':
-        posts = posts.filter(published_at__lte=datetime.datetime.now()).exclude(stage__slug='vault').exclude(
-            stage__slug='published')
-    elif filter == 'vault':
-        posts = posts.filter(stage__slug='vault')
-    else:
-        posts = posts.all()
+    posts = get_filtered_queryset(posts, filter, request.user)
 
-    posts = Paginator(posts, 25)  # Show 25 contacts per page
+    posts = Paginator(posts, POSTS_PER_PAGE)
 
     page = request.GET.get('page')
     posts = posts.get_page(page)
 
     return render(request, 'plan/articles/index.html', {
         'posts': posts,
+        'filter_': filter,
     })
 
 
