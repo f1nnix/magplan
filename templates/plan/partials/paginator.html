@@ -2,14 +2,15 @@
     <ul class="pagination justify-content-center">
 
         {% if objects.has_previous %}
-            <li class="page-item"><a class="page-link" href="?page=1">&laquo; В начало</a></li>
+            <li class="page-item"><a class="page-link" href="?page=1{% if filter_ %}&filter={{ filter_ }}{% endif %}">&laquo; В начало</a></li>
             <li class="page-item"><a class="page-link"
-                                     href="?page={{ objects.previous_page_number }}">{{ objects.previous_page_number }}</a>
+                                     href="?page={{ objects.previous_page_number }}{% if filter_ %}&filter={{ filter_ }}{% endif %}">{{ objects.previous_page_number }}</a>
             </li>
         {% endif %}
 
         <li class="page-item active">
                 <span class="page-link">
+
                     <span class="sr-only">(current)</span>
                     {{ objects.number }}
                 </span>
@@ -17,9 +18,9 @@
 
         {% if objects.has_next %}
             <li class="page-item"><a class="page-link"
-                                     href="?page={{ objects.next_page_number }}">{{ objects.next_page_number }}</a>
+                                     href="?page={{ objects.next_page_number }}{% if filter_ %}&filter={{ filter_ }}{% endif %}">{{ objects.next_page_number }}</a>
             </li>
-            <li class="page-item"><a class="page-link" href="?page={{ objects.paginator.num_pages }}">В конец
+            <li class="page-item"><a class="page-link" href="?page={{ objects.paginator.num_pages }}{% if filter_ %}&filter={{ filter_ }}{% endif %}">В конец
                 &raquo;</a></li>
         {% endif %}
     </ul>
