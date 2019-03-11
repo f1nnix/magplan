@@ -1,16 +1,20 @@
-import html2text
-import django_filters
 import os
-from django.shortcuts import render, redirect
-from main.models import Idea, Vote, Issue, User
-from plan.forms import IdeaModelForm, PostBaseModelForm, CommentModelForm
-from django.db.models import Count
+
+import django_filters
+import html2text
+from constance import config
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
-from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
-from constance import config
+from django.core.paginator import Paginator
+from django.db.models import Count
+from django.shortcuts import render, redirect
+from django.template.loader import render_to_string
+
+from main.models import Idea, Vote, Issue, User
+from plan.forms import IdeaModelForm, PostBaseModelForm, CommentModelForm
+
+IDEAS_PER_PAGE = 20
 
 
 class IdeaApprovedFilter(django_filters.FilterSet):
@@ -55,7 +59,7 @@ def index(request):
     else:
         ideas = ideas.all()
 
-    paginator = Paginator(ideas, 10)
+    paginator = Paginator(ideas, IDEAS_PER_PAGE)
     page = request.GET.get('page')
     ideas_paginated = paginator.get_page(page)
 

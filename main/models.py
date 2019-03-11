@@ -1,16 +1,18 @@
+import datetime
+
 import django
 import mistune
-from django.db import models
 from authtools.models import AbstractEmailUser
-from django.contrib.postgres.fields import JSONField
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.postgres.fields import JSONField
+from django.db import models
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
+from django.utils import timezone
+from django.utils import timezone
+
 from xmd import XMDRenderer
-from django.utils import timezone
-from django.utils import timezone
-import datetime
 
 
 class AbstractBase(models.Model):
@@ -194,10 +196,11 @@ class Widgetype(AbstractBase):
 
 class Post(AbstractBase):
     def __str__(self):
-        if self.kicker:
-            return '%s. %s' % (self.kicker, self.title)
-        else:
+        if self.kicker is None:
             return self.title
+
+        separator = ' ' if self.kicker.endswith(('!', ':', '?')) else '. '
+        return f'{self.kicker}{separator}{self.title}'
 
     POST_FORMAT_DEFAULT = 0
     POST_FORMAT_FEATURED = 1
