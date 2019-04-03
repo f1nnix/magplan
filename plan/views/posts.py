@@ -266,11 +266,11 @@ def attachment_delete(request, post_id):
 
 @login_required
 def download_content(request: HttpRequest, post_id: int) -> HttpResponse:
-    """Get all files of requested type for post_id and sream to client as ZIP archoive
+    """Get all files of requested type for post_id and stream to client as ZIP archive
 
-    :param request: Django request objcet
+    :param request: Django request object
     :param post_id: post_id
-    :return:
+    :return: Django HttpResponse with file
     """
     if request.method == 'GET':
         s = io.BytesIO()
@@ -278,7 +278,7 @@ def download_content(request: HttpRequest, post_id: int) -> HttpResponse:
         attachemnts = Attachment.objects.filter(post_id=post_id, type=Attachment.TYPE_IMAGE).all()
 
         for attachemnt in attachemnts:
-            fs_path = '%s/%s' % (settings.STATIC_ROOT, attachemnt.file.name)
+            fs_path = '%s/%s' % (settings.MEDIA_ROOT, attachemnt.file.name)
             filename = attachemnt.original_filename
             try:
                 zipfile.write(fs_path, arcname=filename)
