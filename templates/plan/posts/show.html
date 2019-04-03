@@ -33,7 +33,24 @@
 
 
 
-    <a class="btn btn-warning btn-sm" href="{% url 'posts_edit' post.id %}">{% trans "edit" %}</a>
+    <div id="actions" style="margin-bottom: 1rem;">
+
+        <a class="btn btn-warning" href="{% url 'posts_edit' post.id %}">{% trans "edit" %}</a>
+        <div class="dropdown" style="display: inline-block">
+            <a class="btn btn-success dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Скачать контент
+            </a>
+
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+{#                <a class="dropdown-item" href="#">Текст</a>#}
+                <a class="dropdown-item" href="{% url 'posts_download_content' post.id %}">Изображения</a>
+{#                <a class="dropdown-item" href="#">PDF</a>#}
+{#                <a class="dropdown-item" href="#">Файлы</a>#}
+{#                <a class="dropdown-item" href="#">Полный архив</a>#}
+            </div>
+        </div>
+    </div>
 
     <div id="info" class="row">
         <div id="authors" class="col-9">
@@ -41,7 +58,8 @@
                 {% trans "writes" %}
                 {% for author in post.authors.all %}
                     {% if perms.main.manage_authors %}
-                        <a href="{% url 'authors_show' author.id %}">{{ author }}</a>{% if forloop.last is False %}, {% else %}.{% endif %}
+                        <a href="{% url 'authors_show' author.id %}">{{ author }}</a>{% if forloop.last is False %},
+                    {% else %}.{% endif %}
                     {% else %}
                         {{ author }}{% if forloop.last is False %}, {% else %}.{% endif %}
                     {% endif %}
@@ -51,7 +69,8 @@
             {% endif %}
 
             {% if perms.main.manage_authors %}
-                {% trans "edits" %} <a href="{% url 'authors_show' post.editor.id %}">{{ post.editor }}</a>{% if forloop.last is False %}, {% else %}.{% endif %}
+                {% trans "edits" %} <a href="{% url 'authors_show' post.editor.id %}">{{ post.editor }}</a>
+                {% if forloop.last is False %}, {% else %}.{% endif %}
             {% else %}
                 {% trans "edits" %} {{ post.editor }}{% if forloop.last is False %}, {% else %}.{% endif %}
             {% endif %}
@@ -67,7 +86,8 @@
         <div id="meta" class="col-3">
             {% if post.issues.all|length > 0 %}
                 {% for issue in post.issues.all %}
-                    <a href="{% url 'issues_show' issue.id %}">{{ issue }}</a>{% if forloop.last is False %}, {% else %}.{% endif %}
+                    <a href="{% url 'issues_show' issue.id %}">{{ issue }}</a>{% if forloop.last is False %}, {% else %}
+                    .{% endif %}
                 {% endfor %}
             {% endif %}
 

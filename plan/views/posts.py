@@ -1,17 +1,23 @@
-import os
-import html2text
 import datetime
+import io
+import os
+from collections import deque
+from zipfile import ZipFile, ZIP_DEFLATED
+
+import html2text
+from constance import config
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.core.mail import EmailMultiAlternatives
+from django.http import HttpRequest
 from django.shortcuts import render, HttpResponse, redirect
+from django.template import Template, Context
+from django.template.loader import render_to_string
+from slugify import slugify
+
 from main.models import Post, Postype, Stage, Idea, Attachment, Comment, User
 from plan.forms import PostBaseModelForm, PostExtendedModelForm, CommentModelForm
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from slugify import slugify
-from constance import config
-from django.template.loader import render_to_string
-from django.core.mail import EmailMultiAlternatives
-from collections import deque
-from django.template import Template, Context
 
 
 # Create your views here.
@@ -256,3 +262,31 @@ def attachment_delete(request, post_id):
             pass
 
         return HttpResponse(status=204)
+
+
+@login_required
+def download_content(request: HttpRequest, post_id: int) -> HttpResponse:
+    """Get all files of requested type for post_id and sream to client as ZIP archoive
+
+    :param request: Django request objcet
+    :param post_id: post_id
+    :return:
+    """
+    if request.method == 'GET':
+        s = io.BytesIO()
+        zipfile = ZipFile(s, 'w', ZIP_DEFLATED)
+        attachemnts = Attachment.objects.filter(post_id=post_id, type=Attachment.TYPE_IMAGE).all()
+
+        for attachemnt in attachemnts:
+            fs_path = '%s/%s' % (settings.STATIC_ROOT, attachemnt.file.name)
+            filename = attachemnt.original_filename
+            try:
+                zipfile.write(fs_path, arcname=filename)
+            except Exception as e:
+                # TODO: handle not found files
+                pass
+        zipfile.close()
+
+        resp = HttpResponse(s.getvalue(), content_type='application/x-zip-compressed')
+        resp['Content-Disposition'] = f'attachment; filename=content_{post_id}.zip'
+        return resp
