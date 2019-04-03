@@ -36,6 +36,7 @@ urlpatterns = [
     path('posts/<int:post_id>/comments/', posts.comments, name='posts_comments'),
     path('posts/<int:post_id>/set_stage/', posts.set_stage, name='posts_set_stage'),
     path('posts/<int:post_id>/edit/', posts.edit, name='posts_edit'),
+    path('posts/<int:post_id>/download/', posts.download_content, name='posts_download_content'),
     path('posts/<int:post_id>/', posts.show, name='posts_show'),
     path('posts', posts.create, name='posts_create'),
 

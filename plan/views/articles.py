@@ -19,14 +19,13 @@ def get_filtered_queryset(queryset, filter, user=None):
             stage__slug='published')
     elif filter == 'vault':
         return queryset.filter(stage__slug='vault')
-    else:
-        return queryset.all()
+    return queryset
 
 
 @login_required
 def index(request):
-    posts = Post.objects.order_by('-created_at').prefetch_related('section', 'stage', 'issues__magazine',
-                                                                  'editor__profile')
+    posts = Post.objects.order_by('-created_at')\
+                .prefetch_related('section', 'stage', 'issues__magazine', 'editor__profile')
 
     # filters
     filter = request.GET.get('filter', None)
