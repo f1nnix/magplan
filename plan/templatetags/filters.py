@@ -1,9 +1,12 @@
-from django import template
-from main.models import Vote
-from finance.models import Payment
-from django.urls import reverse
-from plan.views import posts, ideas
 import datetime
+from typing import List
+
+from django import template
+from django.urls import reverse
+
+from finance.models import Payment
+from main.models import Vote, Comment
+from plan.views import posts, ideas
 
 register = template.Library()
 
@@ -110,3 +113,22 @@ def is_overdue(date):
 @register.filter
 def humazine_payment_type(payment):
     return Payment.FORMAT_CHOICES[payment.format][1]
+
+
+@register.filter
+def count_human_comments(comments: List[Comment]) -> int:
+    """Count comment from arrays, made by real users.
+
+    It seems, plain iterator with incrementable counter may be faster
+    as it does not produce additional map in closure.
+
+        counter = 0
+        for comment in comments:
+            if comment.type != Comment.TYPE_SYSTEM:
+                counter+=1
+        return counter
+
+    :param comments: Array of Comment instances
+    :return: Actual comments number
+    """
+    return len(list(filter(lambda c: c.type != Comment.TYPE_SYSTEM, comments)))
