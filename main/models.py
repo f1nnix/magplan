@@ -173,7 +173,7 @@ class Idea(AbstractBase):
         all_scores = sum(
             [v.score for v in self.votes.all()]
         )
-        return all_scores / len(self.votes.all()) / 2 * 100
+        return round(all_scores / len(self.votes.all()) / 2 * 100)
 
     @property
     def description_html(self):

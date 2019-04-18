@@ -4,16 +4,15 @@
         <div class="comment" style="margin-bottom: 1rem;">
             {% if comment.type == TYPE_SYSTEM %}
                 <small style="color: #777777;">
-                    <strong style="padding-right: 1rem;">{{ comment.created_at }}</strong>
                     {% if comment.meta.comment.action == SYSTEM_ACTION_SET_STAGE %}
                         <div>
-                            {{ comment.meta.comment.user.str }} передвинул пост на
-                            этап {{ comment.meta.comment.stage.str }}
+                            {{ comment.created_at }} {{ comment.meta.comment.user.str }} передвинул пост на
+                            этап {{ comment.meta.comment.stage.str }}.
                         </div>
                     {% endif %}
                     {% if comment.meta.comment.action == SYSTEM_ACTION_UPDATE %}
                         <div>
-                            {{ comment.meta.comment.user.str }} отредактировал пост.
+                            {{ comment.created_at }} {{ comment.meta.comment.user.str }} отредактировал пост.
                             {% if comment.meta.comment.files|length > 0 %}
                                 Загружены файлы:
                                 <ul>

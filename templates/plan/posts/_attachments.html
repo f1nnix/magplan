@@ -1,52 +1,59 @@
 {% load filters %}
 {% load i18n %}
 
-<div>
-    <h2 style="display: inline-block;">{% trans "attachments" %}</h2>
-    {% if hide_upload_form is not True %}
-        <input type="file" name="attachments" id="customFile" multiple="true" style="float: right"/>
-    {% endif %}
-</div>
-<div style="clear: both"></div>
-
-{% if hide_images is not True %}
-    <section id="images">
-    <h4 style="display: inline-block;">{% trans "images" %}</h4>
-    <div class="row">
-
-        {% if images|length > 0 %}
-            {% for image in images %}
-                <div class="col-6 col-sm-3 col-md-2 col-lg-2 col-xl-2" style="margin-bottom: 1rem;">
-                    <div class="card">
-                        <div class="card-img-top"
-                             style="height: 5rem; background: url({{ image.file.url }}) 100% 100% no-repeat; background-size: cover;"
-                             alt="Card image cap"></div>
-                        <div class="card-body  bg-light" style="padding: 0.5rem;">
-                            <p class="card-text">
-                                <a href="{{ image.file.url }}"
-                                   class="attachment-link"
-                                   data-id="{{ image.id }}"
-                                   data-filename="{{ image.original_filename }}"
-                                >{{ image.original_filename|trim_filename }}</a>
-                                <a href="#" class="attachment-delete-link">&#10060;</a>
-                                <small style="display: block">{{ image.created_at }}</small>
-                            </p>
-                        </div>
-                    </div>
-
+{#    <h2 style="display: inline-block;">{% trans "attachments" %}</h2>#}
+{% if hide_upload_form is not True %}
+    <div class="row justify-content-end">
+        <div class="col-lg-8 col-xs-12">
+            <h4>Загрузить файлы</h4>
+            <p>Выберите файлы для загрузки к статье, а затем нажмите «Сохранить» внизу страницы.</p>
+        </div>
+        <div class="col-lg-4 col-xs-12">
+            <div class="card bg-light mb-3">
+                <div class="card-body">
+                    {#                                        <p class="card-text">Выберите файлы для загрузки к статье</p>#}
+                    <input type="file" name="attachments" id="customFile" multiple="true"/>
                 </div>
-            {% endfor %}
-        {% else %}
-            <div class="col-12">Изображений пока не загружено</div>
-        {% endif %}
+            </div>
+        </div>
     </div>
 {% endif %}
-</section>
+
+{% if hide_images is not True %}
+    {% if images|length > 0 %}
+        <section id="images">
+            <h4 style="display: inline-block;">{% trans "images" %}</h4>
+            <div class="row">
+                {% for image in images %}
+                    <div class="col-6 col-sm-3 col-md-2 col-lg-2 col-xl-2" style="margin-bottom: 1rem;">
+                        <div class="card">
+                            <div class="card-img-top"
+                                 style="height: 5rem; background: url({{ image.file.url }}) 100% 100% no-repeat; background-size: cover;"
+                                 alt="Card image cap"></div>
+                            <div class="card-body  bg-light" style="padding: 0.5rem;">
+                                <p class="card-text">
+                                    <a href="{{ image.file.url }}"
+                                       class="attachment-link"
+                                       data-id="{{ image.id }}"
+                                       data-filename="{{ image.original_filename }}"
+                                    >{{ image.original_filename|trim_filename }}</a>
+                                    <a href="#" class="attachment-delete-link">&#10060;</a>
+                                    <small style="display: block">{{ image.created_at }}</small>
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
+{% endif %}
 
 <div class="row">
     <div class="col-6">
-        <h4>PDF</h4>
         {% if pdfs|length > 0 %}
+            <h4>PDF</h4>
             <table class="table table-sm">
                 <tbody>
                 {% for pdf in pdfs %}
@@ -63,14 +70,11 @@
 
                 </tbody>
             </table>
-
-        {% else %}
-            {% trans "No PDF uploaded yet" %}
         {% endif %}
     </div>
     <div class="col-6">
-        <h4>Файлы</h4>
         {% if files|length > 0 %}
+            <h4>Файлы</h4>
             <table class="table table-sm">
                 <tbody>
                 {% for file in files %}
@@ -87,7 +91,6 @@
 
                 </tbody>
             </table>
-        {% else %}Файлов пока не загружено
         {% endif %}
     </div>
 </div>

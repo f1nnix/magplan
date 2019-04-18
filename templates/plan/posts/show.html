@@ -2,6 +2,7 @@
 {% block title %}{{ post.title }}{% endblock %}
 {% load i18n %}
 {% load filters %}
+
 {% block styles %}
     <style type="text/css">
         #progress, #info, #lead, #stages {
@@ -26,12 +27,11 @@
         }
     </style>
 {% endblock %}
+
 {% block content %}
     {% with stages=stages %}{% include 'plan/posts/_progress.html' %}{% endwith %}
 
     <h1>{{ post }}</h1>
-
-
 
     <div id="actions" style="margin-bottom: 1rem;">
 
@@ -86,8 +86,7 @@
         <div id="meta" class="col-3">
             {% if post.issues.all|length > 0 %}
                 {% for issue in post.issues.all %}
-                    <a href="{% url 'issues_show' issue.id %}">{{ issue }}</a>{% if forloop.last is False %}, {% else %}
-                    .{% endif %}
+                    <a href="{% url 'issues_show' issue.id %}">{{ issue }}</a>{% if forloop.last is False %}, {% else %}.{% endif %}
                 {% endfor %}
             {% endif %}
 
@@ -109,7 +108,7 @@
 
     <div class="row">
         <div class="col-12">
-            <a href="#comments" class="float-right">К комментариям ({{ post.comments|length }})</a>
+            <a href="#comments" class="float-right">К комментариям ({{ post.comments.all|count_human_comments }})</a>
         </div>
     </div>
 
@@ -142,6 +141,7 @@
     {% endwith %}
 
 {% endblock %}
+
 {% block scripts %}
     <script type="text/javascript">
         {#window.DELETE_ATTACHMENT_URL = "{{ app.router['posts_delete_attachment'].url_for(post_id=post.id|string) }}";#}
