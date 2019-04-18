@@ -1,5 +1,6 @@
 {% extends "layout_plan.html" %}
 {% block title %}Редактирование «{{ post.title }}»{% endblock %}
+
 {% block styles %}
     <style>
         .attachment-image {
@@ -36,12 +37,12 @@
         }
     </style>
 {% endblock %}
+
 {% block content %}
     <h2>Редактирование «<a href="{% url 'posts_show' post.id %}">{{ post }}</a>»</h2>
     <div class="meta">
         <p>В номерах: {% for issue in post.issues.all %}
-            <a href="{% url 'issues_show' issue.id %}">{{ issue }}</a>{% if loop.last == false %}, {% else %}.
-            {% endif %}
+            <a href="{% url 'issues_show' issue.id %}">{{ issue }}</a>{% if forloop.last is False %}, {% else %}.{% endif %}
         {% endfor %}</p>
     </div>
     <form id="save_post_form"

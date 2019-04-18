@@ -31,8 +31,6 @@
 
     <h1>{{ post }}</h1>
 
-
-
     <div id="actions" style="margin-bottom: 1rem;">
 
         <a class="btn btn-warning" href="{% url 'posts_edit' post.id %}">{% trans "edit" %}</a>
@@ -86,8 +84,7 @@
         <div id="meta" class="col-3">
             {% if post.issues.all|length > 0 %}
                 {% for issue in post.issues.all %}
-                    <a href="{% url 'issues_show' issue.id %}">{{ issue }}</a>{% if forloop.last is False %}, {% else %}
-                    .{% endif %}
+                    <a href="{% url 'issues_show' issue.id %}">{{ issue }}</a>{% if forloop.last is False %}, {% else %}.{% endif %}
                 {% endfor %}
             {% endif %}
 
