@@ -106,9 +106,10 @@ def edit(request, post_id):
 
         if form.is_valid():
             post.meta['wpid'] = request.POST.get('wp_id', None)
+            post.imprint_updater(request.user)
             form.save()
 
-            # messages.add_message(request, messages.SUCCESS, 'Пост «%s» успешно отредактирован' % post)
+            messages.add_message(request, messages.SUCCESS, 'Пост «%s» успешно отредактирован' % post)
 
             # create system comment
             if config.SYSTEM_USER_ID:
@@ -164,6 +165,7 @@ def set_stage(request, post_id, system=Comment.TYPE_SYSTEM):
         duration = stage.duration if stage.duration else 1
         post.published_at = post.published_at + + datetime.timedelta(days=duration)
         post.stage = stage
+        post.imprint_updater(request.user)
         post.save()
         messages.add_message(request, messages.INFO, 'Текущий этап статьи «%s» обновлен' % post)
 

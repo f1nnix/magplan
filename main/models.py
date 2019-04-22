@@ -228,9 +228,21 @@ class Post(AbstractBase):
     stage = models.ForeignKey(Stage, on_delete=models.CASCADE, verbose_name='Этап')
     issues = models.ManyToManyField(Issue, related_name='posts', verbose_name='Выпуски')
     section = models.ForeignKey(Section, on_delete=models.CASCADE, null=False, blank=False, verbose_name='Раздел')
+    last_updater = models.ForeignKey(User, related_name='posts_updated', verbose_name='Кто последний обновлял',
+                                     null=True, on_delete=models.SET_NULL)
+
     meta = JSONField(default=dict)
 
     comments = GenericRelation('Comment')
+
+    def imprint_updater(self, user: User) -> None:
+        """Update updated_at timestamp and set provided user as last_updater.
+
+        `created_at` may be overwritten further on DB-hook level.
+        .save() method should be explicitly called.
+        """
+        self.last_updater = user
+        self.updated_at = datetime.datetime.now()
 
     @property
     def images(self):
