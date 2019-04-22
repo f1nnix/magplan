@@ -9,6 +9,7 @@
         <th>{% trans "authors" %}</th>
         <th>{% trans "editor" %}</th>
         <th>{% trans "deadline" %}</th>
+        <th>Обновлено</th>
         <th>{% trans "stage" %}</th>
         </thead>
         <tbody>
@@ -43,6 +44,9 @@
                 </td>
                 <td class="{% if post.is_overdue is True %}table-danger{% endif %}">
                     <nobr>{{ post.published_at }}</nobr>
+                </td>
+                <td>
+                    <nobr>{{ post.updated_at }}</nobr>{% if post.last_updater %}, {{ post.last_updater }}{% endif %}
                 </td>
                 <td><span class="badge badge-custom" style="background-color: #{{ post.stage.meta.background }};">
                     <span style="visibility: hidden; font-size: 1px;">{{ post.stage.sort }}</span>{{ post.stage.title }}</span>
