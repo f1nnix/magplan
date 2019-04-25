@@ -109,7 +109,7 @@
 {% block footer %}
     <footer class="footer">
         <div class="container">
-            <span></span>
+            <span class="smal">Последнее изменение: {{ post.updated_at }} {% if post.last_updater %}от {{ post.last_updater }}{% endif %}</span>
             <div class="float-right"><input type="submit" id="save_post" form="save_post_form" class="btn btn-success"
                                             value="Сохранить"></div>
         </div>

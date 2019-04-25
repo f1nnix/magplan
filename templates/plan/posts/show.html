@@ -33,11 +33,7 @@
 
     <h1>{{ post }}</h1>
 
-    <p class="small">Последнее изменение: {{ post.updated_at }}
-        {% if post.last_updater %}от {{ post.last_updater }}{% endif %}
-    </p>
     <div id="actions" style="margin-bottom: 1rem;">
-
         <a class="btn btn-warning" href="{% url 'posts_edit' post.id %}">{% trans "edit" %}</a>
         <div class="dropdown" style="display: inline-block">
             <a class="btn btn-success dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
