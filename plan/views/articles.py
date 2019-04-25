@@ -1,43 +1,31 @@
 import datetime
 
+from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
 
 from main.models import Post, Postype, Stage
 from plan.forms import WhitelistedPostExtendedModelForm, AdPostExtendedModelForm
 
-POSTS_PER_PAGE = 20
-
-
-def get_filtered_queryset(queryset, filter, user=None):
-    if filter == 'self':
-        return queryset.filter(editor=user)
-    elif filter == 'overdue':
-        return queryset.filter(published_at__lte=datetime.datetime.now()).exclude(stage__slug='vault').exclude(
-            stage__slug='published')
-    elif filter == 'vault':
-        return queryset.filter(stage__slug='vault')
-    return queryset
-
 
 @login_required
 def index(request):
-    posts = Post.objects.order_by('-created_at')\
-                .prefetch_related('section', 'stage', 'issues__magazine', 'editor__profile')
+    posts = Post.objects.order_by('-created_at') \
+        .prefetch_related('section', 'stage', 'issues__magazine', 'editor__profile')
 
-    # filters
-    filter = request.GET.get('filter', None)
-    posts = get_filtered_queryset(posts, filter, request.user)
-
-    posts = Paginator(posts, POSTS_PER_PAGE)
-
-    page = request.GET.get('page')
-    posts = posts.get_page(page)
+    # get filtered queryset
+    filter = request.GET.get('filter')
+    if filter == 'self':
+        posts = posts.filter(editor=request.user)
+    elif filter == 'overdue':
+        posts = posts.filter(published_at__lte=datetime.datetime.now()).exclude(stage__slug='vault').exclude(
+            stage__slug='published')
+    elif filter == 'vault':
+        posts = posts.filter(stage__slug='vault')
 
     return render(request, 'plan/articles/index.html', {
         'posts': posts,
+
         'filter_': filter,
     })
 

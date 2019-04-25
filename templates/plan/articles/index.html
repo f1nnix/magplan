@@ -21,24 +21,6 @@
         </div>
     </div>
 
-
-    {#    <div class="collapse" id="create_ad_post_form">#}
-    {#        <br/>#}
-    {#        {% with form=regular_post_form %}#}
-    {#            <div class="card card-body">#}
-    {#                {% with form=ad_post_form %}#}
-    {#                <form action="{% url 'posts_create' %}"#}
-    {#                      method="POST"#}
-    {#                      accept-charset="utf-8">#}
-    {#                    {% csrf_token %}#}
-    {#                    {% include 'plan/posts/_form_base.html' %}#}
-    {#                    <button type="submit" class="btn btn-success float-right">Создать рекламный материал</button>#}
-    {#                </form>#}
-    {#            {% endwith %}#}
-    {#            </div>#}
-    {#        {% endwith %}#}
-    {#    </div>#}
-
     <hr/>
     <ul class="nav nav-tabs">
         <li class="nav-item">
@@ -60,13 +42,7 @@
     <br/>
 
 
-    <p>Страница {{ posts.number }} из {{ posts.paginator.num_pages }}</p>
     {% with posts=posts interactive=True %}
         {% include 'plan/partials/posts_table.html' %}
     {% endwith %}
-
-    {% with objects=posts filter=filter_ %}
-        {% include 'plan/partials/paginator.html' %}
-    {% endwith %}
-
 {% endblock %}

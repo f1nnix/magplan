@@ -6,7 +6,6 @@ from constance import config
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.mail import EmailMultiAlternatives
-from django.core.paginator import Paginator
 from django.db.models import Count
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
@@ -59,12 +58,8 @@ def index(request):
     else:
         ideas = ideas.all()
 
-    paginator = Paginator(ideas, IDEAS_PER_PAGE)
-    page = request.GET.get('page')
-    ideas_paginated = paginator.get_page(page)
-
     return render(request, 'plan/ideas/index.html', {
-        'ideas': ideas_paginated,
+        'ideas': ideas,
         'form': form,
         'filter_': filter,
     })
