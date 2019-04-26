@@ -59,10 +59,10 @@
                         <a href="{% url 'ideas_show' idea.id %}">{{ idea.title }}</a>
                         <p>{{ idea.description|truncatechars:512 }}</p>
                     <td>
-                        {% if idea.approved == true %}
-                            <span class="badge badge-success">одобрено</span>
-                        {% elif idea.approved == false %}
-                            <span class="badge badge-danger">отклонено</span>
+                        {% if idea.approved is True %}
+                            <span class="badge badge-success">Одобрено</span>
+                        {% elif idea.approved is False %}
+                            <span class="badge badge-danger">Отклонено</span>
                         {% else %}
                             Идет голосование. Проголосовали {{ idea.voted }}
                         {% endif %}
@@ -70,7 +70,7 @@
                         {% if idea.post %}
                             <br/>
                             <br/>
-                            <a class="btn btn-primary btn-sm" href="{% url 'posts_show' idea.post.id %}">Посмотреть
+                            <a href="{% url 'posts_show' idea.post.id %}">Посмотреть
                                 статью</a>
                         {% endif %}
                     </td>
