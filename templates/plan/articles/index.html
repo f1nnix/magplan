@@ -24,7 +24,11 @@
     <hr/>
     <ul class="nav nav-tabs">
         <li class="nav-item">
-            <a class="nav-link {% if filter_ == none %}active{% endif %}" href="{% url 'articles_index' %}">Все</a>
+            <a class="nav-link {% if filter_ == none %}active{% endif %}" href="{% url 'articles_index' %}">Недавние</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if filter_ == 'all' %}active{% endif %}"
+               href="{% url 'articles_index' %}?filter=all">Все</a>
         </li>
         <li class="nav-item">
             <a class="nav-link {% if filter_ == 'self' %}active{% endif %}"
