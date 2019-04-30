@@ -11,10 +11,16 @@ from plan.forms import WhitelistedPostExtendedModelForm, AdPostExtendedModelForm
 @login_required
 def index(request):
     posts = Post.objects.order_by('-created_at') \
-        .prefetch_related('section', 'stage', 'issues__magazine', 'editor__profile')
+        .prefetch_related('section', 'stage', 'issues__magazine', 'editor__profile')\
+        .order_by('-created_at')
+
+    filter = request.GET.get('filter')
+
+    # render recent by default
+    if filter is None:
+        posts = posts[:50]
 
     # get filtered queryset
-    filter = request.GET.get('filter')
     if filter == 'self':
         posts = posts.filter(editor=request.user)
     elif filter == 'overdue':
