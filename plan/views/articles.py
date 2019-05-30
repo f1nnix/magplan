@@ -12,7 +12,7 @@ from plan.forms import WhitelistedPostExtendedModelForm, AdPostExtendedModelForm
 def index(request):
     posts = Post.objects.order_by('-created_at') \
         .prefetch_related('section', 'stage', 'issues__magazine', 'editor__profile') \
-        .order_by('-created_at')
+        .order_by('-updated_at')
 
     filter = request.GET.get('filter')
 
