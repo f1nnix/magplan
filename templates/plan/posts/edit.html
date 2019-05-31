@@ -72,6 +72,18 @@
             {% with images=post.images pdfs=post.pdfs files=post.files %}
                 {% include 'plan/posts/_attachments.html' %}
             {% endwith %}
+
+
+            <div id="images_status">
+                <p id="missing" style="color: lightcoral">
+                    <span style="font-weight: bold;">Не хватает картинок: </span>
+                    <span class="value"></span>
+                </p>
+                <p id="extra" style="color: cadetblue">
+                    <span style="font-weight: bold;">Лишние картинки: </span>
+                    <span class="value"></span>
+                </p>
+            </div>
         </section>
 
         {% include 'plan/posts/_form_extended.html' %}
@@ -109,7 +121,8 @@
 {% block footer %}
     <footer class="footer">
         <div class="container">
-            <span class="smal">Последнее изменение: {{ post.updated_at }} {% if post.last_updater %}от {{ post.last_updater }}{% endif %}</span>
+            <span class="smal">Последнее изменение: {{ post.updated_at }} {% if post.last_updater %}от
+                {{ post.last_updater }}{% endif %}</span>
             <div class="float-right"><input type="submit" id="save_post" form="save_post_form" class="btn btn-success"
                                             value="Сохранить"></div>
         </div>
@@ -169,7 +182,63 @@
 
             }
         }
+    </script>
+    <script type="text/javascript">
+        let INITIAL = [
+            {% for image in post.images %}
+                '{{ image.original_filename }}',
+            {% endfor %}
 
-        {#alarm_unbound_images()#}
+        ]
+        let getUsedImages = function () {
+            let currentText = $('#id_xmd').val()
+            return currentText.match(/!\[(.*?)\]\(.+?\)/gm).map(function (currentValue, index, array) {
+                let img = currentValue.match(/\((.*?)\)$/igm)[0].slice(1, -1);
+
+                // if its a video with preview
+                if (img.indexOf(' ' > -1)) {
+                    let chunks = img.split(' ');
+                    if (chunks[0].indexOf('youtube.com') > -1) return chunks[1];
+                    if (chunks[0].indexOf('vimeo.com') > -1) return chunks[1]
+                }
+
+                // if its a gallery
+                if (img.indexOf(',') > -1) return img.split(',');
+
+                return img
+            })
+        }
+
+        let countStats = function () {
+            let usedImages = getUsedImages()
+
+            let missingImages = [...new Set(usedImages.filter(x => !INITIAL.includes(x)))]
+            let extraImages = [...new Set(INITIAL.filter(x => !usedImages.includes(x)))]
+
+            return [missingImages, extraImages]
+        }
+
+        let updateStats = function () {
+            let [missing, extra] = countStats()
+
+            let missingInfo = 'все в порядке'
+            if (missing.length > 0) {
+                missingInfo = missing.join(', ')
+            }
+            $('#images_status #missing .value').text(missingInfo)
+
+            let extraInfo = 'все в порядке'
+            if (extra.length > 0) {
+                extraInfo = extra.join(', ')
+            }
+            $('#images_status #extra .value').text(extraInfo)
+        }
+
+        $(document).ready(function () {
+            updateStats()
+            $("#id_xmd").on('change keyup paste', function () {
+                updateStats()
+            });
+        });
     </script>
 {% endblock %}
