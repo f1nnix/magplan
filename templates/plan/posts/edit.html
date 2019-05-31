@@ -133,56 +133,7 @@
     <script type="text/javascript">
         window.DELETE_ATTACHMENT_URL = "{% url 'posts_attachment_delete' post.id %}";
     </script>
-    <script type="text/javascript">
-        function alarm_unbound_images() {
-            var text = window.editor.getSession().getValue();
-            var required_images = text.match(/^!\[(.*?)\]\(.+?\)$/gm).map(function (currentValue, index, array) {
-                var img = currentValue.match(/\((.*?)\)$/igm)[0].slice(1, -1);
 
-                // if its a video with preview
-                if (img.indexOf(' ' > -1)) {
-                    var chunks = img.split(' ');
-                    if (chunks[0].indexOf('youtube.com') > -1) return chunks[1];
-                    if (chunks[0].indexOf('vimeo.com') > -1) return chunks[1]
-                }
-
-                // if its a gallery
-                if (img.indexOf(',') > -1) return img.split(',');
-
-                return img
-            });
-
-            var attached_images = [
-                {% for image in images %}
-                    {#'{{ image["original_filename"] }}',#}
-                {% endfor %}
-            ];
-
-
-            var missing_images = required_images.filter(x => !attached_images.includes(x));
-            var extra_images = attached_images.filter(x => !required_images.includes(x));
-
-            if (missing_images.length > 0) {
-                $('#missing_images').show();
-                var container = $('#missing_images .card-text');
-
-                for (var i = missing_images.length - 1; i >= 0; i--) {
-                    $('<li>' + missing_images[i] + '</li>').appendTo(container)
-                }
-
-            }
-
-            if (extra_images.length > 0) {
-                $('#extra_images').show();
-                var container = $('#extra_images .card-text');
-
-                for (var i = extra_images.length - 1; i >= 0; i--) {
-                    $('<li>' + extra_images[i] + '</li>').appendTo(container)
-                }
-
-            }
-        }
-    </script>
     <script type="text/javascript">
         let INITIAL = [
             {% for image in post.images %}
