@@ -1,0 +1,41 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<script type="text/javascript">
+    let getUsedImages = function (currentText) {
+        return currentText.match(/!\[(.*?)\]\(.+?\)/gm).map(function (currentValue, index, array) {
+            // TODO: improve lazy matching group to catch first ( from $
+            let img = currentValue.match(/\]\((.+?)\)$/)[0].slice(2, -1);
+
+            // if its a video with preview
+            if (img.indexOf(' ') > -1) {
+                let chunks = img.split(' ');
+                if (chunks[0].indexOf('youtube.com') > -1) return chunks[1];
+                if (chunks[0].indexOf('vimeo.com') > -1) return chunks[1]
+            }
+
+            // if its a gallery
+            if (img.indexOf(',') > -1) return img.split(',');
+
+            return img
+        })
+    }
+
+    let testCase = `
+![Ключевые этапы адаптивной безопасности, которые должны быть выстроены Blue Team (источник — Gartner)](adaptive_security_gartner.png)
+![Выбери свою пилюлю, Нео, но помни, что результат должен быть один](red_blue_circles.png)
+![](https://twitter.com/difezza/status/1123539814530392064)
+![](https://www.youtube.com/watch?v=pL9q2lOZ1Fw)
+![Жизненный цикл таргетированной атаки (Attack Kill Chain) и road map для красной команды](TA_lifecycle.png)
+![Матрица MITRE ATT&CK](mitre_attack_matrix.png)
+![Пример дорожной карты проекта для Red Team](red_team_roadmap.png)
+`
+</script>
+</body>
+</html>
