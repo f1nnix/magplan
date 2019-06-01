@@ -144,7 +144,8 @@
         let getUsedImages = function () {
             let currentText = $('#id_xmd').val()
             return currentText.match(/!\[(.*?)\]\(.+?\)/gm).map(function (currentValue, index, array) {
-                let img = currentValue.match(/\((.*?)\)$/igm)[0].slice(1, -1);
+                // TODO: improve lazy matching group to catch first ( from $
+                let img = currentValue.match(/\]\((.+?)\)$/)[0].slice(2, -1);
 
                 // if its a video with preview
                 if (img.indexOf(' ' > -1)) {
