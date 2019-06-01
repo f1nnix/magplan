@@ -141,14 +141,14 @@
             {% endfor %}
 
         ]
-        let getUsedImages = function () {
-            let currentText = $('#id_xmd').val()
+
+        let getUsedImages = function (currentText) {
             return currentText.match(/!\[(.*?)\]\(.+?\)/gm).map(function (currentValue, index, array) {
                 // TODO: improve lazy matching group to catch first ( from $
                 let img = currentValue.match(/\]\((.+?)\)$/)[0].slice(2, -1);
 
                 // if its a video with preview
-                if (img.indexOf(' ' > -1)) {
+                if (img.indexOf(' ') > -1) {
                     let chunks = img.split(' ');
                     if (chunks[0].indexOf('youtube.com') > -1) return chunks[1];
                     if (chunks[0].indexOf('vimeo.com') > -1) return chunks[1]
@@ -161,8 +161,10 @@
             })
         }
 
+
         let countStats = function () {
-            let usedImages = getUsedImages()
+            let currentText = $('#id_xmd').val()
+            let usedImages = getUsedImages(currentText)
 
             let missingImages = [...new Set(usedImages.filter(x => !INITIAL.includes(x)))]
             let extraImages = [...new Set(INITIAL.filter(x => !usedImages.includes(x)))]
@@ -190,7 +192,7 @@
             updateStats()
             $("#id_xmd").on('change keyup paste', function () {
                 updateStats()
-            });
-        });
+            })
+        })
     </script>
 {% endblock %}
