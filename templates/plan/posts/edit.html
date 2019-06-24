@@ -35,6 +35,18 @@
         .edit_hidden {
             display: none;
         }
+
+        #images_status > p {
+            color: #ddd;
+        }
+
+        #images_status > #missing.active {
+            color: lightcoral;
+        }
+
+        #images_status > #extra.active {
+            color: cadetblue;
+        }
     </style>
 {% endblock %}
 
@@ -75,14 +87,8 @@
 
 
             <div id="images_status">
-                <p id="missing" style="color: lightcoral">
-                    <span style="font-weight: bold;">Не хватает картинок: </span>
-                    <span class="value"></span>
-                </p>
-                <p id="extra" style="color: cadetblue">
-                    <span style="font-weight: bold;">Лишние картинки: </span>
-                    <span class="value"></span>
-                </p>
+                <p id="missing"></p>
+                <p id="extra"></p>
             </div>
         </section>
 
@@ -174,18 +180,28 @@
 
         let updateStats = function () {
             let [missing, extra] = countStats()
+            let missingClass = '',
+                missingText = '',
+                extraClass = '',
+                extraText = ''
 
-            let missingInfo = 'все в порядке'
+
             if (missing.length > 0) {
-                missingInfo = missing.join(', ')
+                missingText = 'Не хватает картинок: ' + missing.join(', ')
+                missingClass = 'active'
+            } else {
+                missingText = 'Все картинки приложены'
             }
-            $('#images_status #missing .value').text(missingInfo)
+            $('#images_status #missing').text(missingText).attr('class', missingClass)
 
-            let extraInfo = 'все в порядке'
+
             if (extra.length > 0) {
-                extraInfo = extra.join(', ')
+                extraText = 'Лишние картинки: ' + extra.join(', ')
+                extraClass = 'active'
+            } else {
+                extraText = 'Лишних картинок нет'
             }
-            $('#images_status #extra .value').text(extraInfo)
+            $('#images_status #extra').text(extraText).attr('class', extraClass)
         }
 
         $(document).ready(function () {
