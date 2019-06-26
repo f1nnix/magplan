@@ -34,18 +34,7 @@ class PostAdmin(admin.ModelAdmin):
         ('editor', RelatedDropdownFilter),
     )
 
-    def admin_post_display_name(self, obj):
-        editor = obj.editor
-        return '{0} {1}, {2}, {3}'.format(
-            editor.meta['l_name'],
-            editor.meta['f_name'],
-            '',
-            '',
-        )
-
-    admin_post_display_name.short_description = 'Редактор'
-
-    list_display = ('title', 'created_at', 'stage', 'section', 'admin_post_display_name')
+    list_display = ('title', 'created_at', 'stage', 'section', 'editor')
 
 
 class AttachmentAdmin(admin.ModelAdmin):
