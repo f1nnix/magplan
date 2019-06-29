@@ -32,8 +32,12 @@ def index(request):
             idea = form.save(commit=False)
             idea.editor = request.user
             idea.save()
+            
+            # Save authors, if existing specified 
+            if idea.author_type == Idea.AUTHOR_TYPE_EXISTING:
+                form.save_m2m()
 
-            # clear idea form to prevent rendering prefilled form
+            # Clear idea form to prevent rendering prefilled form
             form = IdeaModelForm()
 
             messages.add_message(request, messages.SUCCESS, 'Идея «%s» успешно выдвинута на голосование!' % idea.title)
@@ -77,6 +81,7 @@ def show(request, idea_id):
         'idea': idea,
         'form': form,
         'comment_form': CommentModelForm(),
+        'AUTHOR_TYPE_CHOICES': Idea.AUTHOR_TYPE_CHOICES,
     })
 
 

@@ -1,0 +1,74 @@
+<div class="row">
+    <div class="col-12">
+        <div class="form-group">
+            {{ form.title.label }}
+            {% if form.title.errors %}
+                <ul class="errors">
+                    {% for error in form.title.errors %}
+                        <li>{{ error }}</li>{% endfor %}
+                </ul>
+            {% endif %}
+            {{ form.title }}
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-12">
+        <div class="form-group">
+            {{ form.description.label }}
+            {% if form.description.errors %}
+                <ul class="errors">
+                    {% for error in form.description.errors %}
+                        <li>{{ error }}</li>{% endfor %}
+                </ul>
+            {% endif %}
+            {{ form.description }}
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-6">
+        <div class="form-group">
+            {{ form.author_type.label }}
+            {% if form.author_type.errors %}
+                <ul class="errors">
+                    {% for error in form.author_type.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {{ form.author_type }}
+        </div>
+    </div>
+    <div class="col-6">
+        <!--new authors-->
+        <div class="form-group" style="display: none;">
+            {{ form.authors_new.label }}
+            {% if form.description.errors %}
+                <ul class="errors">
+                    {% for error in form.authors_new.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {{ form.authors_new }}
+        </div>
+
+        <!--existing authors-->
+        <div class="form-group" style="display: none;">
+            {{ form.authors.label }}
+            {% if form.authors.errors %}
+                <ul class="errors">
+                    {% for error in form.authors.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {{ form.authors }}
+        </div>
+    </div> 
+</div>
+

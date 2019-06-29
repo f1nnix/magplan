@@ -32,10 +32,16 @@ class ProfileModelForm(ModelForm):
 class IdeaModelForm(ModelForm):
     class Meta:
         model = Idea
-        fields = ['title', 'description', ]
+        fields = ['title', 'description', 'author_type', 'authors_new', 'authors']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', }),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
+            'author_type': forms.Select(attrs={'class': 'form-control'}),
+            'authors_new': forms.TextInput(attrs={'class': 'form-control'}),
+            'authors': forms.SelectMultiple(attrs={
+                'class': 'form-control live_multiselect',
+                'data-url': '/admin/api/users/search',
+            }),
         }
 
 

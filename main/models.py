@@ -156,9 +156,10 @@ class Idea(AbstractBase):
     editor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='editor')
     post = models.OneToOneField('Post', on_delete=models.SET_NULL, null=True, blank=True)
     comments = GenericRelation('Comment')
-    author_type = models.CharField(max_length=2, choices=AUTHOR_TYPE_CHOICES, default=AUTHOR_TYPE_NO, verbose_name='Тип автора')
-    author_new = models.CharField(max_length=255, null=True, blank=True, verbose_name='Новый автор')
-    authors = models.ManyToManyField(User, verbose_name='Авторы', related_name='authors')
+    author_type = models.CharField(max_length=2, choices=AUTHOR_TYPE_CHOICES, default=AUTHOR_TYPE_NO,
+                                   verbose_name='Тип автора')
+    authors_new = models.CharField(max_length=255, null=True, blank=True, verbose_name='Новые автор')
+    authors = models.ManyToManyField(User, verbose_name='Авторы', related_name='authors', null=True, blank=True)
 
     def voted(self, user):
         vote = next((v for v in self.votes.all() if v.user_id == user.id), None)
