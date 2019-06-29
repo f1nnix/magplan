@@ -1,5 +1,13 @@
 {% extends "layout_plan.html" %}
 {% block title %}Идеи{% endblock %}
+{% block styles %}
+    <style>
+        /* Fix for select2 initial render in hidden mode */
+        .select2.select2-container {
+            width: 100% !important;
+        }
+    </style>
+{% endblock %}
 {% block content %}
     <h1>Идеи</h1>
     <div class="card border-success">
@@ -10,7 +18,7 @@
                   method="post"
                   accept-charset="utf-8">
                 {% csrf_token %}
-                {{ form.as_p }}
+                {% include 'plan/ideas/_form_base.html' %}
                 <button type="submit" class="btn btn-success float-right">На голосование!</button>
             </form>
         </div>
@@ -81,4 +89,22 @@
         </table>
     </div>
 
+{% endblock %}
+{% block scripts %}
+    <script type='text/javascript'>
+        $( '#id_author_type' ).change(function() {
+            let $newContainer = $('#id_authors_new').parent()
+            let $extContainer = $('#id_authors').parent()
+            let newValue = $(this).val()
+
+            $newContainer.hide()
+            $extContainer.hide()
+            
+            if (newValue === 'NW') {
+                $newContainer.show()
+            } else if (newValue === 'EX') {
+                $extContainer.show()
+            }
+        })
+    </script>
 {% endblock %}

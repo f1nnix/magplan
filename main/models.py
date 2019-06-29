@@ -142,12 +142,24 @@ class Stage(AbstractBase):
 
 
 class Idea(AbstractBase):
+    AUTHOR_TYPE_NO = 'NO'
+    AUTHOR_TYPE_NEW = 'NW'
+    AUTHOR_TYPE_EXISTING = 'EX'
+    AUTHOR_TYPE_CHOICES = [
+        (AUTHOR_TYPE_NO, 'Нет автора'),
+        (AUTHOR_TYPE_NEW, 'Новый автор'),
+        (AUTHOR_TYPE_EXISTING, 'Существующий автор(ы)'),
+    ]
     title = models.CharField(null=False, blank=False, max_length=255, verbose_name='Заголовок идеи', )
     description = models.TextField(verbose_name='Описание идеи')
     approved = models.BooleanField(null=True, )
-    editor = models.ForeignKey(User, on_delete=models.CASCADE)
+    editor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='editor')
     post = models.OneToOneField('Post', on_delete=models.SET_NULL, null=True, blank=True)
     comments = GenericRelation('Comment')
+    author_type = models.CharField(max_length=2, choices=AUTHOR_TYPE_CHOICES, default=AUTHOR_TYPE_NO,
+                                   verbose_name='Тип автора')
+    authors_new = models.CharField(max_length=255, null=True, blank=True, verbose_name='Новые автор')
+    authors = models.ManyToManyField(User, verbose_name='Авторы', related_name='authors', null=True, blank=True)
 
     def voted(self, user):
         vote = next((v for v in self.votes.all() if v.user_id == user.id), None)

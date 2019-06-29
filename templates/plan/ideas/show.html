@@ -8,6 +8,11 @@
     <p>
         <strong>Предложил</strong> {{ idea.editor }}
     </p>
+    <p>
+        {% with idea=idea AUTHOR_TYPE_CHOICES=AUTHOR_TYPE_CHOICES %}
+            {% include 'plan/ideas/_authors_list.html' %}
+        {% endwith %}
+    </p>
     <div id="description">{{ idea.description_html|safe }}</div>
 
     {% if idea.approved is None %}
