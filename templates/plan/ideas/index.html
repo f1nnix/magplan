@@ -48,6 +48,10 @@
             <a class="nav-link {% if filter_ == 'rejected' %}active{% endif %}"
                href="{% url 'ideas_index' %}?filter=rejected">Отклоненные</a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link {% if filter_ == 'no_author' %}active{% endif %}"
+               href="{% url 'ideas_index' %}?filter=no_author">Нет автора</a>
+        </li>
     </ul>
     <br/>
 

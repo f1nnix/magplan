@@ -1,4 +1,5 @@
 import os
+import datetime
 
 import django_filters
 import html2text
@@ -14,6 +15,9 @@ from main.models import Idea, Vote, Issue, User
 from plan.forms import IdeaModelForm, PostBaseModelForm, CommentModelForm
 
 IDEAS_PER_PAGE = 20
+
+# HACK
+AUTHOR_TYPE_DAY = datetime.date(2019, 6, 29)
 
 
 class IdeaApprovedFilter(django_filters.FilterSet):
@@ -52,15 +56,19 @@ def index(request):
     # filters
     filter = request.GET.get('filter', None)
     if filter == 'voted':
-        ideas = ideas.filter(approved=None).all()
+        ideas = ideas.filter(approved=None)
     elif filter == 'self':
-        ideas = ideas.filter(editor=request.user).all()
+        ideas = ideas.filter(editor=request.user)
     elif filter == 'approved':
-        ideas = ideas.filter(approved=True).all()
+        ideas = ideas.filter(approved=True)
     elif filter == 'rejected':
-        ideas = ideas.filter(approved=False).all()
-    else:
-        ideas = ideas.all()
+        ideas = ideas.filter(approved=False)
+    elif filter == 'no_author':
+        ideas = ideas.filter(author_type=Idea.AUTHOR_TYPE_NO)
+        # HACK:
+        ideas = ideas.filter(created_at__gte=AUTHOR_TYPE_DAY)
+    
+    ideas = ideas.all()
 
     return render(request, 'plan/ideas/index.html', {
         'ideas': ideas,
