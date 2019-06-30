@@ -163,7 +163,7 @@ def set_stage(request, post_id, system=Comment.TYPE_SYSTEM):
 
         # set deadline to current stage durtion. If no duration, append 1 day
         duration = stage.duration if stage.duration else 1
-        post.published_at = post.published_at + + datetime.timedelta(days=duration)
+        post.finished_at = post.finished_at + + datetime.timedelta(days=duration)
         post.stage = stage
         post.imprint_updater(request.user)
         post.save()

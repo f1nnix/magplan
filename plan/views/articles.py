@@ -26,7 +26,7 @@ def index(request):
     if filter == 'self':
         posts = posts.filter(editor=request.user)
     elif filter == 'overdue':
-        posts = posts.filter(published_at__lte=datetime.datetime.now()).exclude(stage__slug='vault').exclude(
+        posts = posts.filter(finished_at__lte=datetime.datetime.now()).exclude(stage__slug='vault').exclude(
             stage__slug='published')
     elif filter == 'vault':
         posts = posts.filter(stage__slug='vault')

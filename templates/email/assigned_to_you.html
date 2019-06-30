@@ -1,6 +1,6 @@
 <h1>На вас назначена статья</h1>
 <p>Статья «{{ post }}» пришла на этап «{{ post.stage.title }}» и назначена на вас. Дедлайн
-    — {{ post.published_at }}.</p>
+    — {{ post.finished_at }}.</p>
 
 <p>
     <a href="{{ APP_URL }}{% url 'posts_show' post.id %}">Посмотреть статью</a>.

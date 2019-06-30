@@ -21,8 +21,8 @@
     </div>
 
     <div class="col-4" style="text-align: center;">
-        {% blocktrans with stage=post.stage.title assignee=post.assignee published_at=post.published_at %}
-            Сейчас на <strong>{{ stage }}</strong> ({{ assignee }}) до {{ published_at }}
+        {% blocktrans with stage=post.stage.title assignee=post.assignee finished_at=post.finished_at %}
+            Сейчас на <strong>{{ stage }}</strong> ({{ assignee }}) до {{ finished_at }}
         {% endblocktrans %}
 
 

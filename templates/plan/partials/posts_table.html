@@ -45,8 +45,8 @@
                     {% endif %}
                 </td>
                 <td class="{% if post.is_overdue is True %}table-danger{% endif %}"
-                    data-order="{{ post.published_at|date:'U' }}">
-                    <nobr>{{ post.published_at|date:'d b Y' }}</nobr>
+                    data-order="{{ post.finished_at|date:'U' }}">
+                    <nobr>{{ post.finished_at|date:'d b Y' }}</nobr>
                 </td>
                 <td data-order="{{ post.updated_at|date:'U' }}">
                     <nobr>{{ post.updated_at|date:'d b Y' }}</nobr>{% if post.last_updater %},

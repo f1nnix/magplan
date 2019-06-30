@@ -222,7 +222,7 @@ class Post(AbstractBase):
     )
 
     format = models.SmallIntegerField(choices=POST_FORMAT_CHOICES, default=POST_FORMAT_DEFAULT)
-    published_at = models.DateTimeField(null=False, blank=False, default=django.utils.timezone.now,
+    finished_at = models.DateTimeField(null=False, blank=False, default=django.utils.timezone.now,
                                         verbose_name='Дедлайн')
     kicker = models.CharField(null=True, blank=True, max_length=255, )
     slug = models.SlugField(null=True, blank=True, max_length=255, )
@@ -310,7 +310,7 @@ class Post(AbstractBase):
     def is_overdue(self):
         if self.stage.slug in ('vault', 'published'):
             return False
-        return timezone.now() > self.published_at
+        return timezone.now() > self.finished_at
 
     @property
     def description_html(self):
