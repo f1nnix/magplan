@@ -1,4 +1,5 @@
 {% extends "layout_plan.html" %}
+{% load filters %}
 {% block title %}Сводка{% endblock %}
 {% block styles %}
     <style type="text/css">
@@ -10,8 +11,9 @@
 {% block content %}
     {% if opened_issues|length > 0 %}
         <h4>Открытые выпуски:
-            {% for issue in opened_issues  %}
-                <a href="{% url 'issues_show' issue.id %}">{{ issue }}</a>{% if forloop.last is False %}, {% else %}.{% endif %}
+            {% for issue in opened_issues %}
+                <a href="{% url 'issues_show' issue.id %}">{{ issue }}</a>{% if forloop.last is False %}, {% else %}.
+            {% endif %}
             {% endfor %}
         </h4>
     {% endif %}
@@ -38,4 +40,36 @@
     {% with posts=self_posts %}
         {% include 'plan/partials/posts_table.html' %}
     {% endwith %}
+
+    <br>
+    <h4>План публикаций</h4>
+    <table class="table table-bordered table-striped table-hover">
+        <tbody>
+        {% for day, posts in schedule.items %}
+            {% if day|is_today == True %}
+                <tr style="font-weight: bold">
+                    {% else %}
+                <tr>
+            {% endif %}
+        <td>{{ day|date:'D' }}</td>
+        <td>{{ day|date:'j M' }}</td>
+        <td>
+            {% for post in posts %}
+                <div class="row">
+                    <div class="col-lg-7 col-xs-12">
+                        {{ post }} (<a href="{% url 'posts_edit' post_id=post.id %}">ред</a>)
+                    </div>
+                    <div class="col-lg-3 col-xs-12">
+                        {{ post.editor }}
+                    </div>
+                    <div class="col-lg-2 col-xs-12">
+                        {{ post.stage }}
+                    </div>
+                </div>
+            {% endfor %}
+        </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

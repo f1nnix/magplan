@@ -69,16 +69,16 @@
     </div>
     <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12">
         <div class="form-group">
-            {{ form.published_at.label }}
-            {% if form.published_at.errors %}
+            {{ form.finished_at.label }}
+            {% if form.finished_at.errors %}
                 <ul class="errors">
-                    {% for error in form.published_at.errors %}
+                    {% for error in form.finished_at.errors %}
                         <li>{{ error }}</li>{% endfor %}
                 </ul>
             {% endif %}
-            <input type="text" name="published_at" value="{{ form.published_at.value|date:'Y-m-d' }}"
-                   class="form-control date_picker" required="" id="id_published_at">
-            {#            {{ form.published_at }}#}
+            <input type="text" name="finished_at" value="{{ form.finished_at.value|date:'Y-m-d' }}"
+                   class="form-control date_picker" required="" id="id_finished_at">
+            {#            {{ form.finished_at }}#}
         </div>
     </div>
 </div>

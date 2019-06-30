@@ -65,7 +65,7 @@ class PostBaseModelForm(ModelForm):
 
     class Meta:
         model = Post
-        fields = ('title', 'description', 'issues', 'authors', 'published_at', 'section',)
+        fields = ('title', 'description', 'issues', 'authors', 'finished_at', 'section',)
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', }),
             'description': forms.Textarea(attrs={'class': 'form-control', }),
@@ -77,7 +77,7 @@ class PostBaseModelForm(ModelForm):
                 'class': 'form-control live_multiselect',
                 'data-url': '/admin/api/users/search',
             }),
-            'published_at': forms.DateInput(attrs={'class': 'form-control date_picker', }),
+            'finished_at': forms.DateInput(attrs={'class': 'form-control date_picker', }),
         }
 
     def __init__(self, *args, **kwargs):
