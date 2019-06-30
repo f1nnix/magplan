@@ -3,7 +3,7 @@ import io
 import os
 from collections import deque
 from zipfile import ZipFile, ZIP_DEFLATED
-from dateutil.parser import parse
+import time    
 import html2text
 from constance import config
 from django.conf import settings
@@ -218,7 +218,8 @@ def schedule(request, post_id):
         messages.add_message(request, messages.ERROR, 'Ошибка планирования публикации — дата не передана')
         return redirect('posts_show', post.id)
 
-    dt = parse(published_at).replace(hour=10 minute=0, second=0)
+    dt = datetime.datetime.strptime(published_at, '%Y-%m-%d')
+    dt = dt.replace(hour=10, minute=0, second=0)
     post.published_at = dt 
     post.save()
 
