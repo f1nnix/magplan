@@ -132,3 +132,9 @@ def count_human_comments(comments: List[Comment]) -> int:
     :return: Actual comments number
     """
     return len(list(filter(lambda c: c.type != Comment.TYPE_SYSTEM, comments)))
+
+
+@register.filter
+def is_today(date: datetime) -> bool:
+    today = datetime.datetime.today().replace(hour=0, minute=0, second=0)
+    return today <= date <= today + datetime.timedelta(days=1)
