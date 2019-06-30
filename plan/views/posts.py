@@ -8,7 +8,7 @@ import html2text
 from constance import config
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.core.mail import EmailMultiAlternatives
 from django.http import HttpRequest
 from django.shortcuts import render, HttpResponse, redirect
@@ -204,6 +204,24 @@ def set_stage(request, post_id, system=Comment.TYPE_SYSTEM):
             msg.send()
 
             return redirect('posts_show', post_id)
+
+    return redirect('posts_show', post.id)
+
+
+@login_required
+@permission_required('main.schedule_publish')
+def schedule(request, post_id):
+    post = Post.objects.get(id=post_id)
+
+    published_at = request.POST.get('published_at')
+    if published_at is None:
+        messages.add_message(request, messages.ERROR, 'Ошибка планирования публикации — дата не передана')
+        return redirect('posts_show', post.id)
+
+    post.published_at = published_at
+    post.save()
+
+    messages.add_message(request, messages.SUCCESS, 'Пост успешно запланирован в публикацию')
 
     return redirect('posts_show', post.id)
 

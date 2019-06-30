@@ -1,0 +1,23 @@
+{% if perms.main.schedule_publish %}
+    <div class="row">
+        <div class="col-12">
+            <h4>Запланировать публикацию</h4>
+        </div>
+    </div>
+    <form action="{% url 'posts_schedule' post_id=post.id %}" method="POST">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-4">
+                <div class="form-group">
+                    <input type="text" name="published_at" value="{{ post.published_at|date:'Y-m-d' }}"
+                           class="form-control date_picker" required="" id="id_published_at">
+                </div>
+            </div>
+            <div class="col-8">
+                <div class="form-group">
+                    <input type="submit" value="Запланировать" class="btn btn-success">
+                </div>
+            </div>
+        </div>
+    </form>
+{% endif %}
