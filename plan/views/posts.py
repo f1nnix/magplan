@@ -3,7 +3,7 @@ import io
 import os
 from collections import deque
 from zipfile import ZipFile, ZIP_DEFLATED
-
+from dateutil.parser import parse
 import html2text
 from constance import config
 from django.conf import settings
@@ -212,13 +212,14 @@ def set_stage(request, post_id, system=Comment.TYPE_SYSTEM):
 @permission_required('main.schedule_publish')
 def schedule(request, post_id):
     post = Post.objects.get(id=post_id)
-
     published_at = request.POST.get('published_at')
+
     if published_at is None:
         messages.add_message(request, messages.ERROR, 'Ошибка планирования публикации — дата не передана')
         return redirect('posts_show', post.id)
 
-    post.published_at = published_at
+    dt = parse(published_at).replace(hour=10 minute=0, second=0)
+    post.published_at = dt 
     post.save()
 
     messages.add_message(request, messages.SUCCESS, 'Пост успешно запланирован в публикацию')
