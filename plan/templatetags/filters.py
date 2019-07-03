@@ -128,7 +128,7 @@ def count_human_comments(comments: List[Comment]) -> int:
 
 
 @register.filter
-def date_state(datetime_obj: datetime.datetime) -> int:
+def date_class(datetime_obj: datetime.datetime) -> str:
     """Return numeric representaion of provided dates, where:
 
     datetime_obj|f = 1 if passed
@@ -140,8 +140,8 @@ def date_state(datetime_obj: datetime.datetime) -> int:
     today = datetime.datetime.now().date()
 
     if date < today:
-        return 1
+        return 'past'
     elif date == today:
-        return 2
+        return 'today'
     else:
-        return 0
+        return ''
