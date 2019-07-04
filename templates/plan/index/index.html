@@ -3,8 +3,16 @@
 {% block title %}Сводка{% endblock %}
 {% block styles %}
     <style type="text/css">
-        table > tbody > tr > td {
-            padding: 0rem 1rem;
+        #schedule > tbody > tr:nth-child(5) {
+            border-bottom: 1rem solid #ffffff;
+        }
+        .table-posts {
+            width: 100%;
+            background-color: transparent !important;
+            margin-bottom: 0rem !important;
+        }
+        .table-posts tr > td {
+            border: 0px !important;
         }
     </style>
 {% endblock %}
@@ -33,9 +41,6 @@
         </div>
     {% endif %}
 
-    <!-- <h5>сегодня</h5>
-    <h5>завтра</h5>
-    <h5>Статьи на неделю</h5> -->
     <h4>Материалы на мне</h4>
     {% with posts=self_posts %}
         {% include 'plan/partials/posts_table.html' %}
@@ -43,30 +48,43 @@
 
     <br>
     <h4>План публикаций</h4>
-    <table class="table table-bordered table-striped table-hover">
+    <table id="schedule" class="table table-bordered">
         <tbody>
         {% for day, posts in schedule.items %}
-            {% if day|is_today == True %}
-                <tr style="font-weight: bold">
+            {% if posts|length == 0 %}
+                <tr class="table-danger">
+            {% else %}
+            {% if day|date_state == 2 %}
+                <tr class="table-success day-today">
+                    {% elif day|date_state == 1 %}
+                <tr class="table-active day-passed">
                     {% else %}
-                <tr>
+                <tr class="table-warning">
+                {% endif %}
             {% endif %}
         <td>{{ day|date:'D' }}</td>
-        <td>{{ day|date:'j M' }}</td>
         <td>
-            {% for post in posts %}
-                <div class="row">
-                    <div class="col-lg-7 col-xs-12">
-                        {{ post }} (<a href="{% url 'posts_edit' post_id=post.id %}">ред</a>)
-                    </div>
-                    <div class="col-lg-3 col-xs-12">
-                        {{ post.editor }}
-                    </div>
-                    <div class="col-lg-2 col-xs-12">
-                        {{ post.stage }}
-                    </div>
-                </div>
-            {% endfor %}
+            <nobr>{{ day|date:'j M' }}</nobr>
+        </td>
+        <td>
+            <table class="table table-sm table-posts">
+                <tbody>
+                {% for post in posts %}
+                    <tr>
+                        <td style="width:60%;">
+                            <a href="{% url 'posts_show' post_id=post.id %}">{{ post }}</a>
+                            (<a href="{% url 'posts_edit' post_id=post.id %}">ред</a>)
+                        </td>
+                        <td style="width: 20%">
+                            {{ post.editor }}
+                        </td>
+                        <td style="width: 20%">
+                            {{ post.stage }}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </td>
         </tr>
         {% endfor %}
