@@ -67,17 +67,10 @@ def set_var(parser, token):
     """
     parts = token.split_contents()
     if len(parts) < 4:
-        raise template.TemplateSyntaxError("'set' tag must be of the form: {% set <var_name> = <var_value> %}")
+        raise template.TemplateSyntaxError(
+            "'set' tag must be of the form: {% set <var_name> = <var_value> %}")
 
     return SetVarNode(parts[1], parts[3])
-
-
-@register.filter
-def divide(value, arg):
-    try:
-        return str(int(value) / int(arg))
-    except (ValueError, ZeroDivisionError):
-        return None
 
 
 @register.filter
@@ -135,6 +128,20 @@ def count_human_comments(comments: List[Comment]) -> int:
 
 
 @register.filter
-def is_today(date: datetime) -> bool:
-    today = datetime.datetime.today().replace(hour=0, minute=0, second=0)
-    return today <= date <= today + datetime.timedelta(days=1)
+def date_state(datetime_obj: datetime.datetime) -> int:
+    """Return numeric representaion of provided dates, where:
+
+    datetime_obj|f = 1 if passed
+    datetime_obj|f = 2 if today
+    datetime_obj|f = 0 else
+    """
+    # Convert 'datetime' => 'date' class for easier comparison
+    date = datetime_obj.date()
+    today = datetime.datetime.now().date()
+
+    if date < today:
+        return 1
+    elif date == today:
+        return 2
+    else:
+        return 0
