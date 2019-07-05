@@ -9,59 +9,27 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
                 {% if perms.main.manage_authors %}
-                    <li class="nav-item dropdown {% if navbar_current == 'authors' %}active{% endif %}">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{% trans "authors" %}</a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item"
-                               href="{% url 'authors_new' %}">Добавить автора</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="{% url 'authors_index' %}">{% trans "Все авторы" %}</a>
-                        </div>
+                    <li class="nav-item {% if navbar_current == 'authors' %}active{% endif %}">
+                        <a class="nav-link" href="{% url 'authors_index' %} ">Авторы</a>
                     </li>
                 {% endif %}
-                <li class="nav-item dropdown {% if navbar_current == 'issues' %}active{% endif %}">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{% trans "issues" %}</a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        {% for issue in navbar_issues %}
-                            <a class="dropdown-item"
-                               href="{% url 'issues_show' issue.id %}">{{ issue }}</a>
-                        {% endfor %}
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="{% url 'issues_index' %}">{% trans "Все выпуски" %}</a>
-                    </div>
+
+                <li class="nav-item {% if navbar_current == 'issues' %}active{% endif %}">
+                    <a class="nav-link" href="{% url 'issues_index' %} ">Выпуски</a>
                 </li>
 
-                <li class="nav-item dropdown {% if navbar_current == 'ideas' %}active{% endif %}">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{% trans "ideas" %}</a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="{% url 'ideas_index' %}?filter=voted">На голосовании</a>
-                        <a class="dropdown-item" href="{% url 'ideas_index' %}?filter=self">Свои</a>
-                        <a class="dropdown-item" href="{% url 'ideas_index' %}?filter=approved">Принятые</a>
-                        <a class="dropdown-item" href="{% url 'ideas_index' %}?filter=rejected">Отклоненные</a>
-                        <a class="dropdown-item" href="{% url 'ideas_index' %}?filter=no_author">Нет автора</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="{% url 'ideas_index' %}">Все идеи</a>
-                    </div>
+                <li class="nav-item {% if navbar_current == 'ideas' %}active{% endif %}">
+                    <a class="nav-link" href="{% url 'ideas_index' %}?filter=voted">Идеи</a>
                 </li>
 
-                <li class="nav-item dropdown {% if navbar_current == 'articles' %}active{% endif %}">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{% trans "articles" %}</a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="{% url 'articles_index' %}">Недавние</a>
-                        <a class="dropdown-item" href="{% url 'articles_index' %}?filter=self">Свои</a>
-                        <a class="dropdown-item" href="{% url 'articles_index' %}?filter=overdue">Просрочено</a>
-                        <a class="dropdown-item" href="{% url 'articles_index' %}?filter=vault">Копилка</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="{% url 'articles_index' %}?filter=all">Все статьи</a>
-                    </div>
+                <li class="nav-item {% if navbar_current == 'articles' %}active{% endif %}">
+                    <a class="nav-link" href="{% url 'articles_index' %} ">Статьи</a>
                 </li>
+
                 <li class="nav-item {% if navbar_current == 'stages' %}active{% endif %}">
                     <a class="nav-link" href="{% url 'sections_index' %} ">{% trans "sections" %}</a>
                 </li>
+
                 <li class="nav-item {% if navbar_current == 'stages' %}active{% endif %}">
                     <a class="nav-link" href="{% url 'stages_index' %} ">{% trans "stages" %}</a>
                 </li>
