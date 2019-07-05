@@ -34,10 +34,8 @@
         <div class="form-group">
             {{ form.author_type.label }}
             {% if form.author_type.errors %}
-                <ul class="errors">
-                    {% for error in form.author_type.errors %}
-                    <li>{{ error }}</li>
-                    {% endfor %}
+                <ul class="errors"> {% for error in form.author_type.errors %}
+                    <li>{{ error }}</li> {% endfor %}
                 </ul>
             {% endif %}
             {{ form.author_type }}
@@ -45,12 +43,12 @@
     </div>
     <div class="col-6">
         <!--new authors-->
-        <div class="form-group" style="display: none;">
-            {{ form.authors_new.label }}
+        <div id="authors_new" class="form-group" style="display: none;">
+            <span class="label-hidable">{{ form.authors_new.label }}</span>
             {% if form.description.errors %}
                 <ul class="errors">
                     {% for error in form.authors_new.errors %}
-                    <li>{{ error }}</li>
+                        <li>{{ error }}</li>
                     {% endfor %}
                 </ul>
             {% endif %}
@@ -58,17 +56,17 @@
         </div>
 
         <!--existing authors-->
-        <div class="form-group" style="display: none;">
-            {{ form.authors.label }}
+        <div id="authors" class="form-group" style="display: none;">
+            <span class="label-hidable">{{ form.authors.label }}</span>
             {% if form.authors.errors %}
                 <ul class="errors">
                     {% for error in form.authors.errors %}
-                    <li>{{ error }}</li>
+                        <li>{{ error }}</li>
                     {% endfor %}
                 </ul>
             {% endif %}
             {{ form.authors }}
         </div>
-    </div> 
+    </div>
 </div>
 
