@@ -14,8 +14,17 @@
                     </li>
                 {% endif %}
 
-                <li class="nav-item {% if navbar_current == 'issues' %}active{% endif %}">
-                    <a class="nav-link" href="{% url 'issues_index' %} ">Выпуски</a>
+                <li class="nav-item dropdown {% if navbar_current == 'issues' %}active{% endif %}">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{% trans "issues" %}</a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        {% for issue in navbar_issues %}
+                            <a class="dropdown-item"
+                               href="{% url 'issues_show' issue.id %}">{{ issue }}</a>
+                        {% endfor %}
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'issues_index' %}">{% trans "Все выпуски" %}</a>
+                    </div>
                 </li>
 
                 <li class="nav-item {% if navbar_current == 'ideas' %}active{% endif %}">
