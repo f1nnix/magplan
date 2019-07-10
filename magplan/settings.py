@@ -27,7 +27,6 @@ SECRET_KEY = os.getenv('SECRET_KEY', '-6w*l1-u(9gy8gnp%e#1nf8-!*8j)e@%l%^ct)77r^
 DEBUG = True if os.getenv('APP_ENV', None) in ('DEVELOPMENT', 'TEST',) else False
 
 ALLOWED_HOSTS = [] if DEBUG is True else [os.getenv('APP_HOST', None)]
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -129,9 +128,11 @@ TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 
-USE_L10N = True
+USE_L10N = False 
 
 USE_TZ = True
+
+DATETIME_FORMAT = 'M d, y H:m'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
