@@ -1,12 +1,23 @@
+<style>
+    .issues-suggestions .suggestion {
+        display: inline;
+        margin-right: 0.2rem;
+    }
+
+    .issues-suggestions .suggestion a {
+        text-decoration: underline;
+        text-decoration-style: dotted;
+    }
+</style>
 <div class="row">
     <div class="col-12">
         <div class="form-group">
             {{ form.title.label }}
             {% if form.title.errors %}
-                <ul class="errors">
-                    {% for error in form.title.errors %}
-                        <li>{{ error }}</li>{% endfor %}
-                </ul>
+            <ul class="errors">
+                {% for error in form.title.errors %}
+                <li>{{ error }}</li>{% endfor %}
+            </ul>
             {% endif %}
             {{ form.title }}
         </div>
@@ -17,10 +28,11 @@
         <div class="form-group">
             {{ form.description.label }}
             {% if form.description.errors %}
-                <ul class="errors">
-                    {% for error in form.description.errors %}
-                        <li>{{ error }}</li>{% endfor %}
-                </ul>
+            <ul class="errors">
+                {% for error in form.description.errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
             {% endif %}
             {{ form.description }}
         </div>
@@ -32,10 +44,10 @@
         <div class="form-group">
             {{ form.section.label }}
             {% if form.section.errors %}
-                <ul class="errors">
-                    {% for error in form.section_id.errors %}
-                        <li>{{ error }}</li>{% endfor %}
-                </ul>
+            <ul class="errors">
+                {% for error in form.section_id.errors %}
+                <li>{{ error }}</li>{% endfor %}
+            </ul>
             {% endif %}
             {{ form.section }}
         </div>
@@ -44,12 +56,19 @@
         <div class="form-group">
             {{ form.issues.label }}
             {% if form.issues.errors %}
-                <ul class="errors">
-                    {% for error in form.issues.errors %}
-                        <li>{{ error }}</li>{% endfor %}
-                </ul>
+            <ul class="errors">
+                {% for error in form.issues.errors %}
+                <li>{{ error }}</li>{% endfor %}
+            </ul>
             {% endif %}
             {{ form.issues }}
+            <div class="issues-suggestions">
+                {% for issue in issues_suggesions %}
+                <div class="suggestion">
+                    <a href="#" class="text-success"data-id="{{ issue.id }}">{{ issue }}</a>
+                </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
 </div>
@@ -59,10 +78,11 @@
         <div class="form-group">
             {{ form.authors.label }}
             {% if form.authors.errors %}
-                <ul class="errors">
-                    {% for error in form.authors.errors %}
-                        <li>{{ error }}</li>{% endfor %}
-                </ul>
+            <ul class="errors">
+                {% for error in form.authors.errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
             {% endif %}
             {{ form.authors }}
         </div>
@@ -71,13 +91,14 @@
         <div class="form-group">
             {{ form.finished_at.label }}
             {% if form.finished_at.errors %}
-                <ul class="errors">
-                    {% for error in form.finished_at.errors %}
-                        <li>{{ error }}</li>{% endfor %}
-                </ul>
+            <ul class="errors">
+                {% for error in form.finished_at.errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
             {% endif %}
             <input type="text" name="finished_at" value="{{ form.finished_at.value|date:'Y-m-d' }}"
-                   class="form-control date_picker" required="" id="id_finished_at">
+                class="form-control date_picker" required="" id="id_finished_at">
             {#            {{ form.finished_at }}#}
         </div>
     </div>
