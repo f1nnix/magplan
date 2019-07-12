@@ -70,7 +70,7 @@ class PostBaseModelForm(ModelForm):
             'title': forms.TextInput(attrs={'class': 'form-control', }),
             'description': forms.Textarea(attrs={'class': 'form-control', }),
             'issues': forms.SelectMultiple(attrs={
-                'class': 'form-control live_multiselect',
+                'class': 'form-control live_multiselect wiih_suggestions',
                 'data-url': '/admin/api/issues/search',
             }),
             'authors': forms.SelectMultiple(attrs={

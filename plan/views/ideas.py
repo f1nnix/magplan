@@ -1,5 +1,6 @@
-import os
 import datetime
+import os
+from typing import List, Tuple
 
 import django_filters
 import html2text
@@ -8,11 +9,11 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.mail import EmailMultiAlternatives
 from django.db.models import Count
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
 
-from main.models import Idea, Vote, Issue, User
-from plan.forms import IdeaModelForm, PostBaseModelForm, CommentModelForm
+from main.models import Idea, Issue, User, Vote
+from plan.forms import CommentModelForm, IdeaModelForm, PostBaseModelForm
 
 IDEAS_PER_PAGE = 20
 
@@ -36,15 +37,16 @@ def index(request):
             idea = form.save(commit=False)
             idea.editor = request.user
             idea.save()
-            
-            # Save authors, if existing specified 
+
+            # Save authors, if existing specified
             if idea.author_type == Idea.AUTHOR_TYPE_EXISTING:
                 form.save_m2m()
 
             # Clear idea form to prevent rendering prefilled form
             form = IdeaModelForm()
 
-            messages.add_message(request, messages.SUCCESS, 'Идея «%s» успешно выдвинута на голосование!' % idea.title)
+            messages.add_message(
+                request, messages.SUCCESS, 'Идея «%s» успешно выдвинута на голосование!' % idea.title)
     else:
         form = IdeaModelForm()
 
@@ -54,40 +56,71 @@ def index(request):
              .order_by('-created_at'))
 
     # filters
-    filter = request.GET.get('filter', None)
-    if filter == 'voted':
+    filter_ = request.GET.get('filter', None)
+    if filter_ == 'voted':
         ideas = ideas.filter(approved=None)
-    elif filter == 'self':
+    elif filter_ == 'self':
         ideas = ideas.filter(editor=request.user)
-    elif filter == 'approved':
+    elif filter_ == 'approved':
         ideas = ideas.filter(approved=True)
-    elif filter == 'rejected':
+    elif filter_ == 'rejected':
         ideas = ideas.filter(approved=False)
-    elif filter == 'no_author':
+    elif filter_ == 'no_author':
         ideas = ideas.filter(author_type=Idea.AUTHOR_TYPE_NO)
         # HACK:
         ideas = ideas.filter(created_at__gte=AUTHOR_TYPE_DAY)
-    
+
     ideas = ideas.all()
 
     return render(request, 'plan/ideas/index.html', {
         'ideas': ideas,
         'form': form,
-        'filter_': filter,
+        'filter_': filter_,
     })
+
+
+def _get_suggestion_issues() -> Tuple[Issue, List[Issue]]:
+    """Get issues for Post form issues suggesion.
+
+    Retrieve last five issues and determine, which of them are opened
+    to set the oldest opened as intial placeholder for issues field.
+    """
+    # Cast to list to provide List buil-ins
+    last_issues = list(Issue.objects.order_by('-number')[:4])
+
+    # Get all opened issues at once to prevent N+1 lookups
+    opened_issues = Issue.objects.filter(
+        posts__stage__slug__in=['waiting', 'proofreading_editor', 'precheck',
+                                'spellcheck', 'markup', 'proofreading_spell',
+                                'proofreading_chief_dpt', 'proofreading_chief',
+                                'publishing']) \
+        .distinct()
+
+    # By default we consider the newest issue to initial suggesion
+    issue_to_pop = 0
+    for i, last_issue in enumerate(last_issues):
+        # Determine, if issue is opened (perists in opened_issues)
+        # If found, update issue to initial suggesion with next found
+        if next((opened_issue for opened_issue in opened_issues if opened_issue.id == last_issue.id), None):
+            issue_to_pop = i
+
+    # Extract initial suggestion from list
+    initial_issue = last_issues.pop(issue_to_pop)
+    return initial_issue, last_issues
 
 
 @login_required
 def show(request, idea_id):
     idea = Idea.objects.prefetch_related('votes__user').get(id=idea_id)
+    initial_issues_suggesion, issues_suggesions = _get_suggestion_issues()
     form = PostBaseModelForm(initial={
-        'issues': Issue.objects.order_by('-number').first(),
-        # 'authors': User.objects.last(),
+        'issues': initial_issues_suggesion,
     }, instance=idea)
 
     return render(request, 'plan/ideas/show.html', {
         'idea': idea,
         'form': form,
+        'issues_suggesions': issues_suggesions,
         'comment_form': CommentModelForm(),
         'AUTHOR_TYPE_CHOICES': Idea.AUTHOR_TYPE_CHOICES,
     })
@@ -98,9 +131,11 @@ def vote(request, idea_id):
     idea = Idea.objects.prefetch_related('votes__user').get(id=idea_id)
 
     if request.method == 'POST':
-        vote = Vote(score=request.POST.get('score', 1), idea=idea, user=request.user)
+        vote = Vote(score=request.POST.get('score', 1),
+                    idea=idea, user=request.user)
         vote.save()
-        messages.add_message(request, messages.SUCCESS, 'Ваш голос учтен. Спасибо!')
+        messages.add_message(request, messages.SUCCESS,
+                             'Ваш голос учтен. Спасибо!')
 
     return redirect('ideas_show', idea_id=idea.id)
 
@@ -110,7 +145,8 @@ def approve(request, idea_id):
     idea = Idea.objects.prefetch_related('votes__user').get(id=idea_id)
 
     if request.method == 'POST':
-        idea.approved = (True if request.POST.get('approve', False) == '1' else False)
+        idea.approved = (True if request.POST.get(
+            'approve', False) == '1' else False)
         idea.save()
         messages.add_message(request, messages.INFO, 'Статус идеи изменен.')
 
@@ -122,7 +158,8 @@ def approve(request, idea_id):
                 'APP_URL': os.environ.get('APP_URL', None),
             })
             text_content = html2text.html2text(html_content)
-            msg = EmailMultiAlternatives(subject, text_content, config.PLAN_EMAIL_FROM, [idea.editor.email])
+            msg = EmailMultiAlternatives(
+                subject, text_content, config.PLAN_EMAIL_FROM, [idea.editor.email])
             msg.attach_alternative(html_content, "text/html")
             msg.send()
 
@@ -146,7 +183,8 @@ def comments(request, idea_id):
             # send notification to:
             #   * all, who has 'recieve_admin_emails' permission
             #   * post editor
-            recipients = [u.email for u in User.objects.filter(groups__name='Editors').exclude(id=comment.user.id)]
+            recipients = [u.email for u in User.objects.filter(
+                groups__name='Editors').exclude(id=comment.user.id)]
 
             if idea.editor != request.user:
                 recipients.append(idea.editor.email)
@@ -159,7 +197,8 @@ def comments(request, idea_id):
                     'APP_URL': os.environ.get('APP_URL', None),
                 })
                 text_content = html2text.html2text(html_content)
-                msg = EmailMultiAlternatives(subject, text_content, config.PLAN_EMAIL_FROM, recipients)
+                msg = EmailMultiAlternatives(
+                    subject, text_content, config.PLAN_EMAIL_FROM, recipients)
                 msg.attach_alternative(html_content, "text/html")
                 msg.send()
 
