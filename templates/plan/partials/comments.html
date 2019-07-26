@@ -1,16 +1,16 @@
 <h2>Комментарии</h2>
 <div class='comments' id="comments">
-    {% for comment in comments %}
+    {% for comment in post.comments_ %}
         <div class="comment" style="margin-bottom: 1rem;">
-            {% if comment.type == TYPE_SYSTEM %}
+            {% if comment.type == TYPE_CHOICES.0.0 %}
                 <small style="color: #777777;">
-                    {% if comment.meta.comment.action == SYSTEM_ACTION_SET_STAGE %}
+                    {% if comment.meta.comment.action == SYSTEM_ACTION_CHOICES.0.0 %}
                         <div>
                             {{ comment.created_at }} {{ comment.meta.comment.user.str }} передвинул пост на
                             этап {{ comment.meta.comment.stage.str }}.
                         </div>
                     {% endif %}
-                    {% if comment.meta.comment.action == SYSTEM_ACTION_UPDATE %}
+                    {% if comment.meta.comment.action == SYSTEM_ACTION_CHOICES.1.0 %}
                         <div>
                             {{ comment.created_at }} {{ comment.meta.comment.user.str }} отредактировал пост.
                             {% if comment.meta.comment.files|length > 0 %}

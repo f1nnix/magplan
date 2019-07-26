@@ -43,8 +43,8 @@ def show(request, post_id):
         .prefetch_related('editor', 'authors', 'stage', 'section', 'issues', 'comments__user') \
         .get(id=post_id)
 
-    post_meta_form = PostMetaForm(initial={
-        'wp_id': post.meta.get('wpid', None)}, instance=post)
+    post_meta_form = PostMetaForm(initial={'wp_id': post.meta.get('wpid', None)},
+                                  instance=post)
 
     return render(request, 'plan/posts/show.html', {
         'post': post,
@@ -53,9 +53,8 @@ def show(request, post_id):
         'comment_form': CommentModelForm(),
         'meta_form': post_meta_form,
 
-        'TYPE_SYSTEM': Comment.TYPE_SYSTEM,
-        'SYSTEM_ACTION_SET_STAGE': Comment.SYSTEM_ACTION_SET_STAGE,
-        'SYSTEM_ACTION_UPDATE': Comment.SYSTEM_ACTION_UPDATE,
+        'TYPE_CHOICES': Comment.TYPE_CHOICES,
+        'SYSTEM_ACTION_CHOICES': Comment.SYSTEM_ACTION_CHOICES,
     })
 
 

@@ -12,8 +12,7 @@
         #kicker h1 {
             display: inline;
             font-weight: bold;
-        }
-
+        } 
         #authors, #meta {
             font-weight: bold;
         }
@@ -172,13 +171,13 @@
                   href='https://fonts.googleapis.com/css?family=Ubuntu%3A300%2C300italic%2Cregular%2Citalic%2C500%2C500italic%2C700%2C700italic&#038;subset=latin%2Ccyrillic'
                   type='text/css' media='all'/>
             <div class="inner">
-                {{ post.html|safe }}
-            </div>
+                {{ post.html|safe }} </div>
 
 
         </section>
     {% endif %}
-    {% with comments=post.comments_ add_comment_url=post|url_for_post_comments TYPE_SYSTEM=TYPE_SYSTEM SYSTEM_ACTION_SET_STAGE=SYSTEM_ACTION_SET_STAGE SYSTEM_ACTION_UPDATE=SYSTEM_ACTION_UPDATE %}
+
+    {% with form=comment_form  %}
         {% include 'plan/partials/comments.html' %}
     {% endwith %}
 
