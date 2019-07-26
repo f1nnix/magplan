@@ -44,13 +44,13 @@ INSTALLED_APPS = [
     'plan',
     'finance',
     'authtools',
-    'debug_toolbar',
+    # 'debug_toolbar',
     'django_filters',
 
 ]
 
 MIDDLEWARE = [
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

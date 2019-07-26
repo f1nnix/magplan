@@ -1,0 +1,62 @@
+<div class="row">
+    <div class="col-6">
+        <div class="form-group">
+            {{ form.editor.label }}
+            {% if form.editor.errors %}
+                <ul class="errors">
+                    {% for error in form.section_id.errors %}
+                        <li>{{ error }}</li>{% endfor %}
+                </ul>
+            {% endif %}
+            {{ form.editor }}
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="form-group">
+            {{ form.issues.label }}
+            {% if form.issues.errors %}
+                <ul class="errors">
+                    {% for error in form.issues.errors %}
+                        <li>{{ error }}</li>{% endfor %}
+                </ul>
+            {% endif %}
+            {{ form.issues }}
+            <div class="issues-suggestions">
+                {% for issue in issues_suggesions %}
+                    <div class="suggestion">
+                        <a href="#" class="text-success" data-id="{{ issue.id }}">{{ issue }}</a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-6">
+        <div class="form-group">
+            {{ form.finished_at.label }}
+            {% if form.finished_at.errors %}
+                <ul class="errors">
+                    {% for error in form.finished_at.errors %}
+                        <li>{{ error }}</li>{% endfor %}
+                </ul>
+            {% endif %}
+            {{ form.finished_at }}
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="form-group">
+            {{ form.published_at.label }}
+            {% if form.published_at.errors %}
+                <ul class="errors">
+                    {% for error in form.published_at.errors %}
+                        <li>{{ error }}</li>{% endfor %}
+                </ul>
+            {% endif %}
+            {{ form.published_at }}
+        </div>
+    </div>
+</div>
+
+

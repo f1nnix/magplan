@@ -1,9 +1,8 @@
 import datetime
 import io
 import os
-from collections import deque
 from zipfile import ZipFile, ZIP_DEFLATED
-import time    
+
 import html2text
 from constance import config
 from django.conf import settings
@@ -17,26 +16,42 @@ from django.template.loader import render_to_string
 from slugify import slugify
 
 from main.models import Post, Postype, Stage, Idea, Attachment, Comment, User
-from plan.forms import PostBaseModelForm, PostExtendedModelForm, CommentModelForm
+from plan.forms import PostBaseModelForm, PostExtendedModelForm, CommentModelForm, PostMetaForm
 
 
 # Create your views here.
-@login_required
-def show(request, post_id):
-    post = Post.objects.prefetch_related('editor', 'authors', 'stage', 'section', 'issues', 'comments__user').get(
-        id=post_id)
+def _get_arbitrary_chunk(post: Post) -> str:
+    """Render instance specific template code
 
-    # redner instance specific template code
-    intance_template = Template(config.PLAN_POSTS_INSTANCE_CHUNK)
-    instance_chunk = intance_template.render(Context({
+    Used to render some arbitrary HTML code in a context of Post instance.
+    Useful to provide sensitive HTML template, which can't be committed
+    into Git repository directly or may vary for each particular instance.
+
+    :param post: Post instance to use in template
+    :return: Rendered template string
+    """
+    instance_template = Template(config.PLAN_POSTS_INSTANCE_CHUNK)
+    instance_chunk = instance_template.render(Context({
         'post': post,
     }))
-    pass
+    return instance_chunk
+
+
+@login_required
+def show(request, post_id):
+    post = Post.objects \
+        .prefetch_related('editor', 'authors', 'stage', 'section', 'issues', 'comments__user') \
+        .get(id=post_id)
+
+    post_meta_form = PostMetaForm(initial={
+        'wp_id': post.meta.get('wpid', None)}, instance=post)
+
     return render(request, 'plan/posts/show.html', {
         'post': post,
         'stages': Stage.objects.order_by('sort').all(),
-        'form': CommentModelForm(),
-        'instance_chunk': instance_chunk,
+        'instance_chunk': _get_arbitrary_chunk(post),
+        'comment_form': CommentModelForm(),
+        'meta_form': post_meta_form,
 
         'TYPE_SYSTEM': Comment.TYPE_SYSTEM,
         'SYSTEM_ACTION_SET_STAGE': Comment.SYSTEM_ACTION_SET_STAGE,
@@ -63,10 +78,6 @@ def create(request):
             idea.save()
 
             return redirect('posts_show', post.id)
-        else:
-            pass
-            # import pdb;
-            # pdb.set_trace()
 
     else:
         return HttpResponse(status=405)
@@ -83,11 +94,11 @@ def edit(request, post_id):
         form = PostExtendedModelForm(request.POST, request.FILES, instance=post)
         files = request.FILES.getlist('attachments')
 
-        attachments = deque()
+        attachments = []
         for file in files:
             attachment = Attachment(post=post, user=request.user, original_filename=file.name)  # save original filename
 
-            # slugify original filename and save with safe one
+            # Slugify original filename and save with safe one
             filename, extension = os.path.splitext(file.name)
             file.name = '%s%s' % (slugify(filename), extension)
 
@@ -152,6 +163,47 @@ def edit(request, post_id):
         'form': form,
 
     })
+
+
+@login_required
+def edit_meta(request, post_id):
+    try:
+        post = Post.objects.get(id=post_id)
+    except Post.DoesNotExist:
+        return HttpResponse(status=401)
+
+    if request.method == 'POST':
+        form = PostMetaForm(request.POST, instance=post)
+        if not form.is_valid():
+            return HttpResponse(status=403)
+
+        # Iterate over all changeable attributes and stage changes in logs
+        changelog = []
+        new_issues = form.cleaned_data.get('issues', ())
+        if post.issues != new_issues:
+            # Stage change
+            log = '* выпуски сменились с "{0}" на "{1}"'.format(
+                ', '.join([str(i) for i in post.issues.all()]),
+                ', '.join([str(i) for i in new_issues])
+            )
+            changelog.append(log)
+            post.issues.set(new_issues)
+
+        if post.editor != form.cleaned_data.get('editor'):
+            log = '* редактор вменился с "{0}" на "{1}"'.format(
+                str(post.editor),
+                str(form.cleaned_data.get('editor'))
+            )
+            changelog.append(log)
+            post.editor = form.cleaned_data.get('editor')
+
+        if request.user.is_member('Managing editors'):
+            ...
+
+        post.save()
+        messages.add_message(request, messages.INFO, f'Пост {post} успешно обновлен!')
+
+    return redirect('posts_show', post_id)
 
 
 @login_required
@@ -220,7 +272,7 @@ def schedule(request, post_id):
 
     dt = datetime.datetime.strptime(published_at, '%Y-%m-%d')
     dt = dt.replace(hour=10, minute=0, second=0)
-    post.published_at = dt 
+    post.published_at = dt
     post.save()
 
     messages.add_message(request, messages.SUCCESS, 'Пост успешно запланирован в публикацию')
@@ -297,11 +349,11 @@ def download_content(request: HttpRequest, post_id: int) -> HttpResponse:
     if request.method == 'GET':
         s = io.BytesIO()
         zipfile = ZipFile(s, 'w', ZIP_DEFLATED)
-        attachemnts = Attachment.objects.filter(post_id=post_id, type=Attachment.TYPE_IMAGE).all()
+        attachments = Attachment.objects.filter(post_id=post_id, type=Attachment.TYPE_IMAGE).all()
 
-        for attachemnt in attachemnts:
-            fs_path = '%s/%s' % (settings.MEDIA_ROOT, attachemnt.file.name)
-            filename = attachemnt.original_filename
+        for attachment in attachments:
+            fs_path = '%s/%s' % (settings.MEDIA_ROOT, attachment.file.name)
+            filename = attachment.original_filename
             try:
                 zipfile.write(fs_path, arcname=filename)
             except Exception as e:

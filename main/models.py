@@ -49,6 +49,14 @@ class User(AbstractEmailUser, AbstractBase):
             ("manage_authors", "Can manage authors"),
         )
 
+    def is_member(self, group_name: str) -> bool:
+        """Check if user is member of group
+
+        :param group_name: Group name to check user belongs to
+        :return: True if a memeber, otherwise False
+        """
+        return self.groups.filter(name=group_name).exists()
+
 
 class Profile(AbstractBase):
     is_public = models.BooleanField(null=False, blank=False, default=False)
@@ -223,7 +231,7 @@ class Post(AbstractBase):
 
     format = models.SmallIntegerField(choices=POST_FORMAT_CHOICES, default=POST_FORMAT_DEFAULT)
     finished_at = models.DateTimeField(null=False, blank=False, default=django.utils.timezone.now,
-                                        verbose_name='Дедлайн')
+                                       verbose_name='Дедлайн')
     published_at = models.DateTimeField(null=True, blank=True, verbose_name='Дата публикации')
     kicker = models.CharField(null=True, blank=True, max_length=255, )
     slug = models.SlugField(null=True, blank=True, max_length=255, )
@@ -243,7 +251,7 @@ class Post(AbstractBase):
     section = models.ForeignKey(Section, on_delete=models.CASCADE, null=False, blank=False, verbose_name='Раздел')
     last_updater = models.ForeignKey(User, related_name='posts_updated', verbose_name='Кто последний обновлял',
                                      null=True, on_delete=models.SET_NULL)
-    
+
     meta = JSONField(default=dict)
 
     comments = GenericRelation('Comment')
@@ -306,6 +314,7 @@ class Post(AbstractBase):
         permissions = (
             ('move_post_to_any_stage', 'Can move post to any stage'),
             ('schedule_publish', 'Can schedule publish'),
+            ('edit_extended_meta', 'Can edit extended meta'),
         )
 
     @property

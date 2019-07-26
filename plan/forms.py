@@ -1,5 +1,6 @@
 from django import forms
 from django.forms import ModelForm
+
 from main.models import Idea, Post, Comment, Section, Issue, User, Profile
 
 
@@ -53,6 +54,24 @@ class IssueModelForm(ModelForm):
             'number': forms.TextInput(attrs={'class': 'form-control', }),
             'title': forms.TextInput(attrs={'class': 'form-control', }),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
+            'published_at': forms.DateInput(attrs={'class': 'form-control date_picker', }),
+        }
+
+
+class PostMetaForm(ModelForm):
+    wp_id = forms.IntegerField(widget=forms.TextInput(attrs={'class': 'form-control', }))
+
+    class Meta:
+        model = Post
+        fields = ('issues', 'editor', 'finished_at', 'published_at',)
+
+        widgets = {
+            'issues': forms.SelectMultiple(attrs={
+                'class': 'form-control live_multiselect wiih_suggestions',
+                'data-url': '/admin/api/issues/search',
+            }),
+            'editor': forms.Select(attrs={'class': 'form-control', }),
+            'finished_at': forms.DateInput(attrs={'class': 'form-control date_picker', }),
             'published_at': forms.DateInput(attrs={'class': 'form-control date_picker', }),
         }
 
@@ -124,19 +143,6 @@ class AdPostExtendedModelForm(PostBaseModelForm):
     issues = forms.ModelChoiceField(queryset=Issue.objects.filter(number=0),
                                     empty_label=None,
                                     widget=forms.Select(attrs={'class': 'form-control', 'rows': 5}))
-
-    # class Meta(PostExtendedModelForm.Meta):
-    #     widgets = PostExtendedModelForm.Meta.widgets.copy()
-    #     widgets.update({
-    #         'issues': forms.SelectMultiple(attrs={
-    #             'class': 'form-control live_multiselect',
-    #             'data-url': '/admin/api/issues/search',
-    #         }),
-    #
-    #     })
-    #
-    # # def __init__(self, *args, **kwargs):
-    # #     super(AdPostExtendedModelForm, self).__init__(*args, **kwargs)
 
 
 class CommentModelForm(ModelForm):

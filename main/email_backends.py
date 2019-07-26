@@ -1,14 +1,13 @@
-"""SMTP email backend class."""
 import smtplib
 import socket
-import ssl
 import threading
 
+import ssl
+from constance import config
 from django.conf import settings
 from django.core.mail.backends.base import BaseEmailBackend
 from django.core.mail.message import sanitize_address
 from django.core.mail.utils import DNS_NAME
-from constance import config
 
 
 class EmailBackend(BaseEmailBackend):

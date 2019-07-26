@@ -1,10 +1,10 @@
 import html2text
 from django.conf import settings
-from django.template import loader
-from main.email import FinanceEmailBackend
-
-from .models import Payment
 from django.core.mail import EmailMultiAlternatives
+from django.template import loader
+
+from main.email_backends import FinanceEmailBackend
+from .models import Payment
 
 
 class AbstractAdminMailer(object):

@@ -25,7 +25,12 @@
         figure img {
             max-width: 100%;
         }
+
+        .select2.select2-container {
+            width: 100% !important;
+        }
     </style>
+
 {% endblock %}
 
 {% block content %}
@@ -35,6 +40,10 @@
 
     <div id="actions" style="margin-bottom: 1rem;">
         <a class="btn btn-warning" href="{% url 'posts_edit' post.id %}">{% trans "edit" %}</a>
+
+        <a class="btn btn-primary" data-toggle="collapse" href="#meta_form_container" role="button"
+           aria-expanded="false" aria-controls="meta_form_container">Редактировать мету</a>
+
         <div class="dropdown" style="display: inline-block">
             <a class="btn btn-success dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -42,11 +51,43 @@
             </a>
 
             <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-{#                <a class="dropdown-item" href="#">Текст</a>#}
                 <a class="dropdown-item" href="{% url 'posts_download_content' post.id %}">Изображения</a>
-{#                <a class="dropdown-item" href="#">PDF</a>#}
-{#                <a class="dropdown-item" href="#">Файлы</a>#}
-{#                <a class="dropdown-item" href="#">Полный архив</a>#}
+            </div>
+        </div>
+    </div>
+
+    <div class="row" style="margin-bottom: 1rem;">
+        <div class="col-12">
+            <div class="collapse multi-collapse" id="meta_form_container">
+                <div class="card card-body">
+                    <form id="save_post_form"
+                          action="{% url 'posts_edit_meta' post.id %}"
+                          method="POST">
+                        {% csrf_token %}
+
+                        {% with form=meta_form %}
+                            {% include "plan/posts/_form_meta.html" %}
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        {{ form.wp_id.label }}
+                                        {% if form.wp_id.errors %}
+                                            <ul class="errors">
+                                                {% for error in form.title.errors %}
+                                                    <li>{{ error }}</li>{% endfor %}
+                                            </ul>
+                                        {% endif %}
+                                        {{ form.wp_id }}
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <br />
+                                    <input class="btn btn-success float-right" type="submit" value="Обновить"/>
+                                </div>
+                            </div>
+                        {% endwith %}
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -68,7 +109,7 @@
             {% endif %}
 
             {% if perms.main.manage_authors %}
-                {% trans "edits" %} <a href="{% url 'authors_show' post.editor.id %}">{{ post.editor }}</a>
+                {% trans "" %} <a href="{% url 'authors_show' post.editor.id %}">{{ post.editor }}</a>
                 {% if forloop.last is False %}, {% else %}.{% endif %}
             {% else %}
                 {% trans "edits" %} {{ post.editor }}{% if forloop.last is False %}, {% else %}.{% endif %}
@@ -85,7 +126,8 @@
         <div id="meta" class="col-3">
             {% if post.issues.all|length > 0 %}
                 {% for issue in post.issues.all %}
-                    <a href="{% url 'issues_show' issue.id %}">{{ issue }}</a>{% if forloop.last is False %}, {% else %}.{% endif %}
+                    <a href="{% url 'issues_show' issue.id %}">{{ issue }}</a>{% if forloop.last is False %}, {% else %}
+                    .{% endif %}
                 {% endfor %}
             {% endif %}
 
