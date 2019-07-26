@@ -12,7 +12,7 @@ from django.db.models import Count
 from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
 
-from main.models import Idea, Issue, User, Vote
+from main.models import Idea, Issue, Vote, users_with_perm
 from plan.forms import CommentModelForm, IdeaModelForm, PostBaseModelForm
 
 IDEAS_PER_PAGE = 20
@@ -169,6 +169,7 @@ def approve(request, idea_id):
 @login_required
 def comments(request, idea_id):
     idea = Idea.objects.prefetch_related('votes__user').get(id=idea_id)
+
     if request.method == 'POST':
         comment_form = CommentModelForm(request.POST)
 
@@ -179,15 +180,17 @@ def comments(request, idea_id):
         if comment_form.is_valid():
             comment_form.save()
 
-            # send email
-            # send notification to:
-            #   * all, who has 'recieve_admin_emails' permission
-            #   * post editor
-            recipients = [u.email for u in User.objects.filter(
-                groups__name='Editors').exclude(id=comment.user.id)]
+            # Send notification to users with 'recieve_post_email_updates' permission
+            recipients = {
+                u.get('email')
+                for u in users_with_perm('main.recieve_idea_email_updates')
+                    .values('email')
+                    .exclude(id=comment.user.id)
+            }
 
+            # Add post editor if it's not he's comment
             if idea.editor != request.user:
-                recipients.append(idea.editor.email)
+                recipients.add(idea.editor.email)
 
             if len(recipients) > 0:
                 subject = f'Комментарий к идее «{idea}» от {comment.user}'

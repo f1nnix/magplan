@@ -15,7 +15,7 @@ from django.template import Template, Context
 from django.template.loader import render_to_string
 from slugify import slugify
 
-from main.models import Post, Postype, Stage, Idea, Attachment, Comment, User
+from main.models import Post, Postype, Stage, Idea, Attachment, Comment, User, users_with_perm
 from plan.forms import PostBaseModelForm, PostExtendedModelForm, CommentModelForm, PostMetaForm
 
 
@@ -260,7 +260,7 @@ def set_stage(request, post_id, system=Comment.TYPE_SYSTEM):
 
 
 @login_required
-@permission_required('main.schedule_publish')
+@permission_required('main.edit_extended_post_attrs')
 def schedule(request, post_id):
     post = Post.objects.get(id=post_id)
     published_at = request.POST.get('published_at')
@@ -293,14 +293,17 @@ def comments(request, post_id):
         if form.is_valid():
             form.save()
 
-            # send email
-            # send notification to:
-            #   * all, who has 'recieve_admin_emails' permission
-            #   * post editor
-            recipients = [u.email for u in User.objects.filter(groups__name='Editors').exclude(id=comment.user.id)]
+            # Send notification to users with 'recieve_post_email_updates' permission
+            recipients = {
+                u.get('email')
+                for u in users_with_perm('main.recieve_post_email_updates')
+                    .values('email')
+                    .exclude(id=comment.user.id)
+            }
 
+            # Add post editor if it's not he's comment
             if post.editor != request.user:
-                recipients.append(post.editor.email)
+                recipients.add(post.editor.email)
 
             if len(recipients) > 0:
                 subject = f'Комментарий к посту «{post}» от {comment.user}'
