@@ -1,3 +1,11 @@
+"""
+FIXTURES
+
+A naive analog of pytest fixtrues.
+
+@deprecated
+"""
+
 import datetime
 import random
 from faker import Faker

@@ -421,7 +421,7 @@ def render_xmd(sender, instance, **kwargs):
 def users_with_perm(perm_name: str, include_superuser: bool = True) -> List[User]:
     """Get all users by full permission name
 
-    :param perm_name: permission name
+    :param perm_name: permission name without app name
     :param include_superuser:
     :return:
     """

@@ -6,7 +6,8 @@ from plan.tests import _User, _Sections, _Section, _Stages, _Post, _Postype, _Is
 from constance import config
 from django.core import mail
 from django.template import Template, Context
-
+from django.contrib.auth.models import Permission
+from unittest.mock import patch
 
 class TestSetStage(TestCase):
     @classmethod
@@ -46,66 +47,6 @@ class TestSetStage(TestCase):
         self.assertEqual(response.url, reverse('posts_show', kwargs={
             'post_id': self.post.id,
         }))
-
-    def test_post_deadline_should_be_updated(self):
-        self.client.force_login(user=self.user)
-        post = Post.objects.get(id=self.post.id)
-        stage = self.stages[:1][0]
-
-        # test stage with duration
-        current_date = post.published_at
-        stage.duration = 3
-        stage.save()
-        response = self.client.post(reverse(self.ROUTE_NAME, kwargs={
-            'post_id': self.post.id,
-        }), {
-                                        'new_stage_id': stage.id,
-                                    })
-        self.assertEqual(response.status_code, 302)
-        post = Post.objects.get(id=self.post.id)
-        self.assertEqual(post.published_at, current_date + datetime.timedelta(days=3))
-
-        # test stage with no duration
-        post = Post.objects.get(id=self.post.id)
-        current_date = post.published_at
-        stage.duration = None
-        stage.save()
-        response = self.client.post(reverse(self.ROUTE_NAME, kwargs={
-            'post_id': self.post.id,
-        }), {
-                                        'new_stage_id': stage.id,
-                                    })
-        self.assertEqual(response.status_code, 302)
-        post = Post.objects.get(id=self.post.id)
-        self.assertEqual(post.published_at, current_date + datetime.timedelta(days=1))
-
-    def test_respect_skip_notifcation_setting(self):
-        self.client.force_login(user=self.user)
-        post = Post.objects.get(id=self.post.id)
-        stage = self.stages[:1][0]
-
-        # should send email
-        stage.skip_notification = False
-        stage.save()
-        response = self.client.post(reverse(self.ROUTE_NAME, kwargs={
-            'post_id': self.post.id,
-        }), {
-                                        'new_stage_id': stage.id
-                                    })
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(len(mail.outbox), 1)
-
-        # should skip email
-        mail.outbox.clear()
-        stage.skip_notification = True
-        stage.save()
-        response = self.client.post(reverse(self.ROUTE_NAME, kwargs={
-            'post_id': self.post.id,
-        }), {
-                                        'new_stage_id': stage.id,
-                                    })
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(len(mail.outbox), 0)
 
 
 class TestEdit(TestCase):
@@ -149,121 +90,6 @@ class TestEdit(TestCase):
         }))
         self.assertEqual(response.status_code, 200)
 
-    def test_post_should_be_updated(self):
-        APPEND = 'lorem ipsum'
-
-
-        new_title = self.post.title + APPEND
-        new_description = self.post.description + APPEND
-        new_kicker = self.post.kicker + APPEND
-        new_published_at = datetime.datetime.now()
-        new_wp_id = '123'
-
-        payload = {
-            'title': new_title,
-            'description': new_description,
-            'kicker': new_kicker,
-            'section': self.new_section.id,
-            'issues': self.new_issue.id,
-            'authors': self.new_author.id,
-            'published_at': new_published_at.strftime('%d.%m.%Y'),
-            'wp_id': new_wp_id,
-        }
-        response = self.client.post(reverse(self.ROUTE_NAME, kwargs={'post_id': self.post.id}), payload)
-
-        self.assertEqual(response.status_code, 200)
-
-        post = Post.objects.get(id=self.post.id)
-        self.assertEqual(post.title, new_title)
-        self.assertEqual(post.description, new_description)
-        self.assertEqual(post.published_at, new_published_at.strftime('%d.%m.%Y'))
-        self.assertEqual(post.meta.get('wpid', None), new_wp_id)
-
-    def test_system_comment_should_be_created_after_stage_change(self):
-        # test comment exists
-        comments_count = Comment.objects.count()
-        self.test_post_should_be_updated()
-        self.assertEqual(Comment.objects.count(), comments_count + 1, )
-
-        # test comment meta
-        comment = Comment.objects.last()
-        self.assertEqual(comment.user, self.system_user)
-        self.assertEqual(comment.type, Comment.TYPE_SYSTEM)
-
-        # test comment data
-        post = Post.objects.get(id=self.post.id)
-        meta = {
-            'action': Comment.SYSTEM_ACTION_UPDATE,
-            'user': {
-                'id': self.user.id,
-                'str': self.user.__str__(),
-            },
-            'files': [],
-
-        }
-        self.assertEqual('comment' in comment.meta.keys(), True)
-        self.assertEqual(comment.meta['comment'], meta)
-
-    def test_files_block_should_exixt_in_system_comment(self):
-        # test comment exists
-        comments_count = Comment.objects.count()
-
-        APPEND = 'lorem ipsum'
-        new_title = self.post.title + APPEND
-        new_description = self.post.description + APPEND
-        new_kicker = self.post.kicker + APPEND
-        new_published_at = str(datetime.datetime.now())
-
-        from io import BytesIO
-        img = BytesIO(b'mybinarydata')
-        img.name = 'myimage.jpg'
-
-        response = self.client.post(reverse(self.ROUTE_NAME, kwargs={'post_id': self.post.id}), {
-            'title': new_title,
-            'description': new_description,
-            'kicker': new_kicker,
-            'section': str(self.new_section.id),
-            'issues': str(self.new_issue.id),
-            'authors': str(self.new_author.id),
-            'published_at': str(new_published_at),
-            'attachments': img,
-
-        })
-
-        self.assertEqual(response.status_code, 200)
-        post = Post.objects.get(id=self.post.id)
-
-        # attachement is created
-        self.assertEqual(post.attachment_set.count(), 1)
-        self.assertEqual(post.attachment_set.first().original_filename, 'myimage.jpg')
-
-        # system comment is creates
-        self.assertEqual(Comment.objects.count(), comments_count + 1, )
-
-        # test comment meta
-        comment = Comment.objects.last()
-        self.assertEqual(comment.user, self.system_user)
-        self.assertEqual(comment.type, Comment.TYPE_SYSTEM)
-
-        # test comment data
-        post = Post.objects.get(id=self.post.id)
-        meta = {
-            'action': Comment.SYSTEM_ACTION_UPDATE,
-            'user': {
-                'id': self.user.id,
-                'str': self.user.__str__(),
-            },
-            'files': [
-                {
-                    'id': post.attachment_set.first().id,
-                    'str': post.attachment_set.first().original_filename,
-                }
-            ],
-
-        }
-        self.assertEqual('comment' in comment.meta.keys(), True)
-        self.assertEqual(comment.meta['comment'], meta)
-
 
 class TestShow(TestCase):
     @classmethod
@@ -301,3 +127,52 @@ class TestShow(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, instance_chunk)
+
+class TestComments(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = _User()
+        cls.user2 = _User()
+        cls.system_user = _User()
+        cls.stages = _Stages()
+        cls.sections = _Sections()
+        cls.postype = _Postype()
+        cls.post = _Post()
+
+        cls.recieve_email_perm = Permission.objects.get(name='Recieve email updates for Post')
+
+    def setUp(self):
+        self.ROUTE_NAME = 'posts_comments'
+        self.client = Client()
+        self.client.force_login(user=self.user)
+
+    @patch('plan.views.posts.EmailMultiAlternatives.send')
+    def test_comment_email_not_sent_without_permission(self, mock_send):
+        url = reverse(self.ROUTE_NAME, kwargs={
+            'post_id': self.post.id,
+        })
+
+        response = self.client.post(url, {
+            'text': 'foo'   
+        })
+        
+        self.assertEqual(response.status_code, 302)
+        mock_send.assert_not_called()
+
+
+    @patch('plan.views.posts.EmailMultiAlternatives.send')
+    def test_comment_email_sent_with_permission(self, mock_send):
+        # Allow user2 to recieve post email updates
+        self.user2.user_permissions.add(self.recieve_email_perm)
+
+        url = reverse(self.ROUTE_NAME, kwargs={
+            'post_id': self.post.id,
+        })
+
+        response = self.client.post(url, {
+            'text': 'foo'   
+        })
+        self.assertEqual(response.status_code, 302)
+        mock_send.assert_called()
+
+

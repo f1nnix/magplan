@@ -89,7 +89,6 @@ def edit(request, post_id):
             .get(id=post_id))
 
     if request.method == 'POST':
-
         form = PostExtendedModelForm(request.POST, request.FILES, instance=post)
         files = request.FILES.getlist('attachments')
 
@@ -283,6 +282,7 @@ def schedule(request, post_id):
 def comments(request, post_id):
     post = Post.objects.prefetch_related('editor', 'authors', 'stage', 'section', 'issues', 'comments__user').get(
         id=post_id)
+    
     if request.method == 'POST':
         form = CommentModelForm(request.POST)
 
@@ -296,7 +296,7 @@ def comments(request, post_id):
             # Send notification to users with 'recieve_post_email_updates' permission
             recipients = {
                 u.get('email')
-                for u in users_with_perm('main.recieve_post_email_updates')
+                for u in users_with_perm('recieve_post_email_updates')
                     .values('email')
                     .exclude(id=comment.user.id)
             }
@@ -305,19 +305,22 @@ def comments(request, post_id):
             if post.editor != request.user:
                 recipients.add(post.editor.email)
 
-            if len(recipients) > 0:
-                subject = f'Комментарий к посту «{post}» от {comment.user}'
-                html_content = render_to_string('email/new_comment.html', {
-                    'comment': comment,
-                    'commentable_type': 'post' if comment.commentable.__class__.__name__ == 'Post' else 'idea',
-                    'APP_URL': os.environ.get('APP_URL', None),
-                })
-                text_content = html2text.html2text(html_content)
-                msg = EmailMultiAlternatives(subject, text_content, config.PLAN_EMAIL_FROM, recipients)
-                msg.attach_alternative(html_content, "text/html")
-                msg.send()
-
+            if len(recipients) == 0:
                 return redirect('posts_show', post_id)
+                
+            subject = f'Комментарий к посту «{post}» от {comment.user}'
+            html_content = render_to_string('email/new_comment.html', {
+                'comment': comment,
+                'commentable_type': 'post' if comment.commentable.__class__.__name__ == 'Post' else 'idea',
+                'APP_URL': os.environ.get('APP_URL', None),
+            })
+            text_content = html2text.html2text(html_content)
+            
+            msg = EmailMultiAlternatives(subject, text_content, config.PLAN_EMAIL_FROM, recipients)
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+
+            return redirect('posts_show', post_id)
 
     return render(request, 'plan/posts/show.html', {
         'post': post,
