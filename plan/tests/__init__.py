@@ -9,7 +9,7 @@ A naive analog of pytest fixtrues.
 import datetime
 import random
 from faker import Faker
-from main.models import User, Stage, Postype, Section, Issue, Post, Magazine
+from main.models import User, Stage, Postype, Section, Issue, Post, Magazine, Idea
 
 
 def _Postype():
@@ -100,3 +100,18 @@ def _Post(stage=None, section=None, postype=None, editor=None, ):
     post.issues.set(Issue.objects.all()[:1])
 
     return post
+
+def _Idea(editor=None):
+    fake = Faker()
+    
+    idea = Idea(
+        title='foo',
+        description='bar',
+        approved=None,
+        editor=editor or _User(),
+        post=None,
+        author_type=Idea.AUTHOR_TYPE_NO,
+    )
+    idea.save()
+
+    return idea

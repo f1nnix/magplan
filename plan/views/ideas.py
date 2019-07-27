@@ -183,7 +183,7 @@ def comments(request, idea_id):
             # Send notification to users with 'recieve_post_email_updates' permission
             recipients = {
                 u.get('email')
-                for u in users_with_perm('main.recieve_idea_email_updates')
+                for u in users_with_perm('recieve_idea_email_updates')
                     .values('email')
                     .exclude(id=comment.user.id)
             }
@@ -192,19 +192,21 @@ def comments(request, idea_id):
             if idea.editor != request.user:
                 recipients.add(idea.editor.email)
 
-            if len(recipients) > 0:
-                subject = f'Комментарий к идее «{idea}» от {comment.user}'
-                html_content = render_to_string('email/new_comment.html', {
-                    'comment': comment,
-                    'commentable_type': 'post' if comment.commentable.__class__.__name__ == 'Post' else 'idea',
-                    'APP_URL': os.environ.get('APP_URL', None),
-                })
-                text_content = html2text.html2text(html_content)
-                msg = EmailMultiAlternatives(
-                    subject, text_content, config.PLAN_EMAIL_FROM, recipients)
-                msg.attach_alternative(html_content, "text/html")
-                msg.send()
-
+            if len(recipients) == 0:
+                return redirect('ideas_show', idea.id)
+            
+            subject = f'Комментарий к идее «{idea}» от {comment.user}'
+            html_content = render_to_string('email/new_comment.html', {
+                'comment': comment,
+                'commentable_type': 'post' if comment.commentable.__class__.__name__ == 'Post' else 'idea',
+                'APP_URL': os.environ.get('APP_URL', None),
+            })
+            text_content = html2text.html2text(html_content)
+            msg = EmailMultiAlternatives(
+                subject, text_content, config.PLAN_EMAIL_FROM, recipients)
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+            
             return redirect('ideas_show', idea.id)
     else:
         return redirect('ideas_show', idea.id)
