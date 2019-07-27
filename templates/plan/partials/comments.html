@@ -37,7 +37,7 @@
 </div>
 
 <form id="add_comment_form"
-      action="{{ add_comment_url }}"
+      action="{% url 'posts_comments' post_id=post.id %}"
       method="post"
       accept-charset="utf-8">
     {% csrf_token %}
