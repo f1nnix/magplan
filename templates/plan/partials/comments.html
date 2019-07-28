@@ -1,6 +1,6 @@
 <h2>Комментарии</h2>
 <div class='comments' id="comments">
-    {% for comment in post.comments_ %}
+    {% for comment in comments %}
         <div class="comment" style="margin-bottom: 1rem;">
             {% if comment.type == TYPE_CHOICES.0.0 %}
                 <small style="color: #777777;">
@@ -37,7 +37,7 @@
 </div>
 
 <form id="add_comment_form"
-      action="{% url 'posts_comments' post_id=post.id %}"
+      action="{{ action_url }}"
       method="post"
       accept-charset="utf-8">
     {% csrf_token %}

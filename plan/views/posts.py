@@ -219,7 +219,7 @@ def set_stage(request, post_id, system=Comment.TYPE_SYSTEM):
         post.save()
         messages.add_message(request, messages.INFO, 'Текущий этап статьи «%s» обновлен' % post)
 
-        # create system comment
+        # Create system comment
         if config.SYSTEM_USER_ID:
             system_user = User.objects.get(id=config.SYSTEM_USER_ID)
             comment = Comment()
@@ -241,7 +241,7 @@ def set_stage(request, post_id, system=Comment.TYPE_SYSTEM):
             }
             comment.save()
 
-        # send email if stage allows it
+        # Send email if stage allows it
         if post.assignee != request.user and stage.skip_notification is False:
             subject = f'На вас назначена статья «{post}»'
             html_content = render_to_string('email/assigned_to_you.html', {

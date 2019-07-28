@@ -12,7 +12,8 @@
         #kicker h1 {
             display: inline;
             font-weight: bold;
-        } 
+        }
+
         #authors, #meta {
             font-weight: bold;
         }
@@ -58,34 +59,40 @@
     <div class="row" style="margin-bottom: 1rem;">
         <div class="col-12">
             <div class="collapse multi-collapse" id="meta_form_container">
-                <div class="card card-body">
-                    <form id="save_post_form"
-                          action="{% url 'posts_edit_meta' post.id %}"
-                          method="POST">
-                        {% csrf_token %}
+                <div class="card">
+                    <div class="card-header bg-primary text-white">Редактировать данные статьи
 
-                        {% with form=meta_form %}
-                            {% include "plan/posts/_form_meta.html" %}
+                    </div>
+                    <div class="card-body">
+                        <form id="save_post_form"
+                              action="{% url 'posts_edit_meta' post.id %}"
+                              method="POST">
+                            {% csrf_token %}
+
                             <div class="row">
-                                <div class="col-6">
-                                    <div class="form-group">
-                                        {{ form.wp_id.label }}
-                                        {% if form.wp_id.errors %}
-                                            <ul class="errors">
-                                                {% for error in form.title.errors %}
-                                                    <li>{{ error }}</li>{% endfor %}
-                                            </ul>
-                                        {% endif %}
-                                        {{ form.wp_id }}
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <br />
-                                    <input class="btn btn-success float-right" type="submit" value="Обновить"/>
-                                </div>
+                                {% with form=meta_form %}
+                                    {% include "plan/posts/_form_meta.html" %}
+                                    {% if perms.main.edit_extended_post_attrs %}
+                                        <div class="col-6">
+                                            <div class="form-group">
+                                               {{ form.wp_id.label }}
+                                                {% if form.wp_id.errors %}
+                                                    <ul class="errors">
+                                                        {% for error in form.title.errors %}
+                                                            <li>{{ error }}</li>{% endfor %}
+                                                    </ul>
+                                                {% endif %}
+                                                {{ form.wp_id }}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endwith %}
                             </div>
-                        {% endwith %}
-                    </form>
+                        </form>
+                    </div>
+                    <div class="card-footer text-muted">
+                        <input class="btn btn-success float-right" type="syyubmit" value="Обновить"/>
+                    </div>
                 </div>
             </div>
         </div>
@@ -108,12 +115,10 @@
             {% endif %}
 
             {% if perms.main.manage_authors %}
-                {% trans "" %} <a href="{% url 'authors_show' post.editor.id %}">{{ post.editor }}</a>
-                {% if forloop.last is False %}, {% else %}.{% endif %}
+                {% trans "edits" %} <a href="{% url 'authors_show' post.editor.id %}">{{ post.editor }}</a>{% if forloop.last is False %}, {% else %}.{% endif %}
             {% else %}
                 {% trans "edits" %} {{ post.editor }}{% if forloop.last is False %}, {% else %}.{% endif %}
             {% endif %}
-
 
             <br/>
             <a class="" data-toggle="collapse" href="#description" role="button"
@@ -145,7 +150,6 @@
     </div>
 
     {% include 'plan/posts/_stages.html' %}
-    {% include 'plan/posts/_schedule.html' %}
 
     <div class="row">
         <div class="col-12">
@@ -177,7 +181,8 @@
         </section>
     {% endif %}
 
-    {% with form=comment_form  %}
+    {# Support for generic comments template #}
+    {% with coments=post.comments_ form=comment_form action_url=post|url_for_post_comments %}
         {% include 'plan/partials/comments.html' %}
     {% endwith %}
 
