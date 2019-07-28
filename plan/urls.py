@@ -1,5 +1,6 @@
 # from django.conf.urls import url
 from django.urls import path
+
 from .views import (
     sections,
     stages,
@@ -35,8 +36,8 @@ urlpatterns = [
     path('posts/<int:post_id>/attachments/delete/', posts.attachment_delete, name='posts_attachment_delete'),
     path('posts/<int:post_id>/comments/', posts.comments, name='posts_comments'),
     path('posts/<int:post_id>/set_stage/', posts.set_stage, name='posts_set_stage'),
-    path('posts/<int:post_id>/schedule/', posts.schedule, name='posts_schedule'),
     path('posts/<int:post_id>/edit/', posts.edit, name='posts_edit'),
+    path('posts/<int:post_id>/edit_meta/', posts.edit_meta, name='posts_edit_meta'),
     path('posts/<int:post_id>/download/', posts.download_content, name='posts_download_content'),
     path('posts/<int:post_id>/', posts.show, name='posts_show'),
     path('posts', posts.create, name='posts_create'),

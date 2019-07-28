@@ -52,9 +52,11 @@
 {% endif %}
 <br />
 
-{% with comments=idea.comments_ add_comment_url=idea|url_for_idea_comments form=comment_form %}
-{% include 'plan/partials/comments.html' %}
+{# Support for generic comments template #}
+{% with comments=idea.comments_ form=comment_form action_url=idea|url_for_idea_comments %}
+    {% include 'plan/partials/comments.html' %}
 {% endwith %}
+
 {% endblock %}
 {% block scripts %}
 <script type="text/javascript">

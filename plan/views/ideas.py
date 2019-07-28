@@ -12,7 +12,7 @@ from django.db.models import Count
 from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
 
-from main.models import Idea, Issue, User, Vote
+from main.models import Idea, Issue, Vote, users_with_perm
 from plan.forms import CommentModelForm, IdeaModelForm, PostBaseModelForm
 
 IDEAS_PER_PAGE = 20
@@ -169,6 +169,7 @@ def approve(request, idea_id):
 @login_required
 def comments(request, idea_id):
     idea = Idea.objects.prefetch_related('votes__user').get(id=idea_id)
+
     if request.method == 'POST':
         comment_form = CommentModelForm(request.POST)
 
@@ -179,29 +180,33 @@ def comments(request, idea_id):
         if comment_form.is_valid():
             comment_form.save()
 
-            # send email
-            # send notification to:
-            #   * all, who has 'recieve_admin_emails' permission
-            #   * post editor
-            recipients = [u.email for u in User.objects.filter(
-                groups__name='Editors').exclude(id=comment.user.id)]
+            # Send notification to users with 'recieve_post_email_updates' permission
+            recipients = {
+                u.get('email')
+                for u in users_with_perm('recieve_idea_email_updates')
+                    .values('email')
+                    .exclude(id=comment.user.id)
+            }
 
+            # Add post editor if it's not he's comment
             if idea.editor != request.user:
-                recipients.append(idea.editor.email)
+                recipients.add(idea.editor.email)
 
-            if len(recipients) > 0:
-                subject = f'Комментарий к идее «{idea}» от {comment.user}'
-                html_content = render_to_string('email/new_comment.html', {
-                    'comment': comment,
-                    'commentable_type': 'post' if comment.commentable.__class__.__name__ == 'Post' else 'idea',
-                    'APP_URL': os.environ.get('APP_URL', None),
-                })
-                text_content = html2text.html2text(html_content)
-                msg = EmailMultiAlternatives(
-                    subject, text_content, config.PLAN_EMAIL_FROM, recipients)
-                msg.attach_alternative(html_content, "text/html")
-                msg.send()
-
+            if len(recipients) == 0:
+                return redirect('ideas_show', idea.id)
+            
+            subject = f'Комментарий к идее «{idea}» от {comment.user}'
+            html_content = render_to_string('email/new_comment.html', {
+                'comment': comment,
+                'commentable_type': 'post' if comment.commentable.__class__.__name__ == 'Post' else 'idea',
+                'APP_URL': os.environ.get('APP_URL', None),
+            })
+            text_content = html2text.html2text(html_content)
+            msg = EmailMultiAlternatives(
+                subject, text_content, config.PLAN_EMAIL_FROM, recipients)
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+            
             return redirect('ideas_show', idea.id)
     else:
         return redirect('ideas_show', idea.id)

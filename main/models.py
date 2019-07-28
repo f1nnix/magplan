@@ -1,15 +1,17 @@
 import datetime
+from typing import List
 
 import django
 import mistune
 from authtools.models import AbstractEmailUser
+from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import JSONField
 from django.db import models
+from django.db.models import Q
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
-from django.utils import timezone
 from django.utils import timezone
 
 from xmd import XMDRenderer
@@ -48,6 +50,14 @@ class User(AbstractEmailUser, AbstractBase):
         permissions = (
             ("manage_authors", "Can manage authors"),
         )
+
+    def is_member(self, group_name: str) -> bool:
+        """Check if user is member of group
+
+        :param group_name: Group name to check user belongs to
+        :return: True if a memeber, otherwise False
+        """
+        return self.groups.filter(name=group_name).exists()
 
 
 class Profile(AbstractBase):
@@ -173,7 +183,8 @@ class Idea(AbstractBase):
 
     class Meta:
         permissions = (
-            ("approve_ideas", "Can approve ideas"),
+            ('edit_extended_idea_attrs', 'Edit extended Idea attributes'),
+            ('recieve_idea_email_updates', 'Recieve email updates for Idea'),
         )
 
     @property
@@ -223,7 +234,7 @@ class Post(AbstractBase):
 
     format = models.SmallIntegerField(choices=POST_FORMAT_CHOICES, default=POST_FORMAT_DEFAULT)
     finished_at = models.DateTimeField(null=False, blank=False, default=django.utils.timezone.now,
-                                        verbose_name='Дедлайн')
+                                       verbose_name='Дедлайн')
     published_at = models.DateTimeField(null=True, blank=True, verbose_name='Дата публикации')
     kicker = models.CharField(null=True, blank=True, max_length=255, )
     slug = models.SlugField(null=True, blank=True, max_length=255, )
@@ -243,7 +254,7 @@ class Post(AbstractBase):
     section = models.ForeignKey(Section, on_delete=models.CASCADE, null=False, blank=False, verbose_name='Раздел')
     last_updater = models.ForeignKey(User, related_name='posts_updated', verbose_name='Кто последний обновлял',
                                      null=True, on_delete=models.SET_NULL)
-    
+
     meta = JSONField(default=dict)
 
     comments = GenericRelation('Comment')
@@ -304,8 +315,8 @@ class Post(AbstractBase):
 
     class Meta:
         permissions = (
-            ('move_post_to_any_stage', 'Can move post to any stage'),
-            ('schedule_publish', 'Can schedule publish'),
+            ('recieve_post_email_updates', 'Recieve email updates for Post'),
+            ('edit_extended_post_attrs', 'Edit extended Post attributes'),
         )
 
     @property
@@ -345,6 +356,12 @@ class Attachment(AbstractBase):
 class Comment(AbstractBase):
     SYSTEM_ACTION_SET_STAGE = 5
     SYSTEM_ACTION_UPDATE = 10
+    SYSTEM_ACTION_CHANGE_META = 15
+    SYSTEM_ACTION_CHOICES = (
+        (SYSTEM_ACTION_SET_STAGE, 'Set stage'),
+        (SYSTEM_ACTION_UPDATE, 'Update'),
+        (SYSTEM_ACTION_CHANGE_META, 'Change meta'),
+    )
 
     TYPE_SYSTEM = 5
     TYPE_PRIVATE = 10
@@ -376,6 +393,17 @@ class Comment(AbstractBase):
         markdown = mistune.Markdown(renderer=renderer)
         return markdown(self.text)
 
+    @property
+    def changelog(self):
+        try:
+            md = '\n'.join(self.meta['comment']['changelog'])
+        except Exception as exc:
+            md = ''
+        renderer = XMDRenderer()
+        markdown = mistune.Markdown(renderer=renderer)
+
+        return markdown(md)
+
 
 class Vote(AbstractBase):
     SCORE_NEGATIVE = 0
@@ -401,3 +429,16 @@ def render_xmd(sender, instance, **kwargs):
         renderer = XMDRenderer(images=instance.images)
         markdown = mistune.Markdown(renderer=renderer)
         instance.html = markdown(instance.xmd)
+
+
+def users_with_perm(perm_name: str, include_superuser: bool = True) -> List[User]:
+    """Get all users by full permission name
+
+    :param perm_name: permission name without app name
+    :param include_superuser:
+    :return:
+    """
+    return User.objects.filter(
+        Q(is_superuser=include_superuser) |
+        Q(user_permissions__codename=perm_name) |
+        Q(groups__permissions__codename=perm_name)).distinct()
