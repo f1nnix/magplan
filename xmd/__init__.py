@@ -2,8 +2,8 @@ import mimetypes
 import mistune
 
 class XMDRenderer(mistune.Renderer):
-    def __init__(self, *args, **kwargs):
-        self.images = kwargs['images']
+    def __init__(self, images=None, *args, **kwargs):
+        self.images = images or []
         super().__init__()
 
     def image(self, src, title, alt_text):

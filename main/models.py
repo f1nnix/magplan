@@ -356,9 +356,11 @@ class Attachment(AbstractBase):
 class Comment(AbstractBase):
     SYSTEM_ACTION_SET_STAGE = 5
     SYSTEM_ACTION_UPDATE = 10
+    SYSTEM_ACTION_CHANGE_META = 15
     SYSTEM_ACTION_CHOICES = (
         (SYSTEM_ACTION_SET_STAGE, 'Set stage'),
         (SYSTEM_ACTION_UPDATE, 'Update'),
+        (SYSTEM_ACTION_CHANGE_META, 'Change meta'),
     )
 
     TYPE_SYSTEM = 5
@@ -390,6 +392,17 @@ class Comment(AbstractBase):
         renderer = XMDRenderer(images=[])
         markdown = mistune.Markdown(renderer=renderer)
         return markdown(self.text)
+
+    @property
+    def changelog(self):
+        try:
+            md = '\n'.join(self.meta['comment']['changelog'])
+        except Exception as exc:
+            md = ''
+        renderer = XMDRenderer()
+        markdown = mistune.Markdown(renderer=renderer)
+
+        return markdown(md)
 
 
 class Vote(AbstractBase):

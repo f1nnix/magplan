@@ -60,22 +60,20 @@
         <div class="col-12">
             <div class="collapse multi-collapse" id="meta_form_container">
                 <div class="card">
-                    <div class="card-header bg-primary text-white">Редактировать данные статьи
+                    <form id="save_post_form"
+                          action="{% url 'posts_edit_meta' post.id %}"
+                          method="POST">
+                        {% csrf_token %}
 
-                    </div>
-                    <div class="card-body">
-                        <form id="save_post_form"
-                              action="{% url 'posts_edit_meta' post.id %}"
-                              method="POST">
-                            {% csrf_token %}
-
+                        <div class="card-header bg-primary text-white">Редактировать данные статьи</div>
+                        <div class="card-body">
                             <div class="row">
                                 {% with form=meta_form %}
                                     {% include "plan/posts/_form_meta.html" %}
                                     {% if perms.main.edit_extended_post_attrs %}
                                         <div class="col-6">
                                             <div class="form-group">
-                                               {{ form.wp_id.label }}
+                                                {{ form.wp_id.label }}
                                                 {% if form.wp_id.errors %}
                                                     <ul class="errors">
                                                         {% for error in form.title.errors %}
@@ -88,11 +86,12 @@
                                     {% endif %}
                                 {% endwith %}
                             </div>
-                        </form>
-                    </div>
-                    <div class="card-footer text-muted">
-                        <input class="btn btn-success float-right" type="syyubmit" value="Обновить"/>
-                    </div>
+                        </div>
+                        <div class="card-footer">
+                            <input class="btn btn-success float-right" type="submit" value="Обновить" />
+                            <div style="clear:both"></div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -115,7 +114,8 @@
             {% endif %}
 
             {% if perms.main.manage_authors %}
-                {% trans "edits" %} <a href="{% url 'authors_show' post.editor.id %}">{{ post.editor }}</a>{% if forloop.last is False %}, {% else %}.{% endif %}
+                {% trans "edits" %} <a href="{% url 'authors_show' post.editor.id %}">{{ post.editor }}</a>
+                {% if forloop.last is False %}, {% else %}.{% endif %}
             {% else %}
                 {% trans "edits" %} {{ post.editor }}{% if forloop.last is False %}, {% else %}.{% endif %}
             {% endif %}
@@ -182,7 +182,7 @@
     {% endif %}
 
     {# Support for generic comments template #}
-    {% with coments=post.comments_ form=comment_form action_url=post|url_for_post_comments %}
+    {% with comments=post.comments_ form=comment_form action_url=post|url_for_post_comments %}
         {% include 'plan/partials/comments.html' %}
     {% endwith %}
 

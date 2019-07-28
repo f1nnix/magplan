@@ -7,7 +7,7 @@ import html2text
 from constance import config
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from django.core.mail import EmailMultiAlternatives
 from django.http import HttpRequest
 from django.shortcuts import render, HttpResponse, redirect
@@ -35,6 +35,50 @@ def _get_arbitrary_chunk(post: Post) -> str:
         'post': post,
     }))
     return instance_chunk
+
+
+def _create_system_comment(action_type, user, post, changelog=None) -> Comment:
+    """Create auto-generated system comment with post changes logs
+    
+    :param action_type:
+    :param user:
+    :param post:
+    :param changelog:
+    :return:
+    """
+    if not config.SYSTEM_USER_ID:
+        return None
+
+    system_user = User.objects.get(id=config.SYSTEM_USER_ID)
+    comment = Comment()
+    comment.commentable = post
+    comment.type = Comment.TYPE_SYSTEM
+    comment.user = system_user
+
+    # Depending on action type, fill different fields
+    meta = {
+        'action': action_type,
+        'user': {
+            'id': user.id,
+            'str': user.__str__(),
+        },
+        'files': [],
+
+    }
+
+    if action_type == Comment.SYSTEM_ACTION_CHANGE_META:
+        meta['changelog'] = changelog
+
+    # if len(attachments) > 0:
+    #     meta['files'] = [{
+    #         'id': a.id,
+    #         'str': a.original_filename
+    #     } for a in attachments]
+
+    comment.meta['comment'] = meta
+    comment.save()
+
+    return comment
 
 
 @login_required
@@ -120,37 +164,10 @@ def edit(request, post_id):
 
             messages.add_message(request, messages.SUCCESS, 'Пост «%s» успешно отредактирован' % post)
 
-            # create system comment
-            if config.SYSTEM_USER_ID:
-                system_user = User.objects.get(id=config.SYSTEM_USER_ID)
-                comment = Comment()
-                comment.commentable = post
-                comment.type = Comment.TYPE_SYSTEM
-                comment.user = system_user
-
-                meta = {
-                    'action': Comment.SYSTEM_ACTION_UPDATE,
-                    'user': {
-                        'id': request.user.id,
-                        'str': request.user.__str__(),
-                    },
-                    'files': [],
-
-                }
-                if len(attachments) > 0:
-                    meta['files'] = [{
-                        'id': a.id,
-                        'str': a.original_filename
-                    } for a in attachments]
-                comment.meta['comment'] = meta
-
-                comment.save()
-
-                return redirect('posts_edit', post_id)
+            return redirect('posts_edit', post_id)
 
         else:
             messages.add_message(request, messages.ERROR, 'При обновлении поста произошла ошибка ввода')
-
 
     else:
         form = PostExtendedModelForm(initial={
@@ -165,6 +182,13 @@ def edit(request, post_id):
 
 @login_required
 def edit_meta(request, post_id):
+    def _get_value_repr(value) -> str:
+        try:
+            iter(value)
+            return ', '.join(list(map(str(o) for o in value)))
+        except TypeError as te:
+            return str(value)
+
     try:
         post = Post.objects.get(id=post_id)
     except Post.DoesNotExist:
@@ -177,28 +201,44 @@ def edit_meta(request, post_id):
 
         # Iterate over all changeable attributes and stage changes in logs
         changelog = []
-        new_issues = form.cleaned_data.get('issues', ())
-        if post.issues != new_issues:
-            # Stage change
-            log = '* выпуски сменились с "{0}" на "{1}"'.format(
-                ', '.join([str(i) for i in post.issues.all()]),
-                ', '.join([str(i) for i in new_issues])
-            )
-            changelog.append(log)
-            post.issues.set(new_issues)
+        changed_fields = form.changed_data.copy()
+        changed_fields.remove('wp_id')
 
-        if post.editor != form.cleaned_data.get('editor'):
-            log = '* редактор вменился с "{0}" на "{1}"'.format(
-                str(post.editor),
-                str(form.cleaned_data.get('editor'))
-            )
-            changelog.append(log)
-            post.editor = form.cleaned_data.get('editor')
+        __ = lambda form, field: (
+            ', '.join([str(i) for i in form.initial.get(field)]),
+            ', '.join([str(i) for i in form.cleaned_data.get(field)])
+        )
+        _ = lambda form, field: (
+            form.initial.get(field),
+            form.cleaned_data.get(field)
+        )
+        for changed_field in changed_fields:
+            log = None
 
-        if request.user.is_member('Managing editors'):
-            ...
+            if changed_field == 'issues':
+                log = '* выпуски сменились с "{0}" на "{1}"'.format(*__(form, changed_field))
+            elif changed_field == 'editor':
+                # Initial ForeignKey value is stored as int. Populate it
+                args = _(form, changed_field)
+                init_editor = str(User.objects.get(id=args[0]))
+                new_args = (init_editor, args[1])
+                log = '* редактор cменился с "{0}" на "{1}"'.format(*new_args)
+            elif changed_field == 'finished_at':
+                log = '* дедлайн этапа cменился с "{0}" на "{1}"'.format(*_(form, changed_field))
+            elif changed_field == 'published_at':
+                log = '* дата публикации сменилась с "{0}" на "{1}"'.format(*_(form, changed_field))
 
-        post.save()
+            if log:
+                changelog.append(log)
+
+        # Manually set new Wordpress ID as it's ignored by form
+        form.instance.meta['wpid'] = form.cleaned_data.get('wp_id')
+        form.save()
+
+        # Create system comment
+        if len(changelog) > 0:
+            _create_system_comment(Comment.SYSTEM_ACTION_CHANGE_META, request.user, post, changelog)
+
         messages.add_message(request, messages.INFO, f'Пост {post} успешно обновлен!')
 
     return redirect('posts_show', post_id)
@@ -259,30 +299,10 @@ def set_stage(request, post_id, system=Comment.TYPE_SYSTEM):
 
 
 @login_required
-@permission_required('main.edit_extended_post_attrs')
-def schedule(request, post_id):
-    post = Post.objects.get(id=post_id)
-    published_at = request.POST.get('published_at')
-
-    if published_at is None:
-        messages.add_message(request, messages.ERROR, 'Ошибка планирования публикации — дата не передана')
-        return redirect('posts_show', post.id)
-
-    dt = datetime.datetime.strptime(published_at, '%Y-%m-%d')
-    dt = dt.replace(hour=10, minute=0, second=0)
-    post.published_at = dt
-    post.save()
-
-    messages.add_message(request, messages.SUCCESS, 'Пост успешно запланирован в публикацию')
-
-    return redirect('posts_show', post.id)
-
-
-@login_required
 def comments(request, post_id):
     post = Post.objects.prefetch_related('editor', 'authors', 'stage', 'section', 'issues', 'comments__user').get(
         id=post_id)
-    
+
     if request.method == 'POST':
         form = CommentModelForm(request.POST)
 
@@ -307,7 +327,7 @@ def comments(request, post_id):
 
             if len(recipients) == 0:
                 return redirect('posts_show', post_id)
-                
+
             subject = f'Комментарий к посту «{post}» от {comment.user}'
             html_content = render_to_string('email/new_comment.html', {
                 'comment': comment,
@@ -315,7 +335,7 @@ def comments(request, post_id):
                 'APP_URL': os.environ.get('APP_URL', None),
             })
             text_content = html2text.html2text(html_content)
-            
+
             msg = EmailMultiAlternatives(subject, text_content, config.PLAN_EMAIL_FROM, recipients)
             msg.attach_alternative(html_content, "text/html")
             msg.send()

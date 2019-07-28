@@ -23,6 +23,14 @@
                             {% endif %}
                         </div>
                     {% endif %}
+                    {% if comment.meta.comment.action == SYSTEM_ACTION_CHOICES.2.0 %}
+                        <div>
+                            {{ comment.created_at }} {{ comment.meta.comment.user.str }} изменил мета-информацию поста.
+                            <p>{{ comment.changelog|safe }}</p>
+
+                        </div>
+                    {% endif %}
+
                 </small>
 
             {% else %}

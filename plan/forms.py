@@ -74,6 +74,10 @@ class PostMetaForm(ModelForm):
             'finished_at': forms.DateInput(attrs={'class': 'form-control date_picker', }),
             'published_at': forms.DateInput(attrs={'class': 'form-control date_picker', }),
         }
+    
+    def __init__(self, *args, **kwargs):
+        super(PostMetaForm, self).__init__(*args, **kwargs)
+        self.fields['wp_id'].required = False
 
 
 class PostBaseModelForm(ModelForm):
