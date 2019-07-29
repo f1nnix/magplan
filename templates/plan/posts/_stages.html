@@ -26,7 +26,7 @@
         {% endblocktrans %}
 
 
-        {% if perms.main.move_post_to_any_stage %}
+        {% if perms.main.edit_extended_post_attrs %}
             {% include 'plan/posts/_admin_set_stage.html' %}
         {% endif %}
     </div>

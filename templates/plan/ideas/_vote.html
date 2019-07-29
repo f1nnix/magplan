@@ -34,28 +34,9 @@
                 </h6>
             {% endwith %}
 
-
-            {% if perms.main.approve_ideas %}
-                <h4>Аппрув идеи</h4>
-                <form action="{% url 'ideas_approve' idea.id %}"
-                      method="POST"
-                      accept-charset="utf-8">
-                    <div class="row">
-                        {% csrf_token %}
-                        <div class="col-6">
-                            <select name="approve" class="form-control">
-                                <option value="1">Принять идею</option>
-                                <option value="0">Отклонить идею</option>
-                            </select>
-                        </div>
-                        <div class="col-6">
-                            <button type="submit" class="btn btn-success btn-block">Изменить</button>
-                        </div>
-
-                    </div>
-                </form>
+            {% if perms.main.edit_extended_idea_attrs %}
+                {% include 'plan/ideas/_approve_ideas.html' %}
             {% endif %}
-
         </div>
         <div class="col-6">
             <table class="table table-bordered">

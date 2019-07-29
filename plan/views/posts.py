@@ -1,13 +1,14 @@
 import datetime
 import io
 import os
+from typing import List
 from zipfile import ZipFile, ZIP_DEFLATED
 
 import html2text
 from constance import config
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.core.mail import EmailMultiAlternatives
 from django.http import HttpRequest
 from django.shortcuts import render, HttpResponse, redirect
@@ -79,6 +80,46 @@ def _create_system_comment(action_type, user, post, changelog=None) -> Comment:
     comment.save()
 
     return comment
+
+
+def _generate_changelog_for_form(form: PostMetaForm) -> List[str]:
+    """Iterate over all changed attributes and stage changes in logs
+
+    :param form: Django form
+    :return: list, where each element is changelog line
+    """
+    changelog = []
+    changed_fields = form.changed_data.copy()
+    changed_fields.remove('wp_id')
+
+    __ = lambda form, field: (
+        ', '.join([str(i) for i in form.initial.get(field)]),
+        ', '.join([str(i) for i in form.cleaned_data.get(field)])
+    )
+    _ = lambda form, field: (
+        form.initial.get(field),
+        form.cleaned_data.get(field)
+    )
+    for changed_field in changed_fields:
+        log = None
+
+        if changed_field == 'issues':
+            log = '* выпуски сменились с "{0}" на "{1}"'.format(*__(form, changed_field))
+        elif changed_field == 'editor':
+            # Initial ForeignKey value is stored as int. Populate it
+            args = _(form, changed_field)
+            init_editor = str(User.objects.get(id=args[0]))
+            new_args = (init_editor, args[1])
+            log = '* редактор cменился с "{0}" на "{1}"'.format(*new_args)
+        elif changed_field == 'finished_at':
+            log = '* дедлайн этапа cменился с "{0}" на "{1}"'.format(*_(form, changed_field))
+        elif changed_field == 'published_at':
+            log = '* дата публикации сменилась с "{0}" на "{1}"'.format(*_(form, changed_field))
+
+        if log:
+            changelog.append(log)
+
+        return changelog
 
 
 @login_required
@@ -199,43 +240,12 @@ def edit_meta(request, post_id):
         if not form.is_valid():
             return HttpResponse(status=403)
 
-        # Iterate over all changeable attributes and stage changes in logs
-        changelog = []
-        changed_fields = form.changed_data.copy()
-        changed_fields.remove('wp_id')
-
-        __ = lambda form, field: (
-            ', '.join([str(i) for i in form.initial.get(field)]),
-            ', '.join([str(i) for i in form.cleaned_data.get(field)])
-        )
-        _ = lambda form, field: (
-            form.initial.get(field),
-            form.cleaned_data.get(field)
-        )
-        for changed_field in changed_fields:
-            log = None
-
-            if changed_field == 'issues':
-                log = '* выпуски сменились с "{0}" на "{1}"'.format(*__(form, changed_field))
-            elif changed_field == 'editor':
-                # Initial ForeignKey value is stored as int. Populate it
-                args = _(form, changed_field)
-                init_editor = str(User.objects.get(id=args[0]))
-                new_args = (init_editor, args[1])
-                log = '* редактор cменился с "{0}" на "{1}"'.format(*new_args)
-            elif changed_field == 'finished_at':
-                log = '* дедлайн этапа cменился с "{0}" на "{1}"'.format(*_(form, changed_field))
-            elif changed_field == 'published_at':
-                log = '* дата публикации сменилась с "{0}" на "{1}"'.format(*_(form, changed_field))
-
-            if log:
-                changelog.append(log)
-
         # Manually set new Wordpress ID as it's ignored by form
         form.instance.meta['wpid'] = form.cleaned_data.get('wp_id')
         form.save()
 
-        # Create system comment
+        # Create system comment with changelog
+        changelog = _generate_changelog_for_form(form)
         if len(changelog) > 0:
             _create_system_comment(Comment.SYSTEM_ACTION_CHANGE_META, request.user, post, changelog)
 
@@ -245,6 +255,7 @@ def edit_meta(request, post_id):
 
 
 @login_required
+@permission_required('main.edit_extended_post_attrs')
 def set_stage(request, post_id, system=Comment.TYPE_SYSTEM):
     post = (Post.objects
             .get(id=post_id))
