@@ -205,7 +205,12 @@ def comments(request, idea_id):
             msg = EmailMultiAlternatives(
                 subject, text_content, config.PLAN_EMAIL_FROM, recipients)
             msg.attach_alternative(html_content, "text/html")
-            msg.send()
+
+            try:
+                msg.send()
+            except Exception as esx:
+                # TODO: hotfix for email backend
+                pass
             
             return redirect('ideas_show', idea.id)
     else:
