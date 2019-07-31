@@ -182,7 +182,7 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict({
 CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
 
 if DEBUG is False:
-    EMAIL_BACKEND = 'main.email.DefaultEmailBackend'
+    EMAIL_BACKEND = 'main.email_backends.DefaultEmailBackend'
 
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
