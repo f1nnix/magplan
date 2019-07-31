@@ -38,7 +38,7 @@ def _get_arbitrary_chunk(post: Post) -> str:
     return instance_chunk
 
 
-def _create_system_comment(action_type, user, post, changelog=None) -> Comment:
+def _create_system_comment(action_type, user, post, changelog=None, attachments=None, stage=None) -> Comment:
     """Create auto-generated system comment with post changes logs
     
     :param action_type:
@@ -49,6 +49,11 @@ def _create_system_comment(action_type, user, post, changelog=None) -> Comment:
     """
     if not config.SYSTEM_USER_ID:
         return None
+
+    if not attachments:
+        attachments = ()
+    if not stage:
+        stage = post.stage
 
     system_user = User.objects.get(id=config.SYSTEM_USER_ID)
     comment = Comment()
@@ -70,12 +75,20 @@ def _create_system_comment(action_type, user, post, changelog=None) -> Comment:
     if action_type == Comment.SYSTEM_ACTION_CHANGE_META:
         meta['changelog'] = changelog
 
-    # if len(attachments) > 0:
-    #     meta['files'] = [{
-    #         'id': a.id,
-    #         'str': a.original_filename
-    #     } for a in attachments]
+    elif action_type == Comment.SYSTEM_ACTION_UPDATE:
+        if len(attachments) > 0:
+            meta['files'] = [{
+                'id': a.id,
+                'str': a.original_filename
+            } for a in attachments]
 
+    elif action_type == Comment.SYSTEM_ACTION_SET_STAGE:
+        meta['stage'] = {
+            'id': post.stage.id,
+            'str': post.stage.__str__(),
+        }
+
+    # Assign builded meta to comment and save
     comment.meta['comment'] = meta
     comment.save()
 
@@ -119,7 +132,7 @@ def _generate_changelog_for_form(form: PostMetaForm) -> List[str]:
         if log:
             changelog.append(log)
 
-        return changelog
+    return changelog
 
 
 @login_required
@@ -203,6 +216,9 @@ def edit(request, post_id):
             post.imprint_updater(request.user)
             form.save()
 
+            _create_system_comment(Comment.SYSTEM_ACTION_UPDATE, request.user, post,
+                                   attachments=attachments)
+
             messages.add_message(request, messages.SUCCESS, 'Пост «%s» успешно отредактирован' % post)
 
             return redirect('posts_edit', post_id)
@@ -271,26 +287,8 @@ def set_stage(request, post_id, system=Comment.TYPE_SYSTEM):
         messages.add_message(request, messages.INFO, 'Текущий этап статьи «%s» обновлен' % post)
 
         # Create system comment
-        if config.SYSTEM_USER_ID:
-            system_user = User.objects.get(id=config.SYSTEM_USER_ID)
-            comment = Comment()
-            comment.commentable = post
-            comment.type = system
-            comment.user = system_user
-
-            comment.meta['comment'] = {
-                'action': Comment.SYSTEM_ACTION_SET_STAGE,
-                'stage': {
-                    'id': post.stage.id,
-                    'str': post.stage.__str__(),
-                },
-                'user': {
-                    'id': request.user.id,
-                    'str': request.user.__str__(),
-                },
-
-            }
-            comment.save()
+        _create_system_comment(Comment.SYSTEM_ACTION_SET_STAGE, request.user, post,
+                               stage=post.stage)
 
         # Send email if stage allows it
         if post.assignee != request.user and stage.skip_notification is False:
