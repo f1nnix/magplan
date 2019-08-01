@@ -103,7 +103,8 @@ def _generate_changelog_for_form(form: PostMetaForm) -> List[str]:
     """
     changelog = []
     changed_fields = form.changed_data.copy()
-    changed_fields.remove('wp_id')
+    if 'wp_id' in changed_fields:
+        changed_fields.remove('wp_id')
 
     __ = lambda form, field: (
         ', '.join([str(i) for i in form.initial.get(field)]),
@@ -258,6 +259,12 @@ def edit_meta(request, post_id):
 
         # Manually set new Wordpress ID as it's ignored by form
         form.instance.meta['wpid'] = form.cleaned_data.get('wp_id')
+
+        published_at = form.cleaned_data.get('published_at')
+        if published_at:
+            dt = published_at.replace(hour=10, minute=0, second=0)
+            form.instance.published_at = dt
+
         form.save()
 
         # Create system comment with changelog
