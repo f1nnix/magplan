@@ -1,13 +1,14 @@
-import datetime
-from django.urls import reverse
-from django.test import Client, TestCase
-from main.models import Post, Comment
-from plan.tests import _User, _Sections, _Section, _Stages, _Post, _Postype, _Issue
-from constance import config
-from django.core import mail
-from django.template import Template, Context
-from django.contrib.auth.models import Permission
+from random import choice
 from unittest.mock import patch
+
+from constance import config
+from django.contrib.auth.models import Permission
+from django.template import Template, Context
+from django.test import Client, TestCase
+from django.urls import reverse
+
+from plan.tests import _User, _Sections, _Section, _Stages, _Post, _Postype, _Issue
+
 
 class TestSetStage(TestCase):
     @classmethod
@@ -24,29 +25,104 @@ class TestSetStage(TestCase):
         cls.new_section = _Section()
         cls.new_issue = _Issue()
 
+        cls.perm = Permission.objects.get(name='Edit extended Post attributes')
+
     def setUp(self):
         self.ROUTE_NAME = 'posts_set_stage'
+
+        self.url = reverse(self.ROUTE_NAME, kwargs={
+            'post_id': self.post.id,
+        })
+
         self.client = Client()
         self.client.force_login(user=self.user)
 
+        self.post_stage = self.stages[5]
+        self.post_stage.assignee = self.user
+        self.post_stage.save()
+
+        self.post.stage = self.post_stage
+        self.post.save()
+
         config.SYSTEM_USER_ID = self.system_user.id
+
+    def _get_arbitrary_stage_id(self):
+        legit_stages = (
+            self.post.stage.prev_stage_id,
+            self.post.stage.next_stage_id,
+        )
+        new_stage_id = legit_stages[0]
+        while new_stage_id in legit_stages:
+            new_stage_id = choice(self.stages).id
+        return new_stage_id
 
     def test_redirect_to_login_if_not_authenticated(self):
         client = Client()
-        response = client.get(reverse(self.ROUTE_NAME, kwargs={
-            'post_id': self.post.id,
-        }))
+        response = client.get(self.url)
         self.assertEqual(response.status_code, 302)
 
     def test_redirect_to_post_for_get(self):
-        self.client.force_login(user=self.user)
-        response = self.client.get(reverse(self.ROUTE_NAME, kwargs={
-            'post_id': self.post.id,
-        }))
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse('posts_show', kwargs={
             'post_id': self.post.id,
         }))
+
+    def test_allow_set_next_stage(self):
+        next_stage_id = self.post.stage.next_stage.id
+
+        post_data = {
+            'new_stage_id': next_stage_id
+        }
+        resp = self.client.post(self.url, post_data)
+
+        self.assertEqual(resp.status_code, 302)
+
+        self.post.refresh_from_db()
+        self.assertEqual(self.post.stage_id, next_stage_id)
+
+    def test_allow_set_previous_stage(self):
+        prev_stage_id = self.post.stage.prev_stage_id
+
+        post_data = {
+            'new_stage_id': prev_stage_id
+        }
+        resp = self.client.post(self.url, post_data)
+
+        self.assertEqual(resp.status_code, 302)
+
+        self.post.refresh_from_db()
+        self.assertEqual(self.post.stage_id, prev_stage_id)
+
+    def test_forbid_set_arbitrary_stage_wo_perm(self):
+        # Select arbitrary stage
+        old_stage_id = self.post.stage_id
+        new_stage_id = self._get_arbitrary_stage_id()
+
+        post_data = {
+            'new_stage_id': new_stage_id
+        }
+        resp = self.client.post(self.url, post_data)
+
+        self.assertEqual(resp.status_code, 403)
+
+        self.post.refresh_from_db()
+        self.assertEqual(self.post.stage_id, old_stage_id)
+
+    def test_allow_set_arbitrary_stage_with_perm(self):
+        self.user.user_permissions.add(self.perm)
+
+        new_stage_id = self._get_arbitrary_stage_id()
+
+        post_data = {
+            'new_stage_id': new_stage_id
+        }
+        resp = self.client.post(self.url, post_data)
+
+        self.assertEqual(resp.status_code, 302)
+
+        self.post.refresh_from_db()
+        self.assertEqual(self.post.stage_id, new_stage_id)
 
 
 class TestEdit(TestCase):
@@ -128,6 +204,7 @@ class TestShow(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, instance_chunk)
 
+
 class TestComments(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -153,12 +230,11 @@ class TestComments(TestCase):
         })
 
         response = self.client.post(url, {
-            'text': 'foo'   
+            'text': 'foo'
         })
-        
+
         self.assertEqual(response.status_code, 302)
         mock_send.assert_not_called()
-
 
     @patch('plan.views.posts.EmailMultiAlternatives.send')
     def test_comment_email_sent_with_permission(self, mock_send):
@@ -170,9 +246,7 @@ class TestComments(TestCase):
         })
 
         response = self.client.post(url, {
-            'text': 'foo'   
+            'text': 'foo'
         })
         self.assertEqual(response.status_code, 302)
         mock_send.assert_called()
-
-
