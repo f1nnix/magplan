@@ -10,7 +10,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.mail import EmailMultiAlternatives
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponseForbidden
 from django.shortcuts import render, HttpResponse, redirect
 from django.template import Template, Context
 from django.template.loader import render_to_string
@@ -134,6 +134,28 @@ def _generate_changelog_for_form(form: PostMetaForm) -> List[str]:
             changelog.append(log)
 
     return changelog
+
+
+def _authorize_stage_change(user: User, post: Post, new_stage_id: int, ) -> bool:
+    """Check if user is authorized to set stage for post
+
+    :param user: User instance
+    :param post: Post instance
+    :param new_stage_id: Stage to to set for post
+    :return: True if authorized, otherwise False
+    """
+    legit_stages = (
+        post.stage.prev_stage_id,
+        post.stage.next_stage_id,
+    )
+
+    if new_stage_id in legit_stages and post.stage.assignee == user:
+        return True
+
+    if user.has_perm('main.edit_extended_post_attrs'):
+        return True
+
+    return False
 
 
 @login_required
@@ -278,11 +300,15 @@ def edit_meta(request, post_id):
 
 
 @login_required
-@permission_required('main.edit_extended_post_attrs')
 def set_stage(request, post_id, system=Comment.TYPE_SYSTEM):
-    post = (Post.objects
-            .get(id=post_id))
-    if request.method == 'POST' and request.POST.get('new_stage_id', None):
+    post = Post.objects \
+        .prefetch_related('stage__n_stage', 'stage__p_stage') \
+        .get(id=post_id)
+
+    if request.method == 'POST' and request.POST.get('new_stage_id'):
+        if not _authorize_stage_change(request.user, post, int(request.POST.get('new_stage_id'))):
+            return HttpResponseForbidden()
+
         stage = Stage.objects.get(id=request.POST.get('new_stage_id', None))
 
         # set deadline to current stage durtion. If no duration, append 1 day
