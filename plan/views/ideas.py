@@ -194,7 +194,7 @@ def comments(request, idea_id):
 
             if len(recipients) == 0:
                 return redirect('ideas_show', idea.id)
-            
+
             subject = f'Комментарий к идее «{idea}» от {comment.user}'
             html_content = render_to_string('email/new_comment.html', {
                 'comment': comment,
@@ -207,7 +207,7 @@ def comments(request, idea_id):
             msg.attach_alternative(html_content, "text/html")
 
             msg.send()
-            
+
             return redirect('ideas_show', idea.id)
     else:
         return redirect('ideas_show', idea.id)

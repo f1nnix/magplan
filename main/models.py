@@ -169,7 +169,7 @@ class Idea(AbstractBase):
     author_type = models.CharField(max_length=2, choices=AUTHOR_TYPE_CHOICES, default=AUTHOR_TYPE_NO,
                                    verbose_name='Автор')
     authors_new = models.CharField(max_length=255, null=True, blank=True, verbose_name='Новые автор')
-    authors = models.ManyToManyField(User, verbose_name='Авторы', related_name='authors', null=True, blank=True)
+    authors = models.ManyToManyField(User, verbose_name='Авторы', related_name='authors', blank=True)
 
     def voted(self, user):
         vote = next((v for v in self.votes.all() if v.user_id == user.id), None)
@@ -235,7 +235,8 @@ class Post(AbstractBase):
     format = models.SmallIntegerField(choices=POST_FORMAT_CHOICES, default=POST_FORMAT_DEFAULT)
     finished_at = models.DateTimeField(null=False, blank=False, default=django.utils.timezone.now,
                                        verbose_name='Дедлайн')
-    published_at = models.DateTimeField(null=True, blank=True, verbose_name='Дата публикации')
+    published_at = models.DateTimeField(null=True, blank=True, default=django.utils.timezone.now,
+                                        verbose_name='Дата публикации')
     kicker = models.CharField(null=True, blank=True, max_length=255, )
     slug = models.SlugField(null=True, blank=True, max_length=255, )
     title = models.CharField(null=True, blank=True, max_length=255, verbose_name='Заголовок статьи')

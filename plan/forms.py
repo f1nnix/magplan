@@ -74,7 +74,7 @@ class PostMetaForm(ModelForm):
             'finished_at': forms.DateInput(attrs={'class': 'form-control date_picker', }),
             'published_at': forms.DateInput(attrs={'class': 'form-control date_picker', }),
         }
-    
+
     def __init__(self, *args, **kwargs):
         super(PostMetaForm, self).__init__(*args, **kwargs)
         self.fields['wp_id'].required = False
@@ -109,7 +109,6 @@ class PostBaseModelForm(ModelForm):
 
 
 class PostExtendedModelForm(ModelForm):
-    wp_id = forms.IntegerField()
     section = forms.ModelChoiceField(queryset=Section.objects.filter(is_archived=False),
                                      label="Рубрика",
                                      empty_label=None,
@@ -118,20 +117,21 @@ class PostExtendedModelForm(ModelForm):
     class Meta(PostBaseModelForm.Meta):
         model = Post
 
-        fields = PostBaseModelForm.Meta.fields + ('kicker', 'xmd', 'editor',)
-
-        widgets = PostBaseModelForm.Meta.widgets.copy()
-        widgets.update({
+        fields = ('title', 'description', 'authors', 'kicker', 'xmd',)
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control', }),
+            'description': forms.HiddenInput(),
+            'authors': forms.SelectMultiple(attrs={
+                'class': 'form-control live_multiselect',
+                'data-url': '/admin/api/users/search',
+            }),
             'kicker': forms.TextInput(attrs={'class': 'form-control', }, ),
             'xmd': forms.Textarea(attrs={'class': 'form-control', 'rows': 20, }),
-            'editor': forms.Select(attrs={'class': 'form-control', }),
-            'wp_id': forms.TextInput(attrs={'class': 'form-control', }),
-        })
+        }
 
     def __init__(self, *args, **kwargs):
         super(PostExtendedModelForm, self).__init__(*args, **kwargs)
         self.fields['kicker'].required = False
-        self.fields['wp_id'].required = False
         self.fields['xmd'].required = False
         self.fields['section'].empty_label = None
 

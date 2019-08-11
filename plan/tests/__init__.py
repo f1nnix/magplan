@@ -8,7 +8,10 @@ A naive analog of pytest fixtrues.
 
 import datetime
 import random
+
+from django.utils import timezone
 from faker import Faker
+
 from main.models import User, Stage, Postype, Section, Issue, Post, Magazine, Idea
 
 
@@ -88,7 +91,7 @@ def _Post(stage=None, section=None, postype=None, editor=None, ):
         ),
         title=fake.sentence(nb_words=6, variable_nb_words=True, ext_word_list=None),
         xmd='\r\n'.join(fake.paragraphs(nb=20, ext_word_list=None)),
-        published_at=datetime.datetime.now() + datetime.timedelta(days=random.randint(0, 10)),
+        published_at=timezone.now() + datetime.timedelta(days=random.randint(0, 10)),
         editor=editor or User.objects.first(),
         stage=stage or Stage.objects.first(),
         section=section or Section.objects.first(),
@@ -101,9 +104,10 @@ def _Post(stage=None, section=None, postype=None, editor=None, ):
 
     return post
 
+
 def _Idea(editor=None):
     fake = Faker()
-    
+
     idea = Idea(
         title='foo',
         description='bar',

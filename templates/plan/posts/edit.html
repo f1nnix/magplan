@@ -1,6 +1,6 @@
 {% extends "layout_plan.html" %}
-{% block title %}Редактирование «{{ post.title }}»{% endblock %}
 
+{% block title %}Редактирование «{{ post.title }}»{% endblock %}
 {% block styles %}
     <style>
         .attachment-image {
@@ -66,27 +66,20 @@
           accept-charset="utf-8"
           enctype='multipart/form-data'>
         {% csrf_token %}
+
         <div class="row">
-            <div class="col-12">
-                <div class="form-group">
-                    {{ form.kicker.label }}
-                    {% if form.kicker.errors %}
-                        <ul class="errors">
-                            {% for error in form.kicker.err %}
-                                <li>{{ error }}</li>{% endfor %}
-                        </ul>
-                    {% endif %}
-                    {{ form.kicker }}
-                </div>
-            </div>
+            {% with field="kicker" size=4 %}{% include 'plan/posts/_field_col.html' %}{% endwith %}
+            {% with field="title" size=8 %}{% include 'plan/posts/_field_col.html' %}{% endwith %}
+            {% with field="description" size=12 %}{% include 'plan/posts/_field_col.html' %}{% endwith %}
+            {% with field="section" size=6 %}{% include 'plan/posts/_field_col.html' %}{% endwith %}
+            {% with field="authors" size=6 %}{% include 'plan/posts/_field_col.html' %}{% endwith %}
         </div>
-        {% include 'plan/posts/_form_base.html' %}
-        <br/>
+
+
         <section id="attachments" style="margin-bottom: 1rem;">
             {% with images=post.images pdfs=post.pdfs files=post.files %}
                 {% include 'plan/posts/_attachments.html' %}
             {% endwith %}
-
 
             <div id="images_status">
                 <p id="missing"></p>
@@ -94,42 +87,17 @@
             </div>
         </section>
 
-        {% include 'plan/posts/_form_extended.html' %}
         <div class="row">
-            <div class="col-6">
-                <div class="form-group">
-                    {{ form.editor.label }}
-                    {% if form.editor.errors %}
-                        <ul class="errors">
-                            {% for error in form.editor.err %}
-                                <li>{{ error }}</li>{% endfor %}
-                        </ul>
-                    {% endif %}
-                    {{ form.editor }}
-                </div>
-            </div>
-            <div class="col-3">
-                <div class="form-group">
-                    {{ form.wp_id.label }}
-                    {% if form.wp_id.errors %}
-                        <ul class="errors">
-                            {% for error in form.kicker.err %}
-                                <li>{{ error }}</li>{% endfor %}
-                        </ul>
-                    {% endif %}
-                    {{ form.wp_id }}
-                </div>
-            </div>
+            {% with field="xmd" size=12 %}{% include 'plan/posts/_field_col.html' %}{% endwith %}
         </div>
-
-
     </form>
 {% endblock %}
 
 {% block footer %}
     <footer class="footer">
         <div class="container">
-            <span class="small d-none d-sm-inline">Изменено {{ post.updated_at }}{% if post.last_updater %} — {{ post.last_updater }}{% endif %}</span>
+            <span class="small d-none d-sm-inline">Изменено {{ post.updated_at }}{% if post.last_updater %} —
+                {{ post.last_updater }}{% endif %}</span>
             <div class="float-right"><input type="submit" id="save_post" form="save_post_form" class="btn btn-success"
                                             value="Сохранить"></div>
         </div>

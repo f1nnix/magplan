@@ -8,7 +8,7 @@ import html2text
 from constance import config
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from django.core.mail import EmailMultiAlternatives
 from django.http import HttpRequest, HttpResponseForbidden
 from django.shortcuts import render, HttpResponse, redirect
@@ -158,6 +158,31 @@ def _authorize_stage_change(user: User, post: Post, new_stage_id: int, ) -> bool
     return False
 
 
+def _save_attachments(files: List, post: Post, user: User) -> List[Attachment]:
+    attachments = []
+    for file in files:
+        attachment = Attachment(post=post, user=user, original_filename=file.name)  # save original filename
+
+        # Slugify original filename and save with safe one
+        filename, extension = os.path.splitext(file.name)
+        file.name = '%s%s' % (slugify(filename), extension)
+
+        # Assign file object with slugified filename as name,
+        # original is copied by value
+        attachment.file = file
+
+        if file.content_type in ('image/png', 'image/jpeg'):
+            attachment.type = Attachment.TYPE_IMAGE
+        elif file.content_type == 'application/pdf':
+            attachment.type = Attachment.TYPE_PDF
+        else:
+            attachment.type = Attachment.TYPE_FILE
+
+        attachment.save()
+        attachments.append(attachment)
+    return attachments
+
+
 @login_required
 def show(request, post_id):
     post = Post.objects \
@@ -211,37 +236,16 @@ def edit(request, post_id):
 
     if request.method == 'POST':
         form = PostExtendedModelForm(request.POST, request.FILES, instance=post)
+
         files = request.FILES.getlist('attachments')
-
-        attachments = []
-        for file in files:
-            attachment = Attachment(post=post, user=request.user, original_filename=file.name)  # save original filename
-
-            # Slugify original filename and save with safe one
-            filename, extension = os.path.splitext(file.name)
-            file.name = '%s%s' % (slugify(filename), extension)
-
-            # assign file object with slugified filename as name, original is copied by value
-            attachment.file = file
-
-            if file.content_type in ('image/png', 'image/jpeg'):
-                attachment.type = Attachment.TYPE_IMAGE
-            elif file.content_type == 'application/pdf':
-                attachment.type = Attachment.TYPE_PDF
-            else:
-                attachment.type = Attachment.TYPE_FILE
-
-            attachment.save()
-            attachments.append(attachment)
+        attachments = _save_attachments(files, post, request.user)
 
         if form.is_valid():
-            post.meta['wpid'] = request.POST.get('wp_id', None)
             post.imprint_updater(request.user)
             form.save()
 
             _create_system_comment(Comment.SYSTEM_ACTION_UPDATE, request.user, post,
                                    attachments=attachments)
-
             messages.add_message(request, messages.SUCCESS, 'Пост «%s» успешно отредактирован' % post)
 
             return redirect('posts_edit', post_id)
@@ -250,8 +254,7 @@ def edit(request, post_id):
             messages.add_message(request, messages.ERROR, 'При обновлении поста произошла ошибка ввода')
 
     else:
-        form = PostExtendedModelForm(initial={
-            'wp_id': post.meta.get('wpid', None)}, instance=post)
+        form = PostExtendedModelForm(instance=post)
 
     return render(request, 'plan/posts/edit.html', {
         'post': post,

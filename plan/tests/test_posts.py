@@ -138,6 +138,7 @@ class TestEdit(TestCase):
         cls.new_editor = _User()
         cls.new_author = _User()
         cls.new_section = _Section()
+
         # queryset filters
         cls.new_section.is_archived = False
         cls.new_section.is_whitelisted = False
@@ -147,6 +148,10 @@ class TestEdit(TestCase):
 
     def setUp(self):
         self.ROUTE_NAME = 'posts_edit'
+        self.url = reverse(self.ROUTE_NAME, kwargs={
+            'post_id': self.post.id,
+        })
+
         self.client = Client()
         self.client.force_login(user=self.user)
 
@@ -154,16 +159,11 @@ class TestEdit(TestCase):
 
     def test_redirect_to_login_if_not_authenticated(self):
         client = Client()
-        response = client.get(reverse(self.ROUTE_NAME, kwargs={
-            'post_id': self.post.id,
-        }))
+        response = client.get(self.url)
         self.assertEqual(response.status_code, 302)
 
     def test_allow_access_to_page_if_has_auth(self):
-        self.client.force_login(user=self.user)
-        response = self.client.get(reverse(self.ROUTE_NAME, kwargs={
-            'post_id': self.post.id,
-        }))
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
 

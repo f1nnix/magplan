@@ -1,5 +1,5 @@
-import mimetypes
 import mistune
+
 
 class XMDRenderer(mistune.Renderer):
     def __init__(self, images=None, *args, **kwargs):
