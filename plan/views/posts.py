@@ -326,6 +326,7 @@ def set_stage(request, post_id, system=Comment.TYPE_SYSTEM):
         _create_system_comment(Comment.SYSTEM_ACTION_SET_STAGE, request.user, post,
                                stage=post.stage)
 
+        # TODO: extract method
         # Send email if stage allows it
         if post.assignee != request.user and stage.skip_notification is False:
             subject = f'На вас назначена статья «{post}»'
