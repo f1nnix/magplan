@@ -235,8 +235,7 @@ class Post(AbstractBase):
     format = models.SmallIntegerField(choices=POST_FORMAT_CHOICES, default=POST_FORMAT_DEFAULT)
     finished_at = models.DateTimeField(null=False, blank=False, default=django.utils.timezone.now,
                                        verbose_name='Дедлайн')
-    published_at = models.DateTimeField(null=True, blank=True, default=django.utils.timezone.now,
-                                        verbose_name='Дата публикации')
+    published_at = models.DateTimeField(null=True, blank=True, verbose_name='Дата публикации')
     kicker = models.CharField(null=True, blank=True, max_length=255, )
     slug = models.SlugField(null=True, blank=True, max_length=255, )
     title = models.CharField(null=True, blank=True, max_length=255, verbose_name='Заголовок статьи')
