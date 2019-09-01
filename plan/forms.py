@@ -117,7 +117,7 @@ class PostExtendedModelForm(ModelForm):
     class Meta(PostBaseModelForm.Meta):
         model = Post
 
-        fields = ('title', 'description', 'authors', 'kicker', 'xmd',)
+        fields = ('title', 'description', 'authors', 'kicker', 'xmd', 'section')
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', }),
             'description': forms.HiddenInput(),
