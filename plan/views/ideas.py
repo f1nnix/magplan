@@ -115,6 +115,7 @@ def show(request, idea_id):
     initial_issues_suggesion, issues_suggesions = _get_suggestion_issues()
     form = PostBaseModelForm(initial={
         'issues': initial_issues_suggesion,
+        'finished_at': datetime.datetime.now() + datetime.timedelta(days=3),
     }, instance=idea)
 
     return render(request, 'plan/ideas/show.html', {
