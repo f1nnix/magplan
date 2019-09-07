@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from unittest.mock import patch, Mock, MagicMock
 
 import pytest
 from django.contrib.auth.models import Permission
@@ -26,8 +26,10 @@ def test_comments_not_send_wo_permission(mock_send, _, client, post):
 
 @pytest.mark.django_db
 @patch('plan.views.posts.EmailMultiAlternatives.send')
-def test_comment_email_sent_with_permission(mock_send, _, client, users, post):
-    """This test sould be deprecated in facvout of smart subsribers list"""
+@patch('plan.views.posts.send_post_comment_notification')
+def test_comment_email_sent_with_permission(mock_send_task, _, client, users, post):
+    mock_send_task.delay = MagicMock()
+
     recieve_email_perm = Permission.objects.get(name='Recieve email updates for Post')
     users[1].user_permissions.add(recieve_email_perm)
 
@@ -36,5 +38,5 @@ def test_comment_email_sent_with_permission(mock_send, _, client, users, post):
         'text': 'foo'
     })
 
-    _.assertEqual(response.status_code, 302)
-    mock_send.assert_called()
+    assert response.status_code == 302
+    mock_send_task.delay.assert_called()
