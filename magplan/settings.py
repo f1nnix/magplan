@@ -186,3 +186,6 @@ if DEBUG is False:
 
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
+
+
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://127.0.0.1:6379')
