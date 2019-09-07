@@ -1,6 +1,7 @@
 # Create your tasks here
 from __future__ import absolute_import, unicode_literals
 
+import email
 import logging
 import os
 
@@ -52,7 +53,10 @@ def send_post_comment_notification(comment_id: int) -> None:
     if not recipients:
         return
 
-    _send_email(comment, recipients)
+    # Transform to plain email list
+    recipients_emails = {recipient.email for recipient in recipients}
+
+    _send_email(comment, recipients_emails)
 
 
 def _send_email(comment, recipients):
