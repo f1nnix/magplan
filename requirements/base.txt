@@ -1,6 +1,6 @@
+celery==4.3.0
 certifi==2018.10.15
 chardet==3.0.4
-Django==2.1.2
 django-admin-list-filter-dropdown==1.0.2
 django-authtools==1.6.0
 django-constance==2.3.1
@@ -8,12 +8,14 @@ django-debug-toolbar==1.10.1
 django-filter==2.0.0
 django-picklefield==1.1.0
 django-polymorphic==2.0.3
+Django==2.1.2
 html2text==2018.1.9
 idna==2.7
 mistune==0.8.4
 psycopg2==2.7.5
 python-slugify==1.2.6
 pytz==2018.5
+redis==3.3.8
 requests==2.19.1
 sqlparse==0.2.4
 tqdm==4.28.1
