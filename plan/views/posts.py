@@ -3,7 +3,7 @@ import io
 import os
 from typing import List
 from zipfile import ZIP_DEFLATED, ZipFile
-from plan.tasks import send_post_comment_notification
+from plan.tasks.send_post_comment_notification import send_post_comment_notification
 
 import html2text
 from constance import config

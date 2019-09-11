@@ -6,3 +6,8 @@ from django.contrib.auth.models import Permission
 def post_email_permission():
     recieve_email_perm = Permission.objects.get(name='Recieve email updates for Post')
     return recieve_email_perm
+
+@pytest.fixture
+def idea_email_permission():
+    recieve_email_perm = Permission.objects.get(name='Recieve email updates for Idea')
+    return recieve_email_perm
