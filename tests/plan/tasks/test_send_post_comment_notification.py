@@ -1,6 +1,6 @@
 import pytest
 from main.models import Comment
-from plan.tasks import _get_recipients
+from plan.tasks.send_post_comment_notification import _get_recipients
 
 
 @pytest.mark.django_db

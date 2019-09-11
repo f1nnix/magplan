@@ -153,3 +153,20 @@ def comment(user, post):
     yield comment_
 
     comment_.delete()
+
+
+@pytest.fixture
+def idea_comment(user, idea):
+    comment_ = Comment()
+
+    comment_.commentable = idea
+    comment_.type = Comment.TYPE_SYSTEM
+    comment_.user = user
+
+    comment_.save()
+
+    yield comment_
+
+    comment_.delete()
+
+
