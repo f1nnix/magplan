@@ -13,28 +13,12 @@ def url_(idea_id):
 
 
 @pytest.mark.django_db
-@patch('plan.views.ideas.EmailMultiAlternatives.send')
-def test_comment_email_not_sent_without_permission(mock_send, _, client, idea):
+@patch('plan.views.ideas.send_idea_comment_notification.delay')
+def test_comments_email_sent(mock_delay, _, client, users, idea):
     url = url_(idea.id)
     response = client.post(url, {
         'text': 'foo'
     })
 
     _.assertEqual(response.status_code, 302)
-    mock_send.assert_not_called()
-
-
-@pytest.mark.django_db
-@patch('plan.views.ideas.EmailMultiAlternatives.send')
-def test_comment_email_sent_with_permission(mock_send, _, client, users, idea):
-    # Allow another user to recieve post email updates
-    recieve_email_perm = Permission.objects.get(name='Recieve email updates for Idea')
-    users[1].user_permissions.add(recieve_email_perm)
-
-    url = url_(idea.id)
-    response = client.post(url, {
-        'text': 'foo'
-    })
-
-    _.assertEqual(response.status_code, 302)
-    mock_send.assert_called()
+    mock_delay.assert_called()
