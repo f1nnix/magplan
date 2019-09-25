@@ -40,6 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_admin_listfilter_dropdown',
+    'dynamic_preferences',
+    # comment the following line if you don't want to use user preferences
+    'dynamic_preferences.users.apps.UserPreferencesConfig',
     'main',
     'plan',
     'finance',
@@ -59,6 +62,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'plan.middleware.SetLanguageMiddleware',
 
 ]
 
