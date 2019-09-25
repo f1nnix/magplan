@@ -10,4 +10,4 @@ class PlanUILanguage(ChoicePreference):
     name = 'ui_language'
     section = plan
     choices = [('en', 'English'), ('ru', 'Русский')]
-    default = 'en'
+    default = 'ru'
