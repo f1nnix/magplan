@@ -1,6 +1,7 @@
 import pytest
+
 from main.models import Comment
-from plan.tasks.send_post_comment_notification import _get_recipients
+from plan.tasks.send_post_comment_notification import _get_recipients, _get_whitelisted_recipients
 
 
 @pytest.mark.django_db
@@ -24,7 +25,7 @@ def test_stage_assignee_recieves(comment, users, post_email_permission):
 
 @pytest.mark.django_db
 def test_stage_assignee_is_comment_author_not_recieves(
-    comment, user, post_email_permission
+        comment, user, post_email_permission
 ):
     assignee = comment.commentable.assignee
     assignee.user_permissions.add(post_email_permission)
@@ -36,7 +37,7 @@ def test_stage_assignee_is_comment_author_not_recieves(
 
 @pytest.mark.django_db
 def test_comment_author_not_recieves_with_permisson(
-    comment, user, post_email_permission
+        comment, user, post_email_permission
 ):
     user.user_permissions.add(post_email_permission)
 
@@ -47,7 +48,7 @@ def test_comment_author_not_recieves_with_permisson(
 
 @pytest.mark.django_db
 def test_comment_editor_not_recieves_with_permisson(
-    comment, user, post, post_email_permission
+        comment, user, post, post_email_permission
 ):
     comment.commentable.editor.user_permissions.add(post_email_permission)
     comment.commentable.editor.save()
@@ -92,3 +93,23 @@ def test_previous_comments_included(comment, users, post_email_permission):
     # 2 for post authors
     # 5 for prev comment euthors
     assert len(recipients) == 7  # 10th is comment author, excluded
+
+
+@pytest.mark.django_db
+def test_get_whitelisted_recipients(users):
+    user1, user2, user3 = users[:3]
+    for user in (user1, user2, user3):
+        user.preferences['plan__post_comment_notification_level'] = 'all'
+
+    whitelisted_users = _get_whitelisted_recipients()
+    assert len(whitelisted_users) == 3
+
+
+@pytest.mark.django_db
+def test_get_blacklisted_recipients():
+    ...
+
+
+@pytest.mark.django_db
+def test_get_related_recipients():
+    ...

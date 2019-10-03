@@ -1,9 +1,9 @@
 # Create your tasks here
 from __future__ import absolute_import, unicode_literals
 
-import email
 import logging
 import os
+from typing import Set
 
 import html2text
 from celery import shared_task
@@ -11,6 +11,8 @@ from constance import config
 from django.contrib.contenttypes.models import ContentType
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
+
+from dynamic_preferences.users.models import UserPreferenceModel
 
 from main.models import Comment, User
 
@@ -80,7 +82,30 @@ def _send_email(comment, recipients):
     msg.send()
 
 
-def _get_recipients(comment: Comment) -> set:
+def _get_whitelisted_recipients() -> set:
+    """Get all users, who should recieve all
+    post comments notifications
+
+    :return: Set of users, who we should send
+             every comment
+    """
+    preferences = UserPreferenceModel.objects.filter(
+
+    )
+    return {}
+
+
+def _get_blacklisted_recipients() -> set:
+    """Get all users, who should NOT recieve
+    any post comments notifications
+
+    :return: Set of users, who we should not send
+             any comment
+    """
+    ...
+
+
+def _get_related_recipients(comment: Comment) -> set:
     """
 
     :param comment:
@@ -108,10 +133,40 @@ def _get_recipients(comment: Comment) -> set:
     ).exclude(id=comment.id)
     recipients.update([pc.user for pc in previous_comments])
 
-    # Remove users, who cannot recieve notidiactions
-    recipients = {
-        recipient
-        for recipient in recipients
-        if _can_recieve_notification(recipient, comment)
-    }
     return recipients
+
+
+def _get_recipients(comment: Comment) -> Set[User]:
+    """Build final list of notification recipients
+    for comments.
+
+    Includes:
+
+    — those, who should receive all notifications;
+    — those, who comment is related to.
+
+    Excludes users, who restricted any post comments
+    notifications.
+
+    :param comment: Comment, for which we build
+                    recipient list for
+    :return: Final set of actual recipients
+    """
+    # whitelisted = _get_whitelisted_recipients()
+    # blacklisted = _get_blacklisted_recipients()
+    # related = _get_related_recipients(comment)
+
+    # Combine result sets with different
+    # application rules
+    # recipients = related.add(whitelisted)
+    # recipients = recipients.difference(blacklisted)
+
+    # Remove users, who cannot receive notifications
+    # due to their permissions or comment ownership
+    # recipients = {
+    #     recipient
+    #     for recipient in recipients
+    #     if _can_recieve_notification(recipient, comment)
+    # }
+
+    return ()
