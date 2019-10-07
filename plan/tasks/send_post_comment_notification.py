@@ -11,13 +11,11 @@ from constance import config
 from django.contrib.contenttypes.models import ContentType
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
-
 from dynamic_preferences.users.models import UserPreferenceModel
 
 from main.models import Comment, User
 
 RECIEVE_NOTIFICATIONS_PERMISSION = 'main.recieve_post_email_updates'
-
 
 def _can_recieve_notification(user: User, comment: Comment) -> bool:
     if config.SYSTEM_USER_ID and user.id == config.SYSTEM_USER_ID:
@@ -30,7 +28,6 @@ def _can_recieve_notification(user: User, comment: Comment) -> bool:
         return False
 
     return True
-
 
 @shared_task
 def send_post_comment_notification(comment_id: int) -> None:
@@ -60,7 +57,6 @@ def send_post_comment_notification(comment_id: int) -> None:
 
     _send_email(comment, recipients_emails)
 
-
 def _send_email(comment, recipients):
     subject = f"Комментарий к посту «{comment.commentable}» от {comment.user}"
     commentable_type = (
@@ -81,49 +77,85 @@ def _send_email(comment, recipients):
     msg.attach_alternative(html_content, "text/html")
     msg.send()
 
-
 def _get_whitelisted_recipients() -> set:
     """Get all users, who should recieve all
     post comments notifications
 
+    NB: relies on default setting == 'related'!
+
     :return: Set of users, who we should send
              every comment
     """
-    preferences = UserPreferenceModel.objects.filter(
 
+    preferences = UserPreferenceModel.objects.prefetch_related('instance').filter(
+        section='plan', name='post_comment_notification_level', raw_value='all'
     )
-    return {}
 
+    return {p.instance for p in preferences}
 
 def _get_blacklisted_recipients() -> set:
     """Get all users, who should NOT recieve
     any post comments notifications
 
+    NB: relies on default setting == 'related'!
+
     :return: Set of users, who we should not send
              any comment
     """
-    ...
+    preferences = UserPreferenceModel.objects.prefetch_related('instance').filter(
+        section='plan', name='post_comment_notification_level', raw_value='none'
+    )
 
+    return {p.instance for p in preferences}
 
-def _get_related_recipients(comment: Comment) -> set:
-    """
+def _get_related_recipients() -> set:
+    """Get all users, who should receive any post comments
+    notifications only for posts, which they are involed to
 
-    :param comment:
-    :return:Ø
+        NB: relies on default setting == 'related'!
+
+        :return: Set of users, who we should not send
+                 any comment
+        """
+    related_preferences = UserPreferenceModel.objects.prefetch_related(
+        'instance'
+    ).filter(
+        section='plan', raw_value='related', name='post_comment_notification_level'
+    )
+    related_preferences_users = [p.instance for p in related_preferences]
+
+    # This should be considered as having 'post_comment_notification_level' == 'related'
+    users_without_notification_level_setting = User.objects.filter(
+        related_preferences__name='post_comment_notification_level',
+        related_preferences_set=None,
+    )
+
+    recipients = set()
+    recipients.update(related_preferences_users)
+    recipients.update(users_without_notification_level_setting)
+
+    return recipients
+
+def _get_involved_users(comment: Comment) -> set:
+    """Return all users, who involved in working
+    on current post
+
+    :param comment: Comment for post, for which we count involved users
+    :return: Users set
     """
     post = comment.commentable
 
     # Django objects are hashable, so we can add
     # any probabl reciever to common set, and then
     # filter by permissions
-    recipients = set()
+    users = set()
 
     # Add current stage assignee
-    recipients.add(post.assignee)
+    users.add(post.assignee)
 
     # Add post authors and editors
-    recipients.add(post.editor)
-    recipients.update([author for author in post.authors.all()])
+    users.add(post.editor)
+    users.update([author for author in post.authors.all()])
 
     # Add all previous commenters in the tread
     previous_comments = Comment.objects.filter(
@@ -131,10 +163,10 @@ def _get_related_recipients(comment: Comment) -> set:
         object_id=post.id,
         type=Comment.TYPE_PRIVATE,
     ).exclude(id=comment.id)
-    recipients.update([pc.user for pc in previous_comments])
 
-    return recipients
+    users.update([pc.user for pc in previous_comments])
 
+    return users
 
 def _get_recipients(comment: Comment) -> Set[User]:
     """Build final list of notification recipients
