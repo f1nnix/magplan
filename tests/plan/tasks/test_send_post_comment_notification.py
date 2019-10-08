@@ -1,94 +1,115 @@
 import pytest
+
+from typing import List, Any
+from unittest.mock import patch
 from main.models import Comment
-from plan.tasks.send_post_comment_notification import _get_recipients
+from plan.tasks.send_post_comment_notification import (
+    _get_involved_users,
+    _get_whitelisted_recipients,
+    _can_recieve_notification,
+    _get_recipients,
+)
+
+
+def in_(arr: List[Any], value: Any, key: str) -> bool:
+    """Check, if object with requested attrubute value
+    exists in list
+
+    :param arr: List to search elements in
+    :param value: Value to search
+    :param key: Key to search value of
+    :return: True is exists, else False.
+    """
+    try:
+        search_results = [True for obj in arr if getattr(obj, key) == value]
+    except KeyError:
+        raise KeyError('Key "%s" does not exist in list element(s)' % key)
+    return bool(search_results)
 
 
 @pytest.mark.django_db
-def test_no_email_permissions(comment):
-    recipients = _get_recipients(comment)
+def test_get_involved_users_post_staff_added(comment, users):
+    post = comment.commentable
+    post_authors = post.authors.all()
+    users = _get_involved_users(comment)
 
-    assert not recipients
-
-
-@pytest.mark.django_db
-def test_stage_assignee_recieves(comment, users, post_email_permission):
-    new_stage_assingee = users[5]
-    new_stage_assingee.user_permissions.add(post_email_permission)
-    comment.commentable.stage.assignee = new_stage_assingee
-    comment.commentable.stage.save()
-
-    recipients = _get_recipients(comment)
-
-    assert len(recipients) == 1
+    assert in_(users, post.assignee.id, 'id') == True
+    assert in_(users, post.editor.id, 'id') == True
+    assert in_(users, post_authors[0].id, 'id') == True
+    assert in_(users, post_authors[1].id, 'id') == True
 
 
 @pytest.mark.django_db
-def test_stage_assignee_is_comment_author_not_recieves(
-    comment, user, post_email_permission
+def test_get_involved_users_commenters_added(comment, users):
+    post = comment.commentable
+
+    user1, user2 = users[-1:-3:-1]
+    comment1 = Comment.objects.create(user=user1, commentable=post)
+    comment2 = Comment.objects.create(user=user2, commentable=post)
+
+    users = _get_involved_users(comment)
+    assert in_(users, user1.id, 'id')
+    assert in_(users, user2.id, 'id')
+
+
+@pytest.mark.django_db
+def test_get_whitelisted_recipients(users):
+    user1, user2, user3 = users[-1:-4:-1]
+    for user in (user1, user2, user3):
+        user.preferences['plan__post_comment_notification_level'] = 'all'
+
+    whitelisted_recipients = _get_whitelisted_recipients()
+    assert len(whitelisted_recipients) == 3
+    assert in_(whitelisted_recipients, user1.id, 'id')
+    assert in_(whitelisted_recipients, user2.id, 'id')
+    assert in_(whitelisted_recipients, user3.id, 'id')
+
+
+@pytest.mark.django_db
+def test_can_recieve_notification_no_permission(comment, users):
+    assert _can_recieve_notification(users[-1], comment) == False
+
+
+@pytest.mark.django_db
+def test_can_recieve_notification_with_permission(user_with_permissions, comment):
+    assert _can_recieve_notification(user_with_permissions, comment) == True
+
+
+@pytest.mark.django_db
+def test_can_recieve_notification_comment_owner(comment, user_with_permissions):
+    assert _can_recieve_notification(user_with_permissions, comment) == True
+
+    comment.user = user_with_permissions
+    comment.save()
+    assert _can_recieve_notification(user_with_permissions, comment) == False
+
+
+@pytest.mark.django_db
+@patch('plan.tasks.send_post_comment_notification.config')
+def test_can_recieve_notification_system_user(config, comment, user_with_permissions):
+    config.SYSTEM_USER_ID = user_with_permissions.id
+
+    assert _can_recieve_notification(user_with_permissions, comment) == False
+
+
+@pytest.mark.django_db
+def test_can_recieve_notification_user_settings(comment, restricted_reciever):
+    assert _can_recieve_notification(restricted_reciever, comment) == False
+
+
+@pytest.mark.django_db
+@patch('plan.tasks.send_post_comment_notification._get_involved_users')
+@patch('plan.tasks.send_post_comment_notification._get_whitelisted_recipients')
+@patch('plan.tasks.send_post_comment_notification._can_recieve_notification')
+def test_get_recipients(
+    mock_can_recieve_notification,
+    mock_get_whitelisted_recipients,
+    mock_get_involved_users,
+    comment,
 ):
-    assignee = comment.commentable.assignee
-    assignee.user_permissions.add(post_email_permission)
+    mock_get_involved_users.return_value = {1, 2, 3}
+    mock_get_whitelisted_recipients.return_value = {2, 3, 4}
+    mock_can_recieve_notification.return_value = True
 
     recipients = _get_recipients(comment)
-
-    assert len(recipients) == 0
-
-
-@pytest.mark.django_db
-def test_comment_author_not_recieves_with_permisson(
-    comment, user, post_email_permission
-):
-    user.user_permissions.add(post_email_permission)
-
-    recipients = _get_recipients(comment)
-
-    assert not recipients
-
-
-@pytest.mark.django_db
-def test_comment_editor_not_recieves_with_permisson(
-    comment, user, post, post_email_permission
-):
-    comment.commentable.editor.user_permissions.add(post_email_permission)
-    comment.commentable.editor.save()
-
-    recipients = _get_recipients(comment)
-
-    assert not recipients
-
-
-@pytest.mark.django_db
-def test_comment_author_with_permisson_recieves(comment, post_email_permission):
-    author1, author2 = comment.commentable.authors.all()
-    author1.user_permissions.add(post_email_permission)
-
-    recipients = _get_recipients(comment)
-
-    assert len(recipients) == 1
-
-
-@pytest.mark.django_db
-def test_comment_all_authors_with_permisson_recieve(comment, post_email_permission):
-    author1, author2 = comment.commentable.authors.all()
-    author1.user_permissions.add(post_email_permission)
-    author2.user_permissions.add(post_email_permission)
-
-    recipients = _get_recipients(comment)
-
-    assert len(recipients) == 2
-
-
-@pytest.mark.django_db
-def test_previous_comments_included(comment, users, post_email_permission):
-    for user in users:
-        user.user_permissions.add(post_email_permission)
-
-    for user in users[5:]:
-        Comment.objects.create(commentable=comment.commentable, user=user)
-
-    recipients = _get_recipients(comment)
-
-    # editor is excluded
-    # 2 for post authors
-    # 5 for prev comment euthors
-    assert len(recipients) == 7  # 10th is comment author, excluded
+    assert recipients == {1, 2, 3, 4}

@@ -145,7 +145,7 @@ def comment(user, post):
     comment_ = Comment()
 
     comment_.commentable = post
-    comment_.type = Comment.TYPE_SYSTEM
+    comment_.type = Comment.TYPE_PRIVATE
     comment_.user = user
     
     comment_.save()
