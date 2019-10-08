@@ -15,126 +15,11 @@ from dynamic_preferences.users.models import UserPreferenceModel
 
 from main.models import Comment, User
 
+from django.contrib.auth.models import User
+from django.db.models import Q
+
 RECIEVE_NOTIFICATIONS_PERMISSION = 'main.recieve_post_email_updates'
 
-def _can_recieve_notification(user: User, comment: Comment) -> bool:
-    if config.SYSTEM_USER_ID and user.id == config.SYSTEM_USER_ID:
-        return False
-
-    if user == comment.user:
-        return False
-
-    if not user.has_perm(RECIEVE_NOTIFICATIONS_PERMISSION):
-        return False
-
-    return True
-
-@shared_task
-def send_post_comment_notification(comment_id: int) -> None:
-    """Send email notification for post comment
-
-    Notification is sent to:
-
-    - comment post current stage assignee
-    - comment post authors and editor
-    - everyone, who previously commented comment post
-
-    But only, if users have recieve_post_email_updates
-    permission and not comment author.
-    """
-    logger = logging.getLogger()
-    logger.info('Sending notifications for comment #%s', comment_id)
-
-    # Task will fail if comment is not found
-    comment = Comment.objects.get(id=comment_id)
-
-    recipients = _get_recipients(comment)
-    if not recipients:
-        return
-
-    # Transform to plain email list
-    recipients_emails = {recipient.email for recipient in recipients}
-
-    _send_email(comment, recipients_emails)
-
-def _send_email(comment, recipients):
-    subject = f"Комментарий к посту «{comment.commentable}» от {comment.user}"
-    commentable_type = (
-        "post" if comment.commentable.__class__.__name__ == "Post" else "idea"
-    )
-    html_content = render_to_string(
-        "email/new_comment.html",
-        {
-            "comment": comment,
-            "commentable_type": commentable_type,
-            "APP_URL": os.environ.get("APP_URL", None),
-        },
-    )
-    text_content = html2text.html2text(html_content)
-    msg = EmailMultiAlternatives(
-        subject, text_content, config.PLAN_EMAIL_FROM, recipients
-    )
-    msg.attach_alternative(html_content, "text/html")
-    msg.send()
-
-def _get_whitelisted_recipients() -> set:
-    """Get all users, who should recieve all
-    post comments notifications
-
-    NB: relies on default setting == 'related'!
-
-    :return: Set of users, who we should send
-             every comment
-    """
-
-    preferences = UserPreferenceModel.objects.prefetch_related('instance').filter(
-        section='plan', name='post_comment_notification_level', raw_value='all'
-    )
-
-    return {p.instance for p in preferences}
-
-def _get_blacklisted_recipients() -> set:
-    """Get all users, who should NOT recieve
-    any post comments notifications
-
-    NB: relies on default setting == 'related'!
-
-    :return: Set of users, who we should not send
-             any comment
-    """
-    preferences = UserPreferenceModel.objects.prefetch_related('instance').filter(
-        section='plan', name='post_comment_notification_level', raw_value='none'
-    )
-
-    return {p.instance for p in preferences}
-
-def _get_related_recipients() -> set:
-    """Get all users, who should receive any post comments
-    notifications only for posts, which they are involed to
-
-        NB: relies on default setting == 'related'!
-
-        :return: Set of users, who we should not send
-                 any comment
-        """
-    related_preferences = UserPreferenceModel.objects.prefetch_related(
-        'instance'
-    ).filter(
-        section='plan', raw_value='related', name='post_comment_notification_level'
-    )
-    related_preferences_users = [p.instance for p in related_preferences]
-
-    # This should be considered as having 'post_comment_notification_level' == 'related'
-    users_without_notification_level_setting = User.objects.filter(
-        related_preferences__name='post_comment_notification_level',
-        related_preferences_set=None,
-    )
-
-    recipients = set()
-    recipients.update(related_preferences_users)
-    recipients.update(users_without_notification_level_setting)
-
-    return recipients
 
 def _get_involved_users(comment: Comment) -> set:
     """Return all users, who involved in working
@@ -168,6 +53,41 @@ def _get_involved_users(comment: Comment) -> set:
 
     return users
 
+
+def _get_whitelisted_recipients() -> set:
+    """Get all users, who should recieve all
+    post comments notifications
+
+    NB: relies on default setting == 'related'!
+
+    :return: Set of users, who we should send
+             every comment
+    """
+
+    preferences = UserPreferenceModel.objects.prefetch_related('instance').filter(
+        section='plan', name='post_comment_notification_level', raw_value='all'
+    )
+
+    return {p.instance for p in preferences}
+
+
+def _can_recieve_notification(user: User, comment: Comment) -> bool:
+    if not user.has_perm(RECIEVE_NOTIFICATIONS_PERMISSION):
+        return False
+
+    if user == comment.user:
+        return False
+
+    if config.SYSTEM_USER_ID and user.id == config.SYSTEM_USER_ID:
+        return False
+
+    # Diable notification for restricted notification users
+    if user.preferences['plan__post_comment_notification_level'] == 'none':
+        return False
+
+    return True
+
+
 def _get_recipients(comment: Comment) -> Set[User]:
     """Build final list of notification recipients
     for comments.
@@ -184,21 +104,70 @@ def _get_recipients(comment: Comment) -> Set[User]:
                     recipient list for
     :return: Final set of actual recipients
     """
-    # whitelisted = _get_whitelisted_recipients()
-    # blacklisted = _get_blacklisted_recipients()
-    # related = _get_related_recipients(comment)
+    recipients = set()
 
-    # Combine result sets with different
-    # application rules
-    # recipients = related.add(whitelisted)
-    # recipients = recipients.difference(blacklisted)
+    involved_users = _get_involved_users(comment)
+    recipients.update(involved_users)
+
+    whitelisted_recipients = _get_whitelisted_recipients()
+    recipients.update(whitelisted_recipients)
 
     # Remove users, who cannot receive notifications
-    # due to their permissions or comment ownership
-    # recipients = {
-    #     recipient
-    #     for recipient in recipients
-    #     if _can_recieve_notification(recipient, comment)
-    # }
+    # due to their permissions, comment ownership or settings
+    recipients = {
+        recipient
+        for recipient in recipients
+        if _can_recieve_notification(recipient, comment)
+    }
 
-    return ()
+    return recipients
+
+
+def _send_email(comment, recipients):
+    subject = f"Комментарий к посту «{comment.commentable}» от {comment.user}"
+    commentable_type = (
+        "post" if comment.commentable.__class__.__name__ == "Post" else "idea"
+    )
+    html_content = render_to_string(
+        "email/new_comment.html",
+        {
+            "comment": comment,
+            "commentable_type": commentable_type,
+            "APP_URL": os.environ.get("APP_URL", None),
+        },
+    )
+    text_content = html2text.html2text(html_content)
+    msg = EmailMultiAlternatives(
+        subject, text_content, config.PLAN_EMAIL_FROM, recipients
+    )
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
+
+
+@shared_task
+def send_post_comment_notification(comment_id: int) -> None:
+    """Send email notification for post comment
+
+    Notification is sent to:
+
+    - comment post current stage assignee
+    - comment post authors and editor
+    - everyone, who previously commented comment post
+
+    But only, if users have recieve_post_email_updates
+    permission and not comment author.
+    """
+    logger = logging.getLogger()
+    logger.info('Sending notifications for comment #%s', comment_id)
+
+    # Task will fail if comment is not found
+    comment = Comment.objects.get(id=comment_id)
+
+    recipients = _get_recipients(comment)
+    if not recipients:
+        return
+
+    # Transform to plain email list
+    recipients_emails = {recipient.email for recipient in recipients}
+
+    _send_email(comment, recipients_emails)
