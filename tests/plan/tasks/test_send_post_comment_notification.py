@@ -10,6 +10,19 @@ from tests.plan.tasks.test_utils import in_
 
 
 @pytest.mark.django_db
+def test_get_involved_users_editor_added(comment, users):
+    recipients = _get_involved_users(comment)
+    assert in_(recipients, comment.commentable.editor.id, 'id')
+
+
+@pytest.mark.django_db
+def test_get_involved_users_authors_added(comment, users):
+    recipients = _get_involved_users(comment)
+    assert in_(recipients, comment.commentable.authors.all()[0].id, 'id')
+    assert in_(recipients, comment.commentable.authors.all()[1].id, 'id')
+
+
+@pytest.mark.django_db
 def test_get_involved_users_commenters_added(comment, users):
     post = comment.commentable
 

@@ -98,7 +98,7 @@ def _get_recipients(comment: Comment) -> Set[User]:
 
 def _send_email(comment, recipients):
     logger.debug('Sending emails to ', ', '.join(recipients))
-    
+
     subject = f"Комментарий к посту «{comment.commentable}» от {comment.user}"
     commentable_type = (
         "post" if comment.commentable.__class__.__name__ == "Post" else "idea"
@@ -139,7 +139,7 @@ def send_post_comment_notification(comment_id: int) -> None:
     comment = Comment.objects.get(id=comment_id)
 
     recipients = _get_recipients(comment)
-    
+
     if not recipients:
         return
 
