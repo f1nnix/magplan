@@ -3,8 +3,8 @@ from __future__ import absolute_import, unicode_literals
 
 import logging
 import os
-
 from typing import Set
+
 import html2text
 from constance import config
 from django.contrib.contenttypes.models import ContentType
@@ -13,11 +13,9 @@ from django.template.loader import render_to_string
 
 from celery import shared_task
 from main.models import Comment, User
+from plan.tasks.utils import _can_recieve_notification, _get_whitelisted_recipients
 
-
-from plan.tasks.utils import _get_whitelisted_recipients, _can_recieve_notification
-
-RECIEVE_NOTIFICATIONS_PERMISSION = 'main.recieve_plan_email_updates'
+RECIEVE_NOTIFICATIONS_PERMISSION = 'main.recieve_idea_email_updates'
 NOTIFICATION_LEVEL_PREFERENCE = 'idea_comment_notification_level'
 
 

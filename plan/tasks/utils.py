@@ -1,9 +1,9 @@
 import logging
+
+from constance import config
 from dynamic_preferences.users.models import UserPreferenceModel
 
-from dynamic_preferences.users.models import UserPreferenceModel
 from main.models import Comment, User
-from constance import config
 
 
 def _get_whitelisted_recipients(pref_name: str) -> set:

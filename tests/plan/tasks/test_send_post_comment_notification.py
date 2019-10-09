@@ -1,6 +1,7 @@
+from unittest.mock import patch
+
 import pytest
 
-from unittest.mock import patch
 from main.models import Comment
 from plan.tasks.send_post_comment_notification import (
     _get_involved_users,

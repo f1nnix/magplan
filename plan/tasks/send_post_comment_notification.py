@@ -6,18 +6,14 @@ import os
 from typing import Set
 
 import html2text
-from celery import shared_task
+from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
-from dynamic_preferences.users.models import UserPreferenceModel
 
-from main.models import Comment, User
-
-from django.contrib.auth.models import User
-from django.db.models import Q
-
-from plan.tasks.utils import _get_whitelisted_recipients, _can_recieve_notification
+from celery import shared_task
+from main.models import Comment
+from plan.tasks.utils import _can_recieve_notification, _get_whitelisted_recipients
 
 RECIEVE_NOTIFICATIONS_PERMISSION = 'main.recieve_post_email_updates'
 NOTIFICATION_LEVEL_PREFERENCE = 'post_comment_notification_level'
