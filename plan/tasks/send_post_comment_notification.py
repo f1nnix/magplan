@@ -7,7 +7,6 @@ from typing import Set
 
 import html2text
 from celery import shared_task
-from constance import config
 from django.contrib.contenttypes.models import ContentType
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
@@ -18,7 +17,10 @@ from main.models import Comment, User
 from django.contrib.auth.models import User
 from django.db.models import Q
 
+from plan.tasks.utils import _get_whitelisted_recipients, _can_recieve_notification
+
 RECIEVE_NOTIFICATIONS_PERMISSION = 'main.recieve_post_email_updates'
+NOTIFICATION_LEVEL_PREFERENCE = 'post_comment_notification_level'
 
 
 def _get_involved_users(comment: Comment) -> set:
@@ -54,40 +56,6 @@ def _get_involved_users(comment: Comment) -> set:
     return users
 
 
-def _get_whitelisted_recipients() -> set:
-    """Get all users, who should recieve all
-    post comments notifications
-
-    NB: relies on default setting == 'related'!
-
-    :return: Set of users, who we should send
-             every comment
-    """
-
-    preferences = UserPreferenceModel.objects.prefetch_related('instance').filter(
-        section='plan', name='post_comment_notification_level', raw_value='all'
-    )
-
-    return {p.instance for p in preferences}
-
-
-def _can_recieve_notification(user: User, comment: Comment) -> bool:
-    if not user.has_perm(RECIEVE_NOTIFICATIONS_PERMISSION):
-        return False
-
-    if user == comment.user:
-        return False
-
-    if config.SYSTEM_USER_ID and user.id == config.SYSTEM_USER_ID:
-        return False
-
-    # Diable notification for restricted notification users
-    if user.preferences['plan__post_comment_notification_level'] == 'none':
-        return False
-
-    return True
-
-
 def _get_recipients(comment: Comment) -> Set[User]:
     """Build final list of notification recipients
     for comments.
@@ -109,7 +77,7 @@ def _get_recipients(comment: Comment) -> Set[User]:
     involved_users = _get_involved_users(comment)
     recipients.update(involved_users)
 
-    whitelisted_recipients = _get_whitelisted_recipients()
+    whitelisted_recipients = _get_whitelisted_recipients(NOTIFICATION_LEVEL_PREFERENCE)
     recipients.update(whitelisted_recipients)
 
     # Remove users, who cannot receive notifications
@@ -117,13 +85,20 @@ def _get_recipients(comment: Comment) -> Set[User]:
     recipients = {
         recipient
         for recipient in recipients
-        if _can_recieve_notification(recipient, comment)
+        if _can_recieve_notification(
+            recipient,
+            comment,
+            RECIEVE_NOTIFICATIONS_PERMISSION,
+            NOTIFICATION_LEVEL_PREFERENCE,
+        )
     }
 
     return recipients
 
 
 def _send_email(comment, recipients):
+    logger.debug('Sending emails to ', ', '.join(recipients))
+    
     subject = f"Комментарий к посту «{comment.commentable}» от {comment.user}"
     commentable_type = (
         "post" if comment.commentable.__class__.__name__ == "Post" else "idea"
@@ -164,6 +139,7 @@ def send_post_comment_notification(comment_id: int) -> None:
     comment = Comment.objects.get(id=comment_id)
 
     recipients = _get_recipients(comment)
+    
     if not recipients:
         return
 
