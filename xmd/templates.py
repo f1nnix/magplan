@@ -1,8 +1,10 @@
-# <img src="{image.file.url}" alt="{alt_text}"><figcaption>{alt_text}</figcaption>
+# Media elements
 image_html = f'''
 <figure>
     <img src="%s" alt="%s"><figcaption>%s</figcaption>
 </figure>
 '''
 
+# Panels
 panel_default = f'''<details><summary>%s</summary><p>%s</p></details>'''
+panel_no_title = f'''<details><p>%s</p></details>'''

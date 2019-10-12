@@ -1,6 +1,6 @@
 from mistune import Renderer
 
-from xmd.templates import image_html, panel_default
+from xmd.templates import image_html, panel_default, panel_no_title
 
 
 class XMDRenderer(Renderer):
@@ -9,3 +9,6 @@ class XMDRenderer(Renderer):
 
     def panel_block(self, title, content):
         return panel_default % (title, content)
+
+    def panel_block_no_title(self, content):
+        return panel_no_title % (content)
