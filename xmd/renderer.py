@@ -1,11 +1,11 @@
-import mistune
+from mistune import Renderer
 
-from templates import image_html
+from xmd.templates import image_html, panel_default
 
 
-class XMDRenderer(mistune.Renderer):
-    def __init__(self, *args, **kwargs):
-        super().__init__()
-
+class XMDRenderer(Renderer):
     def image(self, src, title, alt_text):
         return image_html % (src, alt_text, alt_text)
+
+    def panel_block(self, title, content):
+        return panel_default % (title, content)

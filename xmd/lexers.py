@@ -1,19 +1,30 @@
-import copy,re
-from mistune import BlockLexer, BlockGrammar
+import re
+
+from mistune import BlockLexer
 
 
 class PanelBlockLexer(BlockLexer):
-    def enable_panel_block(self):
-        self.rules.panel_block = re.compile(
-            r'\[(.*?)'            # '[ Panel title'  
-            r'\]'                # ]
-        )
+    def __init__(self, *args, **kwargs):
+        super(PanelBlockLexer, self).__init__(*args, **kwargs)
 
+        self.enable_panel()
+
+    def enable_panel(self):
+        self.rules.panel_block = re.compile(r'\[ ?(.*?)\n((?:.*?\n)*)\]')
         self.default_rules.insert(3, 'panel_block')
 
+    def parse_panel_block(self, m):
+        title = m.group(1)
+        content = m.group(2)
+
+        self.tokens.append({
+            'type': 'panel_block',
+            'title': title,
+            'content': content
+        })
+
     def output_panel_block(self, m):
-        text = m.group(1)
-        alt, link = text.split('|')
-        # you can create an custom render
-        # you can also return the html if you like
-        return self.renderer.panel_block(text)
+        title = m.group(1)
+        content = m.group(2)
+
+        return self.renderer.panel_block(title, content)

@@ -4,3 +4,5 @@ image_html = f'''
     <img src="%s" alt="%s"><figcaption>%s</figcaption>
 </figure>
 '''
+
+panel_default = f'''<details><summary>%s</summary><p>%s</p></details>'''
