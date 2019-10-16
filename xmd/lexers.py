@@ -10,7 +10,11 @@ class PanelBlockLexer(BlockLexer):
         self.enable_panel()
 
     def enable_panel(self):
-        self.rules.panel_block = re.compile(r'\[ *?(.*?)\n((?:.*?\n)*)\]')
+        self.rules.panel_block = re.compile(r'\[ (.+)\n'
+                                            r'\n'
+                                            r'((?:.*?\n)*)'
+                                            r'\n'
+                                            )
         self.default_rules.insert(3, 'panel_block')
 
     def parse_panel_block(self, m):

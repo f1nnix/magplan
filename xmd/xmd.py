@@ -1,8 +1,8 @@
 from typing import List
 
 from main.models import Attachment
-from xmd.markdown import ExtendedMarkdown
 from xmd.lexers import PanelBlockLexer
+from xmd.markdown import ExtendedMarkdown
 from xmd.renderer import XMDRenderer
 from xmd.utils import map_attachments_filenames
 

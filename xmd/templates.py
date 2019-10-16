@@ -6,5 +6,6 @@ image_html = f'''
 '''
 
 # Panels
-panel_default = f'''<details><summary>%s</summary><p>%s</p></details>'''
+panel_info = f'''<details><summary>%s</summary><p>%s</p></details>'''
 panel_no_title = f'''<details><p>%s</p></details>'''
+panel_default = f'''<details><summary>%s</summary><p>%s</p></details>'''

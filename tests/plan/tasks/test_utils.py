@@ -1,7 +1,7 @@
 import pytest
 
 
-from typing import List, Any
+from typing import List, Any, Optional
 from unittest.mock import patch
 from plan.tasks.utils import _get_whitelisted_recipients, _can_recieve_notification
 
@@ -23,6 +23,26 @@ def in_(arr: List[Any], value: Any, key: str) -> bool:
     except KeyError:
         raise KeyError('Key "%s" does not exist in list element(s)' % key)
     return bool(search_results)
+
+
+def get_(arr: List[Any], value: Any, key: str) -> Optional[Any]:
+    """Get object with requested attrubute value
+    from list
+
+    :param arr: List to search elements in
+    :param value: Value to search
+    :param key: Key to search value of
+    :return: First object if exists, else None
+    """
+    try:
+        search_results = [obj for obj in arr if obj[key] == value]
+    except KeyError:
+        raise KeyError('Key "%s" does not exist in list element(s)' % key)
+    
+    if search_results:
+        return list(search_results)[0]
+
+    return None
 
 
 @pytest.mark.django_db
