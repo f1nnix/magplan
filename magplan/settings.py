@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 import os
 from collections import OrderedDict
+
 # from django.utils.translation import gettext
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -21,10 +22,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production.sample secret!
-SECRET_KEY = os.getenv('SECRET_KEY', '-6w*l1-u(9gy8gnp%e#1nf8-!*8j)e@%l%^ct)77r^6(cixj2v')
+SECRET_KEY = os.getenv(
+    'SECRET_KEY', '-6w*l1-u(9gy8gnp%e#1nf8-!*8j)e@%l%^ct)77r^6(cixj2v'
+)
 
 # SECURITY WARNING: don't run with debug turned on in production.sample!
-DEBUG = True if os.getenv('APP_ENV', None) in ('DEVELOPMENT', 'TESTING',) else False
+DEBUG = True if os.getenv('APP_ENV', None) in ('DEVELOPMENT', 'TESTING') else False
 
 ALLOWED_HOSTS = [] if DEBUG is True else [os.getenv('APP_HOST', None)]
 # Application definition
@@ -40,13 +43,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_admin_listfilter_dropdown',
+    'dynamic_preferences',
+    # comment the following line if you don't want to use user preferences
+    'dynamic_preferences.users.apps.UserPreferencesConfig',
     'main',
     'plan',
     'finance',
     'authtools',
     # 'debug_toolbar',
     'django_filters',
-
 ]
 
 MIDDLEWARE = [
@@ -59,7 +64,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
+    'plan.middleware.SetLanguageMiddleware',
 ]
 
 ROOT_URLCONF = 'magplan.urls'
@@ -67,8 +72,7 @@ ROOT_URLCONF = 'magplan.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')]
-        ,
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -78,10 +82,9 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'plan.context_processors.inject_last_issues',  # TODO: use context processor only for plan app
                 'plan.context_processors.inject_app_url',  # TODO: use context processor only for plan app
-
-            ],
+            ]
         },
-    },
+    }
 ]
 
 WSGI_APPLICATION = 'magplan.wsgi.application'
@@ -105,30 +108,22 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'
     },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 LANGUAGE_CODE = os.getenv('LANGUAGE_CODE', 'en-us')
-LOCALE_PATHS = [
-    os.path.join(BASE_DIR, 'locale'),
-]
+LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale')]
 TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 
-USE_L10N = False 
+USE_L10N = False
 
 USE_TZ = True
 
@@ -158,7 +153,6 @@ CONSTANCE_CONFIG = {
     'PLAN_EMAIL_FROM': ('', '', str),
     'PLAN_EMAIL_SUBJECT_PREFIX': ('[magplan]', '', str),
     'PLAN_POSTS_INSTANCE_CHUNK': ('', 'Instance-specific arbitrary template code', str),
-
     'FINANCE_EMAIL_USE_TLS': (True, '', bool),
     'FINANCE_EMAIL_HOST': ('smtp.gmail.com', '', str),
     'FINANCE_EMAIL_USER': ('', '', str),
@@ -166,19 +160,32 @@ CONSTANCE_CONFIG = {
     'FINANCE_EMAIL_PORT': (587, '', int),
     'FINANCE_EMAIL_FROM': ('', '', str),
     'FINANCE_EMAIL_SUBJECT_PREFIX': ('[notify]', '', str),
-
     'SYSTEM_USER_ID': (1, '', int),
 }
 
-CONSTANCE_CONFIG_FIELDSETS = OrderedDict({
-    'General settings': ('SYSTEM_USER_ID','PLAN_POSTS_INSTANCE_CHUNK',),
-    'Plan email settings': ('PLAN_EMAIL_HOST', 'PLAN_EMAIL_PORT', 'PLAN_EMAIL_USE_TLS',
-                            'PLAN_EMAIL_USER', 'PLAN_EMAIL_PASSWORD',
-                            'PLAN_EMAIL_FROM', 'PLAN_EMAIL_SUBJECT_PREFIX'),
-    'Finance email settings': ('FINANCE_EMAIL_HOST', 'FINANCE_EMAIL_PORT', 'FINANCE_EMAIL_USE_TLS',
-                               'FINANCE_EMAIL_USER', 'FINANCE_EMAIL_PASSWORD',
-                               'FINANCE_EMAIL_FROM', 'FINANCE_EMAIL_SUBJECT_PREFIX'),
-})
+CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
+    {
+        'General settings': ('SYSTEM_USER_ID', 'PLAN_POSTS_INSTANCE_CHUNK'),
+        'Plan email settings': (
+            'PLAN_EMAIL_HOST',
+            'PLAN_EMAIL_PORT',
+            'PLAN_EMAIL_USE_TLS',
+            'PLAN_EMAIL_USER',
+            'PLAN_EMAIL_PASSWORD',
+            'PLAN_EMAIL_FROM',
+            'PLAN_EMAIL_SUBJECT_PREFIX',
+        ),
+        'Finance email settings': (
+            'FINANCE_EMAIL_HOST',
+            'FINANCE_EMAIL_PORT',
+            'FINANCE_EMAIL_USE_TLS',
+            'FINANCE_EMAIL_USER',
+            'FINANCE_EMAIL_PASSWORD',
+            'FINANCE_EMAIL_FROM',
+            'FINANCE_EMAIL_SUBJECT_PREFIX',
+        ),
+    }
+)
 CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
 
 if DEBUG is False:
