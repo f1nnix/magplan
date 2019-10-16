@@ -1,8 +1,6 @@
 # Media elements
 image_html = f'''
-<figure>
-    <img src="%s" alt="%s"><figcaption>%s</figcaption>
-</figure>
+<figure><img src="%s" alt="%s"><figcaption>%s</figcaption></figure>
 '''
 
 # Panels

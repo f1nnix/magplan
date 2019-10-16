@@ -97,7 +97,5 @@ class TestPanelBlockLexer(TestCase):
         assert token_panel_start
         assert token_panel_end
 
-        self.paragraph_ = [token for token in tokens if token['type'] == 'paragraph']
-        paragraph_tokens = self.paragraph_
+        paragraph_tokens = [token for token in tokens if token['type'] == 'paragraph']
         assert len(paragraph_tokens) == 2
-        assert paragraph_tokens
