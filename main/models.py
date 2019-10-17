@@ -14,7 +14,7 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 
-from xmd import XMDRenderer
+from xmd import render_md
 
 
 class AbstractBase(models.Model):
@@ -47,9 +47,7 @@ class User(AbstractEmailUser, AbstractBase):
         return self.__str__()
 
     class Meta:
-        permissions = (
-            ("manage_authors", "Can manage authors"),
-        )
+        permissions = (("manage_authors", "Can manage authors"),)
 
     def is_member(self, group_name: str) -> bool:
         """Check if user is member of group
@@ -78,41 +76,29 @@ class Profile(AbstractBase):
         (BELARUS, 'Беларусь'),
         (KAZAKHSTAN, 'Казахстан'),
     )
-    country = models.SmallIntegerField('Страна',
-                                       choices=COUNTRY_CHOICES,
-                                       default=RUSSIA,
-                                       )
+    country = models.SmallIntegerField(
+        'Страна', choices=COUNTRY_CHOICES, default=RUSSIA
+    )
     city = models.CharField('Город или поселок', max_length=255, blank=True, null=True)
     notes = models.TextField('Примечания', blank=True, null=True)
-
-
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
-
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
 
 
 class Section(AbstractBase):
     def __str__(self):
         return self.title
 
-    slug = models.SlugField(null=False, blank=False, max_length=255, )
-    title = models.CharField(null=False, blank=False, max_length=255, )
+    slug = models.SlugField(null=False, blank=False, max_length=255)
+    title = models.CharField(null=False, blank=False, max_length=255)
     description = models.TextField(null=True, blank=False)
     sort = models.SmallIntegerField(null=False, blank=False, default=0)
-    color = models.CharField(null=False, blank=False, default='000000', max_length=6, )
+    color = models.CharField(null=False, blank=False, default='000000', max_length=6)
     is_archived = models.BooleanField(null=False, blank=False, default=False)
     is_whitelisted = models.BooleanField(null=False, blank=False, default=False)
 
 
 class Magazine(AbstractBase):
-    slug = models.SlugField(null=False, blank=False, max_length=255, )
-    title = models.CharField(null=False, blank=False, max_length=255, )
+    slug = models.SlugField(null=False, blank=False, max_length=255)
+    title = models.CharField(null=False, blank=False, max_length=255)
     description = models.TextField(null=False, blank=True)
 
     def __str__(self):
@@ -124,29 +110,32 @@ class Issue(AbstractBase):
         ordering = ['-number']
 
     def __str__(self):
-        return '%s #%s' % (
-            self.magazine,
-            self.number,
-        )
+        return '%s #%s' % (self.magazine, self.number)
 
     number = models.SmallIntegerField(null=False, blank=False, default=0)
-    title = models.CharField(null=True, blank=False, max_length=255, )
+    title = models.CharField(null=True, blank=False, max_length=255)
     description = models.TextField(null=True, blank=False)
-    magazine = models.ForeignKey(Magazine, on_delete=models.CASCADE, )
-    published_at = models.DateField(null=False, blank=False, default=datetime.date.today)
+    magazine = models.ForeignKey(Magazine, on_delete=models.CASCADE)
+    published_at = models.DateField(
+        null=False, blank=False, default=datetime.date.today
+    )
 
 
 class Stage(AbstractBase):
     def __str__(self):
         return self.title
 
-    slug = models.SlugField(null=False, blank=False, max_length=255, )
-    title = models.CharField(null=False, blank=False, max_length=255, )
+    slug = models.SlugField(null=False, blank=False, max_length=255)
+    title = models.CharField(null=False, blank=False, max_length=255)
     sort = models.SmallIntegerField(null=False, blank=False, default=0)
     duration = models.SmallIntegerField(null=True, blank=True, default=1)
-    assignee = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE, )
-    prev_stage = models.ForeignKey('self', related_name='n_stage', null=True, blank=True, on_delete=models.CASCADE, )
-    next_stage = models.ForeignKey('self', related_name='p_stage', null=True, blank=True, on_delete=models.CASCADE, )
+    assignee = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
+    prev_stage = models.ForeignKey(
+        'self', related_name='n_stage', null=True, blank=True, on_delete=models.CASCADE
+    )
+    next_stage = models.ForeignKey(
+        'self', related_name='p_stage', null=True, blank=True, on_delete=models.CASCADE
+    )
     skip_notification = models.BooleanField(null=False, blank=False, default=False)
     meta = JSONField(default=dict)
 
@@ -160,16 +149,28 @@ class Idea(AbstractBase):
         (AUTHOR_TYPE_NEW, 'Новый автор'),
         (AUTHOR_TYPE_EXISTING, 'Существующий автор(ы)'),
     ]
-    title = models.CharField(null=False, blank=False, max_length=255, verbose_name='Заголовок', )
+    title = models.CharField(
+        null=False, blank=False, max_length=255, verbose_name='Заголовок'
+    )
     description = models.TextField(verbose_name='Описание')
-    approved = models.BooleanField(null=True, )
+    approved = models.BooleanField(null=True)
     editor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='editor')
-    post = models.OneToOneField('Post', on_delete=models.SET_NULL, null=True, blank=True)
+    post = models.OneToOneField(
+        'Post', on_delete=models.SET_NULL, null=True, blank=True
+    )
     comments = GenericRelation('Comment')
-    author_type = models.CharField(max_length=2, choices=AUTHOR_TYPE_CHOICES, default=AUTHOR_TYPE_NO,
-                                   verbose_name='Автор')
-    authors_new = models.CharField(max_length=255, null=True, blank=True, verbose_name='Новые автор')
-    authors = models.ManyToManyField(User, verbose_name='Авторы', related_name='authors', blank=True)
+    author_type = models.CharField(
+        max_length=2,
+        choices=AUTHOR_TYPE_CHOICES,
+        default=AUTHOR_TYPE_NO,
+        verbose_name='Автор',
+    )
+    authors_new = models.CharField(
+        max_length=255, null=True, blank=True, verbose_name='Новые автор'
+    )
+    authors = models.ManyToManyField(
+        User, verbose_name='Авторы', related_name='authors', blank=True
+    )
 
     def voted(self, user):
         vote = next((v for v in self.votes.all() if v.user_id == user.id), None)
@@ -193,9 +194,7 @@ class Idea(AbstractBase):
 
     @property
     def score(self):
-        all_scores = sum(
-            [v.score for v in self.votes.all()]
-        )
+        all_scores = sum([v.score for v in self.votes.all()])
         return round(all_scores / len(self.votes.all()) / 2 * 100)
 
     @property
@@ -206,14 +205,14 @@ class Idea(AbstractBase):
 
 
 class Postype(AbstractBase):
-    slug = models.SlugField(null=False, blank=False, max_length=255, )
-    title = models.CharField(null=False, blank=False, max_length=255, )
+    slug = models.SlugField(null=False, blank=False, max_length=255)
+    title = models.CharField(null=False, blank=False, max_length=255)
     meta = JSONField(default=dict)
 
 
 class Widgetype(AbstractBase):
-    slug = models.SlugField(null=False, blank=False, max_length=255, )
-    title = models.CharField(null=False, blank=False, max_length=255, )
+    slug = models.SlugField(null=False, blank=False, max_length=255)
+    title = models.CharField(null=False, blank=False, max_length=255)
     meta = JSONField(default=dict)
 
 
@@ -232,28 +231,56 @@ class Post(AbstractBase):
         (POST_FORMAT_FEATURED, 'Featured'),
     )
 
-    format = models.SmallIntegerField(choices=POST_FORMAT_CHOICES, default=POST_FORMAT_DEFAULT)
-    finished_at = models.DateTimeField(null=False, blank=False, default=django.utils.timezone.now,
-                                       verbose_name='Дедлайн')
-    published_at = models.DateTimeField(null=True, blank=True, verbose_name='Дата публикации')
-    kicker = models.CharField(null=True, blank=True, max_length=255, )
-    slug = models.SlugField(null=True, blank=True, max_length=255, )
-    title = models.CharField(null=True, blank=True, max_length=255, verbose_name='Заголовок статьи')
-    description = models.TextField(null=False, blank=True, verbose_name='Описание статьи')
+    format = models.SmallIntegerField(
+        choices=POST_FORMAT_CHOICES, default=POST_FORMAT_DEFAULT
+    )
+    finished_at = models.DateTimeField(
+        null=False,
+        blank=False,
+        default=django.utils.timezone.now,
+        verbose_name='Дедлайн',
+    )
+    published_at = models.DateTimeField(
+        null=True, blank=True, verbose_name='Дата публикации'
+    )
+    kicker = models.CharField(null=True, blank=True, max_length=255)
+    slug = models.SlugField(null=True, blank=True, max_length=255)
+    title = models.CharField(
+        null=True, blank=True, max_length=255, verbose_name='Заголовок статьи'
+    )
+    description = models.TextField(
+        null=False, blank=True, verbose_name='Описание статьи'
+    )
     views = models.IntegerField(default=0)
     is_paywalled = models.BooleanField(default=False)
     xmd = models.TextField(null=True)
     html = models.TextField(null=True)
 
-    editor = models.ForeignKey(User, null=True, on_delete=models.CASCADE, related_name="edited",
-                               verbose_name='Редактор')
+    editor = models.ForeignKey(
+        User,
+        null=True,
+        on_delete=models.CASCADE,
+        related_name="edited",
+        verbose_name='Редактор',
+    )
     authors = models.ManyToManyField(User, verbose_name='Авторы')
-    postype = models.ForeignKey(Postype, on_delete=models.CASCADE, )
+    postype = models.ForeignKey(Postype, on_delete=models.CASCADE)
     stage = models.ForeignKey(Stage, on_delete=models.CASCADE, verbose_name='Этап')
     issues = models.ManyToManyField(Issue, related_name='posts', verbose_name='Выпуски')
-    section = models.ForeignKey(Section, on_delete=models.CASCADE, null=False, blank=False, verbose_name='Раздел')
-    last_updater = models.ForeignKey(User, related_name='posts_updated', verbose_name='Кто последний обновлял',
-                                     null=True, on_delete=models.SET_NULL)
+    section = models.ForeignKey(
+        Section,
+        on_delete=models.CASCADE,
+        null=False,
+        blank=False,
+        verbose_name='Раздел',
+    )
+    last_updater = models.ForeignKey(
+        User,
+        related_name='posts_updated',
+        verbose_name='Кто последний обновлял',
+        null=True,
+        on_delete=models.SET_NULL,
+    )
 
     meta = JSONField(default=dict)
 
@@ -270,15 +297,21 @@ class Post(AbstractBase):
 
     @property
     def images(self):
-        return list(filter(lambda a: a.type == Attachment.TYPE_IMAGE, self.attachment_set.all()))
+        return list(
+            filter(lambda a: a.type == Attachment.TYPE_IMAGE, self.attachment_set.all())
+        )
 
     @property
     def pdfs(self):
-        return list(filter(lambda a: a.type == Attachment.TYPE_PDF, self.attachment_set.all()))
+        return list(
+            filter(lambda a: a.type == Attachment.TYPE_PDF, self.attachment_set.all())
+        )
 
     @property
     def files(self):
-        return list(filter(lambda a: a.type == Attachment.TYPE_FILE, self.attachment_set.all()))
+        return list(
+            filter(lambda a: a.type == Attachment.TYPE_FILE, self.attachment_set.all())
+        )
 
     @property
     def assignee(self):
@@ -327,9 +360,7 @@ class Post(AbstractBase):
 
     @property
     def description_html(self):
-        renderer = XMDRenderer(images=[])
-        markdown = mistune.Markdown(renderer=renderer)
-        return markdown(self.description)
+        return render_md(self.description)
 
 
 class Widget(AbstractBase):
@@ -340,17 +371,13 @@ class Attachment(AbstractBase):
     TYPE_IMAGE = 0
     TYPE_PDF = 1
     TYPE_FILE = 2
-    TYPE_CHOICES = (
-        (TYPE_IMAGE, 'Image',),
-        (TYPE_PDF, 'PDF',),
-        (TYPE_FILE, 'File',),
-    )
-    type = models.SmallIntegerField(choices=TYPE_CHOICES, default=TYPE_IMAGE, )
+    TYPE_CHOICES = ((TYPE_IMAGE, 'Image'), (TYPE_PDF, 'PDF'), (TYPE_FILE, 'File'))
+    type = models.SmallIntegerField(choices=TYPE_CHOICES, default=TYPE_IMAGE)
 
-    original_filename = models.CharField(null=False, blank=False, max_length=255, )
+    original_filename = models.CharField(null=False, blank=False, max_length=255)
     file = models.FileField(upload_to='attachments/%Y/%m/%d/', max_length=2048)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, )
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, )
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
 
 
 class Comment(AbstractBase):
@@ -367,31 +394,25 @@ class Comment(AbstractBase):
     TYPE_PRIVATE = 10
     TYPE_PUBLIC = 15
     TYPE_CHOICES = (
-        (TYPE_SYSTEM, 'system',),
-        (TYPE_PRIVATE, 'private',),
-        (TYPE_PUBLIC, 'public',),
+        (TYPE_SYSTEM, 'system'),
+        (TYPE_PRIVATE, 'private'),
+        (TYPE_PUBLIC, 'public'),
     )
     text = models.TextField(blank=True)
-    type = models.SmallIntegerField(choices=TYPE_CHOICES, default=TYPE_PRIVATE, )
+    type = models.SmallIntegerField(choices=TYPE_CHOICES, default=TYPE_PRIVATE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
-    commentable = GenericForeignKey('content_type', 'object_id', )
+    commentable = GenericForeignKey('content_type', 'object_id')
     meta = JSONField(default=dict)
 
     def __str__(self):
-        return '%s, %s:%s...' % (
-            self.user_id,
-            self.type,
-            self.text[0:50],
-        )
+        return '%s, %s:%s...' % (self.user_id, self.type, self.text[0:50])
 
     @property
     def html(self):
-        renderer = XMDRenderer(images=[])
-        markdown = mistune.Markdown(renderer=renderer)
-        return markdown(self.text)
+        return render_md(self.text)
 
     @property
     def changelog(self):
@@ -399,10 +420,8 @@ class Comment(AbstractBase):
             md = '\n'.join(self.meta['comment']['changelog'])
         except Exception as exc:
             md = ''
-        renderer = XMDRenderer()
-        markdown = mistune.Markdown(renderer=renderer)
 
-        return markdown(md)
+        return render_md(md)
 
 
 class Vote(AbstractBase):
@@ -410,9 +429,9 @@ class Vote(AbstractBase):
     SCORE_NEUTRAL = 1
     SCORE_POSITIVE = 2
     SCORE_CHOICES = (
-        (SCORE_NEGATIVE, 'Не стану читать даже даром',),
-        (SCORE_NEUTRAL, 'Прочел бы, встретив в журнале',),
-        (SCORE_POSITIVE, 'Ради таких статей готов купить журнал',),
+        (SCORE_NEGATIVE, 'Не стану читать даже даром'),
+        (SCORE_NEUTRAL, 'Прочел бы, встретив в журнале'),
+        (SCORE_POSITIVE, 'Ради таких статей готов купить журнал'),
     )
     score = models.SmallIntegerField(choices=SCORE_CHOICES, default=SCORE_NEUTRAL)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -423,14 +442,6 @@ class Vote(AbstractBase):
         return self.__class__.SCORE_CHOICES
 
 
-@receiver(pre_save, sender=Post)
-def render_xmd(sender, instance, **kwargs):
-    if instance.has_text:
-        renderer = XMDRenderer(images=instance.images)
-        markdown = mistune.Markdown(renderer=renderer)
-        instance.html = markdown(instance.xmd)
-
-
 def users_with_perm(perm_name: str, include_superuser: bool = True) -> List[User]:
     """Get all users by full permission name
 
@@ -439,6 +450,24 @@ def users_with_perm(perm_name: str, include_superuser: bool = True) -> List[User
     :return:
     """
     return User.objects.filter(
-        Q(is_superuser=include_superuser) |
-        Q(user_permissions__codename=perm_name) |
-        Q(groups__permissions__codename=perm_name)).distinct()
+        Q(is_superuser=include_superuser)
+        | Q(user_permissions__codename=perm_name)
+        | Q(groups__permissions__codename=perm_name)
+    ).distinct()
+
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    instance.profile.save()
+
+
+@receiver(pre_save, sender=Post)
+def render_xmd(sender, instance, **kwargs):
+    if instance.has_text:
+        instance.html = render_md(instance.xmd, attachments=instance.images)
