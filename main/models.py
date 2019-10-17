@@ -14,6 +14,8 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 
+from xmd import render_md
+
 
 class AbstractBase(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -358,8 +360,6 @@ class Post(AbstractBase):
 
     @property
     def description_html(self):
-        from xmd import render_md
-
         return render_md(self.description)
 
 
@@ -412,13 +412,10 @@ class Comment(AbstractBase):
 
     @property
     def html(self):
-        from xmd import render_md
         return render_md(self.text)
 
     @property
     def changelog(self):
-        from xmd import render_md
-
         try:
             md = '\n'.join(self.meta['comment']['changelog'])
         except Exception as exc:
@@ -472,7 +469,5 @@ def save_user_profile(sender, instance, **kwargs):
 
 @receiver(pre_save, sender=Post)
 def render_xmd(sender, instance, **kwargs):
-    from xmd import render_md
-
     if instance.has_text:
         instance.html = render_md(instance.xmd, attachments=instance.images)

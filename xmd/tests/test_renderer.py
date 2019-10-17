@@ -1,25 +1,33 @@
 """
 Every block element test will be automatically
-wrapped inside `<p></p>`. Thats why every block
+wrapped inside `<p></p>\n`. Thats why every block
 test should include this wrapper tag.
 """
+from unittest.mock import patch
 
 from xmd import render_md
 
 
 class TestImage:
-    expected_html = '''<p>
-<figure>
-    <img src="bar" alt="foo"><figcaption>foo</figcaption>
-</figure>
-</p>
-'''
+    expected_html = (
+        '<p>'
+        '<figure>'
+        '<img src="dummy.jpg" alt="foo" /><figcaption>foo</figcaption>'
+        '</figure>'
+        '</p>\n'
+    )
 
-    def test_render(self):
+    @patch('xmd.renderer.get_attachment_original_filename')
+    def test_render(self, mock_get_attachment_original_filename):
+        mock_get_attachment_original_filename.return_value = 'dummy.jpg'
+
         md = '![foo](bar)'
         assert render_md(md) == self.expected_html
 
-    def test_image_whitespace_end(self):
+    @patch('xmd.renderer.get_attachment_original_filename')
+    def test_whitespace_end(self, mock_get_attachment_original_filename):
+        mock_get_attachment_original_filename.return_value = 'dummy.jpg'
+
         md = '![foo](bar)               '
         assert render_md(md) == self.expected_html
 

@@ -1,16 +1,18 @@
 from typing import List
 
-from main.models import Attachment
 
+def get_attachment_original_filename(filename: str, attachments: List) -> str:
+    """Get actual urlencoded filename from database
+    by human-readable attachment filename
 
-def map_attachments_filenames(text: str, attachments: List[Attachment]) -> str:
-    """Replace human-readable attachments filesnames with actual
-    urlencoded in database
     """
-    # # find requested image from post images
-    # image = next((i for i in self.images if i.original_filename == src), None)
-    # if image is None:
-    #     return ''
-    #
-    # # extension = mimetypes.guess_extension(image.mime_type, strict=True)
-    return text
+    # Find requested attachment from post attachments
+    attachments_ = [
+        attachment
+        for attachment in attachments
+        if attachment.original_filename == filename
+    ]
+    if not attachments_:
+        return ''
+
+    return attachments_[0].file.url

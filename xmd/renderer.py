@@ -1,8 +1,20 @@
+from typing import List
+
 from mistune import Renderer
+
+from xmd.utils import get_attachment_original_filename
 
 
 class XMDRenderer(Renderer):
+    def __init__(self, attachments: List = None, *args, **kwargs):
+        self.attachments = attachments or []
+
+        super(XMDRenderer, self).__init__(*args, **kwargs)
+
     def image(self, src, title, alt_text):
+        # Map human-readable filename to urlencoded one
+        urlencoded_filename = get_attachment_original_filename(src, self.attachments)
+
         html = (
             '<figure>'
             '<img src="%s" alt="%s" />'
@@ -10,7 +22,7 @@ class XMDRenderer(Renderer):
             '</figure>'
         )
 
-        return html % (src, alt_text, alt_text)
+        return html % (urlencoded_filename, alt_text, alt_text)
 
     def panel_block_www_start(self):
         html = (
