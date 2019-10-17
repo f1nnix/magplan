@@ -17,6 +17,10 @@ class ExtendedMarkdown(Markdown):
     def output_panel_block_term(self):
         return self.renderer.panel_block_term_start()
 
+    def output_panel_block_term_code(self):
+        text = self.token.get('content', '')
+        return self.renderer.panel_block_term_code(text)
+
     def output_panel_block_default(self):
         text = self.token.get('content', '')
         return self.renderer.panel_block_default_start(text)

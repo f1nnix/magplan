@@ -12,7 +12,7 @@ class PanelBlockLexer(BlockLexer):
     def enable_panel(self):
         self.rules.panel_block = re.compile(r'\[ (.+)\n'
                                             r'\n'
-                                            r'((?:.*?\n)*)'
+                                            r'((?:.*?\n)*?)'
                                             r'\n'
                                             r'\]'
                                             )
@@ -55,7 +55,16 @@ class PanelBlockLexer(BlockLexer):
             })
 
         # Add nested tokens
-        self.parse(content)
+        if title == 'TERM':
+            # We treat term content as single
+            # code block without nested elements
+            self.tokens.append({
+                'type': 'panel_block_term_code',
+                'content': content
+            })
+
+        else:
+            self.parse(content)
 
         # Add panel end token
         self.tokens.append({

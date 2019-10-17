@@ -29,6 +29,40 @@
         .select2.select2-container {
             width: 100% !important;
         }
+
+        .panel {
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .panel.www,
+        .panel.info,
+        .panel.warning,
+        .panel.greeting {
+            border: solid 1px #ddd;
+            border-radius: 15px;
+        }
+        .panel.www h3,
+        .panel.info h3,
+        .panel.warning h3,
+        .panel.greeting h3 {
+            text-align: center;
+            font-size: 200%;
+        }
+
+        .panel.term, .panel.term pre {
+            padding: 1rem;
+            border: none;
+            background: #000;
+            color: #90ff00;
+            font-family: 'Courier New';
+            overflow: scroll;
+        }
+
+        .panel.default {
+            background: #f8f9fa;
+
+        }
     </style>
 
 {% endblock %}

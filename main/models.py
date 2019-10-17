@@ -412,8 +412,8 @@ class Comment(AbstractBase):
 
     @property
     def html(self):
-
-        return render_xmd(self.text)
+        from xmd import render_md
+        return render_md(self.text)
 
     @property
     def changelog(self):

@@ -13,4 +13,4 @@ def map_attachments_filenames(text: str, attachments: List[Attachment]) -> str:
     #     return ''
     #
     # # extension = mimetypes.guess_extension(image.mime_type, strict=True)
-    return ''
+    return text

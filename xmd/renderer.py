@@ -48,7 +48,7 @@ class XMDRenderer(Renderer):
         html = (
             '<div class="panel term">'
             '<div class="term-inner">'
-            '<h3>term</h3>'
+            # '<h3>term</h3>'
         )
         return html
 
@@ -59,6 +59,14 @@ class XMDRenderer(Renderer):
             '<h3>%s</h3>'
         )
         return html % text
+
+    def panel_block_term_code(self, content):
+        html = (
+            '<pre><code>'
+            '%s'
+            '</code></pre>'
+        )
+        return html % content
 
     def panel_block_end(self):
         html = '</div></div>'
