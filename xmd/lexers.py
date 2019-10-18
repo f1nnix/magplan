@@ -70,4 +70,30 @@ class PanelBlockLexer(BlockLexer):
         self.tokens.append({
             'type': 'panel_block_end'
         })
-        pass
+
+    def parse_paragraph(self, m) -> None:
+        """Parse paragraph, including lead case
+
+        Lead is a first paragraph in document,
+        starting from '$ ' char sequence.
+
+        :param m: Match group for paragraph, where m.group(1) is text.
+        :return:
+        """
+
+        text: str = m.group(1).rstrip('\n')
+        is_lead: bool = text.startswith('$ ') and not self.tokens
+        
+        # If it's lead, wrap with lead tokens,
+        # otherwise parse as ususal paragraph
+        if is_lead:
+            self.tokens.append({'type': 'lead_start'})
+
+            # Strip '$ ' from text
+            # as we've already added lead token
+            text = text[2:]
+
+        self.tokens.append({'type': 'paragraph', 'text': text})
+
+        if is_lead:
+            self.tokens.append({'type': 'lead_end'})

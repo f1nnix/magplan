@@ -27,3 +27,9 @@ class ExtendedMarkdown(Markdown):
 
     def output_panel_block_end(self):
         return self.renderer.panel_block_end()
+
+    def output_lead_start(self):
+        return self.renderer.lead_start()
+
+    def output_lead_end(self):
+        return self.renderer.lead_end()

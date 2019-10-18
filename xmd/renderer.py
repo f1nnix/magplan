@@ -83,3 +83,13 @@ class XMDRenderer(Renderer):
     def panel_block_end(self):
         html = '</div></div>'
         return html
+
+    def lead_start(self)->str:
+        html = '<div class=lead>'
+
+        return html
+
+    def lead_end(self)->str:
+        html = '</div>'
+
+        return html

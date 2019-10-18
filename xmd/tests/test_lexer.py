@@ -99,3 +99,35 @@ class TestPanelBlockLexer(TestCase):
 
         paragraph_tokens = [token for token in tokens if token['type'] == 'paragraph']
         assert len(paragraph_tokens) == 2
+
+
+class TestBlockLexer_lead(TestCase):
+    def setUp(self):
+        self.lexer = PanelBlockLexer()
+
+    def test_basic(self):
+        markdown: str = (
+            '$ Lead\n'
+            '\n'
+            'Paragraph\n'
+        )
+
+        tokens: list = self.lexer.parse(markdown)
+        assert len(tokens) == 4
+        assert tokens[0]['type'] == 'lead_start'
+        assert tokens[1]['type'] == 'paragraph'
+        assert tokens[2]['type'] == 'lead_end'
+        assert tokens[3]['type'] == 'paragraph'
+
+
+    def test_lead_not_first(self):
+        markdown: str = (
+            'Paragraph\n'
+            '\n'
+            '$ Lead\n'
+        )
+
+        tokens: list = self.lexer.parse(markdown)
+        assert len(tokens) == 2
+        assert tokens[0]['type'] == 'paragraph'
+        assert tokens[1]['type'] == 'paragraph'
