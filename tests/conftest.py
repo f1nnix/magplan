@@ -1,8 +1,10 @@
 import pytest
 from django.test import SimpleTestCase
 from faker import Faker
+from django_dynamic_fixture import G
 
-from main.models import Post, Postype, Section, Stage, User, Idea, Comment
+
+from main.models import Post, Postype, Section, Stage, User, Idea, Comment, Issue
 
 fake = Faker()
 
@@ -168,5 +170,14 @@ def idea_comment(user, idea):
     yield comment_
 
     comment_.delete()
+
+@pytest.fixture
+def issue():
+    issue_ = G(Issue)
+
+    yield issue_
+
+    issue_.delete()
+
 
 
