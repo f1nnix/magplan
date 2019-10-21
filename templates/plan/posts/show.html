@@ -42,6 +42,7 @@
             border: solid 1px #ddd;
             border-radius: 15px;
         }
+
         .panel.www h3,
         .panel.info h3,
         .panel.warning h3,
@@ -73,7 +74,8 @@
     <h1>{{ post }}</h1>
 
     <div id="actions" style="margin-bottom: 1rem;">
-        <a class="btn btn-warning" href="{% url 'posts_edit' post.id %}">{% trans "edit" %}</a>
+        {% trans "edit" as edit_label %}
+        <a class="btn btn-warning" href="{% url 'posts_edit' post.id %}">{{ edit_label|capfirst }}</a>
 
         <a class="btn btn-primary" data-toggle="collapse" href="#meta_form_container" role="button"
            aria-expanded="false" aria-controls="meta_form_container">Редактировать мету</a>
