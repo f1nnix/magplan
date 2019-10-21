@@ -199,9 +199,7 @@ class Idea(AbstractBase):
 
     @property
     def description_html(self):
-        renderer = XMDRenderer(images=[])
-        markdown = mistune.Markdown(renderer=renderer)
-        return markdown(self.description)
+        render_md(self.description)
 
 
 class Postype(AbstractBase):

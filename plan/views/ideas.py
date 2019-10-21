@@ -106,6 +106,7 @@ def _get_suggestion_issues() -> Tuple[Issue, List[Issue]]:
             issue_to_pop = i
 
     # Extract initial suggestion from list
+    # FIXME: this will fail if no issues exist in DB
     initial_issue = last_issues.pop(issue_to_pop)
     return initial_issue, last_issues
 
