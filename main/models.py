@@ -199,7 +199,7 @@ class Idea(AbstractBase):
 
     @property
     def description_html(self):
-        render_md(self.description)
+        return render_md(self.description)
 
 
 class Postype(AbstractBase):
