@@ -77,10 +77,7 @@ def _get_recipients(comment: Comment) -> Set[User]:
         recipient
         for recipient in recipients
         if _can_recieve_notification(
-            recipient,
-            comment,
-            RECIEVE_NOTIFICATIONS_PERMISSION,
-            NOTIFICATION_LEVEL_PREFERENCE,
+            recipient, comment, RECIEVE_NOTIFICATIONS_PERMISSION, NOTIFICATION_LEVEL_PREFERENCE
         )
     }
 
@@ -91,16 +88,10 @@ def _send_email(comment, recipients):
     subject = f"Комментарий к идее «{comment.commentable}» от {comment.user}"
     html_content = render_to_string(
         "email/new_comment.html",
-        {
-            "comment": comment,
-            "commentable_type": 'idea',
-            "APP_URL": os.environ.get('APP_URL', None),
-        },
+        {"comment": comment, "commentable_type": 'idea', "APP_URL": os.environ.get('APP_URL', None)},
     )
     text_content = html2text.html2text(html_content)
-    msg = EmailMultiAlternatives(
-        subject, text_content, config.PLAN_EMAIL_FROM, recipients
-    )
+    msg = EmailMultiAlternatives(subject, text_content, config.PLAN_EMAIL_FROM, recipients)
     msg.attach_alternative(html_content, 'text/html')
     msg.send()
 
