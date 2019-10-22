@@ -55,7 +55,7 @@ def test_get_recipients(
 
 @pytest.mark.django_db
 @patch('plan.tasks.send_post_comment_notification.EmailMultiAlternatives.send')
-def test_send_post_comment_notification(mock_send, comment):
+def test_send_email(mock_send, comment):
     _send_email(comment, ())
     mock_send.assert_called()
 
