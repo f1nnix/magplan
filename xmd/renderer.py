@@ -36,7 +36,7 @@ class XMDRenderer(Renderer):
         html = (
             '<div class="panel info">'
             '<div class="info-inner">'
-            '<h3>www</h3>'
+            '<h3>info</h3>'
         )
         return html
 
