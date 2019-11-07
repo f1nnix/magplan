@@ -6,6 +6,7 @@ from mistune import BlockLexer
 class PanelBlockLexer(BlockLexer):
     def __init__(self, *args, **kwargs):
         super(PanelBlockLexer, self).__init__(*args, **kwargs)
+        self.has_lead = False
 
         self.enable_panel()
 
@@ -74,24 +75,29 @@ class PanelBlockLexer(BlockLexer):
     def parse_paragraph(self, m) -> None:
         """Parse paragraph, including lead case
 
-        Lead is a first paragraph in document,
-        starting from '$ ' char sequence.
+        Lead is a first paragraph in document.
+        If 
 
         :param m: Match group for paragraph, where m.group(1) is text.
         :return:
         """
-
         text: str = m.group(1).rstrip('\n')
-        is_lead: bool = text.startswith('$ ') and not self.tokens
+        is_lead: bool = False # Local marker
+        
+        # Are we parsing lead?
+        if not self.has_lead:
+            is_lead = True
+            self.has_lead = True
         
         # If it's lead, wrap with lead tokens,
         # otherwise parse as ususal paragraph
         if is_lead:
             self.tokens.append({'type': 'lead_start'})
-
-            # Strip '$ ' from text
-            # as we've already added lead token
-            text = text[2:]
+            
+            # Strip '$ ' from text if exists
+            if text.startswith('$ '):
+                text = text[2:]
+            self.has_lead = True
 
         self.tokens.append({'type': 'paragraph', 'text': text})
 
