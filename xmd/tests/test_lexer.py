@@ -105,29 +105,64 @@ class TestBlockLexer_lead(TestCase):
     def setUp(self):
         self.lexer = PanelBlockLexer()
 
-    def test_basic(self):
+    def test_with_token(self):
         markdown: str = (
             '$ Lead\n'
             '\n'
             'Paragraph\n'
         )
-
         tokens: list = self.lexer.parse(markdown)
         assert len(tokens) == 4
         assert tokens[0]['type'] == 'lead_start'
         assert tokens[1]['type'] == 'paragraph'
         assert tokens[2]['type'] == 'lead_end'
         assert tokens[3]['type'] == 'paragraph'
-
-
-    def test_lead_not_first(self):
+        
+        assert tokens[1]['text'] == 'Lead'
+        
+    def test_with_token_middle(self):
         markdown: str = (
-            'Paragraph\n'
+            '# foo\n'
             '\n'
             '$ Lead\n'
         )
-
+        
         tokens: list = self.lexer.parse(markdown)
-        assert len(tokens) == 2
-        assert tokens[0]['type'] == 'paragraph'
+        assert len(tokens) == 4
+        assert tokens[0]['type'] == 'heading'
+        assert tokens[1]['type'] == 'lead_start'
+        assert tokens[2]['type'] == 'paragraph'
+        assert tokens[3]['type'] == 'lead_end'
+        
+        assert tokens[2]['text'] == 'Lead'
+        
+    def test_without_token(self):
+        markdown: str = (
+            'Lead\n'
+            '\n'
+            '$ Not a lead\n'
+        )
+        tokens: list = self.lexer.parse(markdown)
+        assert len(tokens) == 4
+        assert tokens[0]['type'] == 'lead_start'
         assert tokens[1]['type'] == 'paragraph'
+        assert tokens[2]['type'] == 'lead_end'
+        assert tokens[3]['type'] == 'paragraph'
+        
+        assert tokens[1]['text'] == 'Lead'
+        
+    def test_without_token_middle(self):
+        markdown: str = (
+            '# foo\n'
+            '\n'
+            'Lead\n'
+        )
+        
+        tokens: list = self.lexer.parse(markdown)
+        assert len(tokens) == 4
+        assert tokens[0]['type'] == 'heading'
+        assert tokens[1]['type'] == 'lead_start'
+        assert tokens[2]['type'] == 'paragraph'
+        assert tokens[3]['type'] == 'lead_end'
+        
+        assert tokens[2]['text'] == 'Lead'
