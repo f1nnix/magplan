@@ -69,6 +69,8 @@
 {% endblock %}
 
 {% block content %}
+    {% with post=post %}{% include 'plan/posts/_paywall_alert.html' %}{% endwith %}
+    
     {% with stages=stages %}{% include 'plan/posts/_progress.html' %}{% endwith %}
 
     <h1>{{ post }}</h1>

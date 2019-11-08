@@ -1,0 +1,9 @@
+{% if post.is_paywalled == False %}
+    <div class="alert alert-success" role="alert">
+        Эта статья будет опубликовна с пейволлом.
+    </div>
+{% else %}
+    <div class="alert alert-info" role="alert">
+        Эта статья будет опубликована БЕЗ пейволла.
+    </div>
+{% endif%}
