@@ -42,3 +42,6 @@ class ExtendedMarkdown(Markdown):
 
     def output_lead_end(self):
         return self.renderer.lead_end()
+        
+    def output_paywall(self):
+        return self.renderer.paywall()

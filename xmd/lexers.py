@@ -9,6 +9,7 @@ class PanelBlockLexer(BlockLexer):
         self.has_lead = False
 
         self.enable_panel()
+        self.enable_paywall()
 
     def enable_panel(self):
         self.rules.panel_block = re.compile(r'\[ (.+)\n'
@@ -18,6 +19,12 @@ class PanelBlockLexer(BlockLexer):
                                             r'\]'
                                             )
         self.default_rules.insert(3, 'panel_block')
+        
+    def enable_paywall(self):
+        self.rules.paywall_block = re.compile(
+            r'^-{10,}'
+        )
+        self.default_rules.insert(1, 'paywall_block')
 
     def parse_panel_block(self, m):
         title = m.group(1)
@@ -103,3 +110,7 @@ class PanelBlockLexer(BlockLexer):
 
         if is_lead:
             self.tokens.append({'type': 'lead_end'})
+
+        
+    def parse_paywall_block(self, m):
+        self.tokens.append({'type': 'paywall'})

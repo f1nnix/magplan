@@ -167,17 +167,42 @@ class TestBlockLexer_lead(TestCase):
         
         assert tokens[2]['text'] == 'Lead'
         
-class TestBlockLexer_lead(TestCase):
+class TestBlockLexer_paywall(TestCase):
     def setUp(self):
         self.lexer = PanelBlockLexer()
         
     def test_basic(self):
         markdown: str = (
-            '---'
+            '----------\n'
             '\n'
             'Paragraph\n'
         )
         
         tokens: list = self.lexer.parse(markdown)
         assert tokens[0]['type'] == 'paywall'
-        assert tokens[2]['type'] == 'paragraph'
+        
+    def test_middle(self):
+        markdown: str = (
+            'Paragraph\n'
+            '\n'
+            '----------\n'
+            '\n'
+            'Paragraph\n'
+            
+        )
+        
+        tokens: list = self.lexer.parse(markdown)
+        assert tokens[3]['type'] == 'paywall'
+        
+    def test_cont_paywall(self):
+        markdown: str = (
+            'Paragraph\n'
+            '\n'
+            '-----------\n'
+            '\n'
+            'Paragraph\n'
+            
+        )
+        
+        tokens: list = self.lexer.parse(markdown)
+        assert tokens[3]['type'] == 'paywall'

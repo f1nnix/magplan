@@ -64,13 +64,52 @@
             background: #f8f9fa;
 
         }
+        
+/*        .paywall-notice {
+           width: 100%;
+           text-align: center;
+           border-bottom: 1px solid #000;
+           line-height: 0.1em;
+           margin: 10px 0 20px;
+        }
+
+        .paywall-notice span {
+            background:#fff;
+            padding:0 10px;
+        }*/
+        
+        .paywall-notice {
+          overflow: hidden;
+          text-align: center;
+          color: #828282;
+          margin: 2.66rem 0rem;
+        }
+
+        .paywall-notice:before,
+        .paywall-notice:after {
+          background-color: #828282;
+          content: "";
+          display: inline-block;
+          height: 1px;
+          position: relative;
+          vertical-align: middle;
+          width: 50%;
+        }
+
+        .paywall-notice:before {
+          right: 0.5em;
+          margin-left: -50%;
+        }
+
+        .paywall-notice:after {
+          left: 0.5em;
+          margin-right: -50%;
+        }
     </style>
 
 {% endblock %}
 
 {% block content %}
-    {% with post=post %}{% include 'plan/posts/_paywall_alert.html' %}{% endwith %}
-    
     {% with stages=stages %}{% include 'plan/posts/_progress.html' %}{% endwith %}
 
     <h1>{{ post }}</h1>
@@ -181,13 +220,14 @@
 
     <div class="collapse" id="description">
         <div class="card card-body">
-
             {{ post.description_html|safe }}
         </div>
         <br/>
     </div>
 
     {% include 'plan/posts/_stages.html' %}
+    
+    {% with post=post %}{% include 'plan/posts/_paywall_alert.html' %}{% endwith %}
 
     <div class="row">
         <div class="col-12">

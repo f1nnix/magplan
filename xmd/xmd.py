@@ -6,7 +6,7 @@ from xmd.renderer import XMDRenderer
 
 
 def render_md(
-        md_text: str, attachments: List = None, *args, **kwargs
+        md_text: str, attachments: List = None, render_lead=True, *args, **kwargs
 ) -> str:
     """Render markdown chunk with optional assets preprocessing.
 
@@ -16,6 +16,10 @@ def render_md(
     """
     renderer = XMDRenderer(attachments=attachments)
     block = PanelBlockLexer()
+    
+    # If we don't want to render lead, fake lead existance
+    if not render_lead:
+        block.has_lead = True
 
     markdown = ExtendedMarkdown(renderer=renderer, block=block)
 

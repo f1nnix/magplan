@@ -340,9 +340,7 @@ class Post(AbstractBase):
 
     @property
     def has_text(self):
-        if self.xmd is not None and self.xmd != '':
-            return True
-        return False
+        return self.xmd is not None and self.xmd != ''
 
     class Meta:
         permissions = (
@@ -358,7 +356,7 @@ class Post(AbstractBase):
 
     @property
     def description_html(self):
-        return render_md(self.description)
+        return render_md(self.description, render_lead=False)
 
 
 class Widget(AbstractBase):
@@ -410,7 +408,7 @@ class Comment(AbstractBase):
 
     @property
     def html(self):
-        return render_md(self.text)
+        return render_md(self.text, render_lead=False)
 
     @property
     def changelog(self):
@@ -419,7 +417,7 @@ class Comment(AbstractBase):
         except Exception as exc:
             md = ''
 
-        return render_md(md)
+        return render_md(md, render_lead=False)
 
 
 class Vote(AbstractBase):
@@ -469,3 +467,12 @@ def save_user_profile(sender, instance, **kwargs):
 def render_xmd(sender, instance, **kwargs):
     if instance.has_text:
         instance.html = render_md(instance.xmd, attachments=instance.images)
+        
+        # HACK: determine paywall status by persistance of
+        #       paywall markup tab. Fix, if renderer changes.
+        if '<div class="paywall-notice">' in instance.html:
+            instance.is_paywalled = True
+        else:
+            instance.is_paywalled = False
+        
+    

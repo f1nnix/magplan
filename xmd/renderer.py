@@ -93,3 +93,12 @@ class XMDRenderer(Renderer):
         html = '</div>'
 
         return html
+        
+    def paywall(self) -> str:
+        html = (
+            '<div class="paywall-notice">'
+            'Продолжение статьи доступно только продписчикам'
+            '</div>'
+        )
+    
+        return html

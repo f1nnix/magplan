@@ -1,9 +1,9 @@
-{% if post.is_paywalled == False %}
-    <div class="alert alert-success" role="alert">
-        Эта статья будет опубликовна с пейволлом.
+{% if post.is_paywalled == True %}
+    <div class="bd-callout" role="alert">
+        Публикуется с пейволлом
     </div>
 {% else %}
-    <div class="alert alert-info" role="alert">
-        Эта статья будет опубликована БЕЗ пейволла.
+    <div class="bd-callout bd-callout-info" role="alert">
+        Публикуется без пейволла
     </div>
 {% endif%}
