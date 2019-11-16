@@ -196,7 +196,12 @@
             {% else %}
                 {% trans "edits" %} {{ post.editor }}{% if forloop.last is False %}, {% else %}.{% endif %}
             {% endif %}
-
+            
+            <br/>            
+            <span id="imprint">
+                Последнее изменение: {{ post.updated_at }}{% if post.last_updater %} от {{ post.last_updater }}{% endif %}
+            </span>
+            
             <br/>
             <a class="" data-toggle="collapse" href="#description" role="button"
                aria-expanded="false" aria-controls="description">
