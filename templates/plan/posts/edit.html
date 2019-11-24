@@ -49,7 +49,12 @@
             /* color: cadetblue; */
             color: lightcoral;
         }
+        
+        footer {
+            z-index: 1;
+        }
     </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
 {% endblock %}
 
 {% block content %}
@@ -115,10 +120,14 @@
                 '{{ image.original_filename }}',
             {% endfor %}
 
-        ]
+        ];
 
         let getUsedImages = function (currentText) {
-            return currentText.match(/!\[(.*?)\]\(.+?\)/gm).map(function (currentValue, index, array) {
+            const matchedImagesGroups = currentText.match(/!\[(.*?)\]\(.+?\)/gm);
+            if (matchedImagesGroups === null) {
+                return [];
+            }
+            return matchedImagesGroups.map(function (currentValue, index, array) {
                 // TODO: improve lazy matching group to catch first ( from $
                 let img = currentValue.match(/\]\((.+?)\)$/)[0].slice(2, -1);
 
@@ -134,7 +143,7 @@
 
                 return img
             })
-        }
+        };
 
 
         let countStats = function () {
@@ -152,11 +161,11 @@
             let missingClass = '',
                 missingText = '',
                 extraClass = '',
-                extraText = ''
+                extraText = '';
 
 
             if (missing.length > 0) {
-                missingText = 'Не хватает картинок: ' + missing.join(', ')
+                missingText = 'Не хватает картинок: ' + missing.join(', ');
                 missingClass = 'active'
             } else {
                 missingText = 'Все картинки приложены'
@@ -165,19 +174,28 @@
 
 
             if (extra.length > 0) {
-                extraText = 'Лишние картинки: ' + extra.join(', ')
+                extraText = 'Лишние картинки: ' + extra.join(', ');
                 extraClass = 'active'
             } else {
                 extraText = 'Лишних картинок нет'
             }
             $('#images_status #extra').text(extraText).attr('class', extraClass)
-        }
+        };
 
         $(document).ready(function () {
-            updateStats()
+            {% if request.user.preferences.plan__xmd_editor_type == 'markdown' %}
+            const simpleMDE = new SimpleMDE({
+                element: $("#id_xmd")[0],
+                spellChecker: false,
+                forceSync: true
+            });
+            {% endif %}
+
+            updateStats();
             $("#id_xmd").on('change keyup paste', function () {
                 updateStats()
-            })
+            });
         })
     </script>
+    <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
 {% endblock %}

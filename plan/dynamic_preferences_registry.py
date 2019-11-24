@@ -45,3 +45,15 @@ class IdeaCommentNotificationLevel(ChoicePreference):
     default = 'related'
     widget = forms.Select(attrs={'class': 'form-control'})
     verbose_name = 'Уведомления о комментариях к идее'
+
+@user_preferences_registry.register
+class XMDEditorType(ChoicePreference):
+    name = 'xmd_editor_type'
+    section = plan
+    choices = [
+        ('plain', 'Plain-text редактор'),
+        ('markdown', 'Markdown-редактор'),
+    ]
+    default = 'plain'
+    widget = forms.Select(attrs={'class': 'form-control'})
+    verbose_name = 'Редактор для статей в XMD'
