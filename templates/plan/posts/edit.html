@@ -49,7 +49,7 @@
             /* color: cadetblue; */
             color: lightcoral;
         }
-        
+
         footer {
             z-index: 1;
         }
@@ -58,6 +58,15 @@
 {% endblock %}
 
 {% block content %}
+    {% if post.is_locked == True %}
+        <div class="flash_messages">
+            <div class="alert alert-warning" role="alert">
+                Этот пост сейчас публикуется в Wordpress. Пожалуйта, не редактируйте его до окончания обновления.
+                Вы можете обновить страницу чтобы убедиться, что публикация завершена.
+            </div>
+        </div>
+    {% endif %}
+
     <h2>Редактирование «<a href="{% url 'posts_show' post.id %}">{{ post }}</a>»</h2>
     <div class="meta">
         <p>В номерах: {% for issue in post.issues.all %}
@@ -82,7 +91,7 @@
 
 
         <section id="attachments" style="margin-bottom: 1rem;">
-            {% with images=post.images pdfs=post.pdfs files=post.files %}
+            {% with is_locked=post.is_locked images=post.images pdfs=post.pdfs files=post.files %}
                 {% include 'plan/posts/_attachments.html' %}
             {% endwith %}
 
@@ -103,8 +112,12 @@
         <div class="container">
             <span class="small d-none d-sm-inline">Изменено {{ post.updated_at }}{% if post.last_updater %} —
                 {{ post.last_updater }}{% endif %}</span>
-            <div class="float-right"><input type="submit" id="save_post" form="save_post_form" class="btn btn-success"
-                                            value="Сохранить"></div>
+            <div class="float-right">
+                <input type="submit" id="save_post" form="save_post_form"
+                       class="btn btn-success" value="Сохранить"
+                       {% if post.is_locked == True %}disabled="disabled"{% endif %}
+                />
+            </div>
         </div>
     </footer>
 {% endblock %}
@@ -184,11 +197,11 @@
 
         $(document).ready(function () {
             {% if request.user.preferences.plan__xmd_editor_type == 'markdown' %}
-            const simpleMDE = new SimpleMDE({
-                element: $("#id_xmd")[0],
-                spellChecker: false,
-                forceSync: true
-            });
+                const simpleMDE = new SimpleMDE({
+                    element: $("#id_xmd")[0],
+                    spellChecker: false,
+                    forceSync: true
+                });
             {% endif %}
 
             updateStats();

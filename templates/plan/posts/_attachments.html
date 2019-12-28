@@ -37,8 +37,10 @@
                                        data-id="{{ image.id }}"
                                        data-filename="{{ image.original_filename }}"
                                     >{{ image.original_filename|trim_filename }}</a>
-                                    <a href="#" class="attachment-delete-link">&#10060;</a>
-                                    <small style="display: block">{{ image.created_at }}</small>
+                                    {% if is_locked == False %}
+                                        <a href="#" class="attachment-delete-link">&#10060;</a>
+                                        <small style="display: block">{{ image.created_at }}</small>
+                                    {% endif %}
                                 </p>
                             </div>
                         </div>

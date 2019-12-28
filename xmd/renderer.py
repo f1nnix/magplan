@@ -1,19 +1,18 @@
-from typing import List
+import typing as tp
 
 from mistune import Renderer
 
-from xmd.utils import get_attachment_original_filename
-
 
 class XMDRenderer(Renderer):
-    def __init__(self, attachments: List = None, *args, **kwargs):
+    def __init__(self, image_mapper: tp.Callable, attachments: tp.List = None, *args, **kwargs):
         self.attachments = attachments or []
+        self.image_mapper = image_mapper
 
         super(XMDRenderer, self).__init__(*args, **kwargs)
 
     def image(self, src, title, alt_text):
         # Map human-readable filename to urlencoded one
-        urlencoded_filename = get_attachment_original_filename(src, self.attachments)
+        urlencoded_filename = self.image_mapper(src, self.attachments)
 
         html = (
             '<figure>'
@@ -93,12 +92,12 @@ class XMDRenderer(Renderer):
         html = '</div>'
 
         return html
-        
+
     def paywall(self) -> str:
         html = (
             '<div class="paywall-notice">'
             'Продолжение статьи доступно только продписчикам'
             '</div>'
         )
-    
+
         return html

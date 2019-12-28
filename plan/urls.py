@@ -40,6 +40,7 @@ urlpatterns = [
     path('posts/<int:post_id>/edit/', posts.edit, name='posts_edit'),
     path('posts/<int:post_id>/edit_meta/', posts.edit_meta, name='posts_edit_meta'),
     path('posts/<int:post_id>/download/', posts.download_content, name='posts_download_content'),
+    path('posts/<int:post_id>/send_to_wp/', posts.send_to_wp(), name='posts_send_to_wp'),
     path('posts/<int:post_id>/', posts.show, name='posts_show'),
     path('posts', posts.create, name='posts_create'),
 
