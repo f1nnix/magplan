@@ -11,7 +11,8 @@ Project management system for publishers, magazines and content creators, writte
 * posts ideas with voting system;
 * discussions, email notifications;
 * fees and payments management;
-* team actions logs.
+* team actions logs;
+* publising content to S3 and WordPress with async tasks. 
 
 ![](docs/screenshot1.jpg)
 
@@ -57,7 +58,7 @@ For more info, please, refer to `ansible/` directory. For regular deploy:
 
 ## Running locally
 
-To run Magplan locally, the following env vars should be set for Python interpreter:
+To run Magplan, the following env vars should be set for Python interpreter and Celery worker:
 
 Example settings:
 

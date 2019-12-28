@@ -419,7 +419,9 @@ class Attachment(AbstractBase):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     meta = JSONField(default=dict)
 
-    S3_BUCKET_URL = ''
+    S3_BUCKET_URL = 'https://{}.s3.eu-central-1.amazonaws.com'.format(
+        os.environ.get('S3_BUCKET_NAME', '')
+    )
 
     @property
     def s3_full_url(self):
