@@ -194,5 +194,16 @@ if DEBUG is False:
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
 
-
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://127.0.0.1:6379')
+
+EXT_DB = {
+    'SSH_HOST': os.getenv('SSH_HOST'),
+    'SSH_PORT': os.getenv('SSH_PORT'),
+    'SSH_USER': os.getenv('SSH_USER'),
+    'SSH_PASS': os.getenv('SSH_PASS'),
+    'EXT_DB_HOST': os.getenv('EXT_DB_HOST'),
+    'EXT_DB_PORT': os.getenv('EXT_DB_PORT'),
+    'EXT_DB_NAME': os.getenv('EXT_DB_NAME'),
+    'EXT_DB_USER': os.getenv('EXT_DB_USER'),
+    'EXT_DB_PASS': os.getenv('EXT_DB_PASS'),
+}

@@ -330,3 +330,10 @@ production
 /.vscode
 /magplan.sublime-project
 /magplan.sublime-workspace
+
+### TextMate ###
+*.tmproj
+*.tmproject
+tmtags
+.tm_properties
+ctags

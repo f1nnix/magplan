@@ -1,10 +1,15 @@
 import datetime
+import enum
+import hashlib
+import logging
+import mimetypes
+import os
+import typing as tp
 from typing import List
 
 import django
-import mistune
 from authtools.models import AbstractEmailUser
-from django.contrib.auth.models import User
+from botocore.exceptions import ClientError
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import JSONField
@@ -14,7 +19,14 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 
+from plan.integrations.images import S3Client
+from plan.integrations.posts import update_ext_db_xmd, replace_images_paths
 from xmd import render_md
+from xmd.mappers import s3_public_mapper as s3_image_mapper
+
+
+class StorageType(enum.Enum):
+    S3 = 1
 
 
 class AbstractBase(models.Model):
@@ -283,6 +295,7 @@ class Post(AbstractBase):
     meta = JSONField(default=dict)
 
     comments = GenericRelation('Comment')
+    is_locked = models.BooleanField(default=False)
 
     def imprint_updater(self, user: User) -> None:
         """Update updated_at timestamp and set provided user as last_updater.
@@ -358,6 +371,36 @@ class Post(AbstractBase):
     def description_html(self):
         return render_md(self.description, render_lead=False)
 
+    @property
+    def wp_id(self):
+        return self.meta.get('wpid')
+
+    def upload(self):
+        """Uploads self images to S3.
+
+        Matches all images and uploads post
+        contest to remote Wordpress instance.
+
+        This method is long-running, can cause time-outs
+        and should be run ONLY in async tasks with post lock.
+
+            with Lock():
+                post.upload()
+        """
+        if not self.wp_id:
+            return
+
+        for image in self.images:
+            image.upload_to_storage()
+
+        # Upload to external DB
+        xmd = replace_images_paths(
+            xmd=self.xmd,
+            attachments=self.images,
+            mapper=s3_image_mapper,
+        )
+        update_ext_db_xmd(self.wp_id, xmd)
+
 
 class Widget(AbstractBase):
     content = models.TextField()
@@ -374,6 +417,54 @@ class Attachment(AbstractBase):
     file = models.FileField(upload_to='attachments/%Y/%m/%d/', max_length=2048)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    meta = JSONField(default=dict)
+
+    S3_BUCKET_URL = 'https://{}.s3.eu-central-1.amazonaws.com'.format(
+        os.environ.get('S3_BUCKET_NAME', '')
+    )
+
+    @property
+    def s3_full_url(self):
+        return '{}/{}'.format(self.S3_BUCKET_URL, self._build_s3_path())
+
+    def _build_s3_path(self) -> str:
+        """Returns S3 object key path for upload.
+        """
+        dirname = os.path.dirname(self.file.name)
+        basename = os.path.basename(self.file.name)
+        hashed_dirname = hashlib.md5(dirname.encode()).hexdigest()
+
+        return '{}/{}/{}'.format(
+            hashed_dirname,
+            self.id,
+            basename
+        )
+
+    def _guess_self_mimetype(self) -> tp.Optional[str]:
+        try:
+            return mimetypes.guess_type(self.file.path, strict=False)[0]
+        except ValueError as exc:
+            return None
+
+    def _upload_to_s3(self):
+        with S3Client() as (s3, S3_BUCKET_NAME):
+            object_name = self._build_s3_path()
+            try:
+                s3_object = s3.Object(S3_BUCKET_NAME, object_name)
+                s3_object.upload_file(
+                    self.file.path,
+                    ExtraArgs={
+                        'ACL': 'public-read',
+                        'ContentType': self._guess_self_mimetype()
+                    })
+            except ClientError as e:
+                logging.error(e)
+                return False
+            return True
+
+    def upload_to_storage(self, storage_type: StorageType = StorageType.S3) -> None:
+        if storage_type == StorageType.S3:
+            self._upload_to_s3()
 
 
 class Comment(AbstractBase):
@@ -467,12 +558,10 @@ def save_user_profile(sender, instance, **kwargs):
 def render_xmd(sender, instance, **kwargs):
     if instance.has_text:
         instance.html = render_md(instance.xmd, attachments=instance.images)
-        
+
         # HACK: determine paywall status by persistance of
         #       paywall markup tab. Fix, if renderer changes.
         if '<div class="paywall-notice">' in instance.html:
             instance.is_paywalled = True
         else:
             instance.is_paywalled = False
-        
-    

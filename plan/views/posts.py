@@ -3,7 +3,6 @@ import io
 import os
 from typing import List
 from zipfile import ZIP_DEFLATED, ZipFile
-from plan.tasks.send_post_comment_notification import send_post_comment_notification
 
 import html2text
 from constance import config
@@ -11,8 +10,10 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.mail import EmailMultiAlternatives
+from django.db import transaction
 from django.http import HttpRequest, HttpResponseForbidden
 from django.shortcuts import HttpResponse, redirect, render
+from django.shortcuts import get_object_or_404
 from django.template import Context, Template
 from django.template.loader import render_to_string
 from slugify import slugify
@@ -25,7 +26,6 @@ from main.models import (
     Postype,
     Stage,
     User,
-    users_with_perm,
 )
 from plan.forms import (
     CommentModelForm,
@@ -33,6 +33,8 @@ from plan.forms import (
     PostExtendedModelForm,
     PostMetaForm,
 )
+from plan.tasks.send_post_comment_notification import send_post_comment_notification
+from plan.tasks.upload_post_to_wp import upload_post_to_wp
 
 
 def _get_arbitrary_chunk(post: Post) -> str:
@@ -51,7 +53,7 @@ def _get_arbitrary_chunk(post: Post) -> str:
 
 
 def _create_system_comment(
-    action_type, user, post, changelog=None, attachments=None, stage=None
+        action_type, user, post, changelog=None, attachments=None, stage=None
 ) -> Comment:
     """Create auto-generated system comment with post changes logs
     
@@ -166,28 +168,38 @@ def _authorize_stage_change(user: User, post: Post, new_stage_id: int) -> bool:
 
 def _save_attachments(files: List, post: Post, user: User) -> List[Attachment]:
     attachments = []
-    for file in files:
-        attachment = Attachment(
-            post=post, user=user, original_filename=file.name
-        )  # save original filename
 
-        # Slugify original filename and save with safe one
-        filename, extension = os.path.splitext(file.name)
-        file.name = "%s%s" % (slugify(filename), extension)
+    with transaction.atomic():
+        for file in files:
+            # Delete files with the same filename,
+            # uploaded for current post. Emulates overwrite without
+            # custom FileSystemStorage
+            Attachment.objects.filter(
+                post=post, original_filename=file.name
+            ).delete()
 
-        # Assign file object with slugified filename as name,
-        # original is copied by value
-        attachment.file = file
+            attachment = Attachment(
+                post=post, user=user, original_filename=file.name
+            )  # save original filename
 
-        if file.content_type in ("image/png", "image/jpeg"):
-            attachment.type = Attachment.TYPE_IMAGE
-        elif file.content_type == "application/pdf":
-            attachment.type = Attachment.TYPE_PDF
-        else:
-            attachment.type = Attachment.TYPE_FILE
+            # Slugify original filename and save with safe one
+            filename, extension = os.path.splitext(file.name)
+            file.name = "%s%s" % (slugify(filename), extension)
 
-        attachment.save()
-        attachments.append(attachment)
+            # Assign file object with slugified filename as name,
+            # original is copied by value
+            attachment.file = file
+
+            if file.content_type in ("image/png", "image/jpeg"):
+                attachment.type = Attachment.TYPE_IMAGE
+            elif file.content_type == "application/pdf":
+                attachment.type = Attachment.TYPE_PDF
+            else:
+                attachment.type = Attachment.TYPE_FILE
+
+            attachment.save()
+            attachments.append(attachment)
+
     return attachments
 
 
@@ -328,7 +340,7 @@ def set_stage(request, post_id, system=Comment.TYPE_SYSTEM):
 
     if request.method == "POST" and request.POST.get("new_stage_id"):
         if not _authorize_stage_change(
-            request.user, post, int(request.POST.get("new_stage_id"))
+                request.user, post, int(request.POST.get("new_stage_id"))
         ):
             return HttpResponseForbidden()
 
@@ -444,3 +456,15 @@ def download_content(request: HttpRequest, post_id: int) -> HttpResponse:
         resp = HttpResponse(s.getvalue(), content_type="application/x-zip-compressed")
         resp["Content-Disposition"] = f"attachment; filename=content_{post_id}.zip"
         return resp
+
+
+def send_to_wp(request: HttpRequest, post_id: int) -> HttpResponse:
+    if request.method == "GET":
+        post = get_object_or_404(Post, id=post_id)
+        upload_post_to_wp.delay(post.id)
+
+        messages.add_message(
+            request, messages.INFO, "Пост «%s» отправлен в Wordpress" % post
+        )
+
+        return redirect("posts_show", post.id)

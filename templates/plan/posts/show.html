@@ -64,46 +64,46 @@
             background: #f8f9fa;
 
         }
-        
-/*        .paywall-notice {
-           width: 100%;
-           text-align: center;
-           border-bottom: 1px solid #000;
-           line-height: 0.1em;
-           margin: 10px 0 20px;
-        }
 
-        .paywall-notice span {
-            background:#fff;
-            padding:0 10px;
-        }*/
-        
+        /*        .paywall-notice {
+                   width: 100%;
+                   text-align: center;
+                   border-bottom: 1px solid #000;
+                   line-height: 0.1em;
+                   margin: 10px 0 20px;
+                }
+
+                .paywall-notice span {
+                    background:#fff;
+                    padding:0 10px;
+                }*/
+
         .paywall-notice {
-          overflow: hidden;
-          text-align: center;
-          color: #828282;
-          margin: 2.66rem 0rem;
+            overflow: hidden;
+            text-align: center;
+            color: #828282;
+            margin: 2.66rem 0rem;
         }
 
         .paywall-notice:before,
         .paywall-notice:after {
-          background-color: #828282;
-          content: "";
-          display: inline-block;
-          height: 1px;
-          position: relative;
-          vertical-align: middle;
-          width: 50%;
+            background-color: #828282;
+            content: "";
+            display: inline-block;
+            height: 1px;
+            position: relative;
+            vertical-align: middle;
+            width: 50%;
         }
 
         .paywall-notice:before {
-          right: 0.5em;
-          margin-left: -50%;
+            right: 0.5em;
+            margin-left: -50%;
         }
 
         .paywall-notice:after {
-          left: 0.5em;
-          margin-right: -50%;
+            left: 0.5em;
+            margin-right: -50%;
         }
     </style>
 
@@ -131,6 +131,10 @@
                 <a class="dropdown-item" href="{% url 'posts_download_content' post.id %}">Изображения</a>
             </div>
         </div>
+
+        {% if post.wp_id %}
+            <a class="btn btn-info" href="{% url 'posts_send_to_wp' post.id %}">Загрузить в WordPress</a>
+        {% endif %}
     </div>
 
     <div class="row" style="margin-bottom: 1rem;">
@@ -196,12 +200,13 @@
             {% else %}
                 {% trans "edits" %} {{ post.editor }}{% if forloop.last is False %}, {% else %}.{% endif %}
             {% endif %}
-            
-            <br/>            
+
+            <br/>
             <span id="imprint">
-                Последнее изменение: {{ post.updated_at }}{% if post.last_updater %} от {{ post.last_updater }}{% endif %}
+                Последнее изменение: {{ post.updated_at }}{% if post.last_updater %} от
+                {{ post.last_updater }}{% endif %}
             </span>
-            
+
             <br/>
             <a class="" data-toggle="collapse" href="#description" role="button"
                aria-expanded="false" aria-controls="description">
@@ -231,7 +236,7 @@
     </div>
 
     {% include 'plan/posts/_stages.html' %}
-    
+
     {% with post=post %}{% include 'plan/posts/_paywall_alert.html' %}{% endwith %}
 
     <div class="row">

@@ -1,12 +1,17 @@
-from typing import List
+import typing as tp
 
 from xmd.lexers import PanelBlockLexer
+from xmd.mappers import plan_internal_mapper as default_image_mapper
 from xmd.markdown import ExtendedMarkdown
 from xmd.renderer import XMDRenderer
 
 
 def render_md(
-        md_text: str, attachments: List = None, render_lead=True, *args, **kwargs
+        md_text: str,
+        image_mapper: tp.Callable = default_image_mapper,
+        attachments: tp.List = None,
+        render_lead=True,
+        *args, **kwargs
 ) -> str:
     """Render markdown chunk with optional assets preprocessing.
 
@@ -14,9 +19,9 @@ def render_md(
     :param attachments: Attachments instances, used in provided MD
     :return: Rendered HTML string
     """
-    renderer = XMDRenderer(attachments=attachments)
+    renderer = XMDRenderer(image_mapper=image_mapper, attachments=attachments)
     block = PanelBlockLexer()
-    
+
     # If we don't want to render lead, fake lead existance
     if not render_lead:
         block.has_lead = True
