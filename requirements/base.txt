@@ -16,7 +16,7 @@ psycopg2==2.7.5
 python-slugify==1.2.6
 pytz==2018.5
 redis==3.3.8
-requests==2.19.1
+requests==2.20.0
 sqlparse==0.2.4
 tqdm==4.28.1
 Unidecode==1.0.22
