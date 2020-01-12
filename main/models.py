@@ -376,10 +376,10 @@ class Post(AbstractBase):
         return self.meta.get('wpid')
 
     def upload(self):
-        """Uploads self images to S3.
-
-        Matches all images and uploads post
-        contest to remote Wordpress instance.
+        """Uploads post and attachments to remote CMS
+        
+        * self images uploaded to S3.
+        * self content uploaded to WP with uploaded S3 images urls
 
         This method is long-running, can cause time-outs
         and should be run ONLY in async tasks with post lock.

@@ -44,9 +44,9 @@
   ignore_errors: yes
   tags: test
 
-- name: pull repository from Github to /srv/ directory
+- name: pull repository from Github to srv_directory
   git: accept_hostkey=yes
-       dest="/srv/{{ project_name }}"
+       dest="{{ source_directory }}"
        key_file="/home/{{ ansible_user }}/.ssh/id_rsa"
        repo="git@github.com:{{ repo_name }}.git"
        update=yes
@@ -59,7 +59,7 @@
 
 - name: fix permissions for cloned repo
   file:
-    path: "/srv/{{ project_name }}"
+    path: "{{ source_directory }}"
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
     recurse: yes

@@ -1,0 +1,7 @@
+- name: add systemd unit file for main app
+  template: src=celery.service.conf
+            dest=/etc/systemd/system/{{ project_name }}-celery.service
+  become: true
+  notify:
+    - restart celery
+  tags: celery

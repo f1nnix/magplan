@@ -38,16 +38,16 @@ server {
     # This is significantly faster than going through gunicorn.
 
     location /static/ {
-        alias {{ srv_directory }}/static/;
+        alias /opt/{{ project_name }}/static/;
     }
 
     location /media/ {
-        alias {{ srv_directory }}/media/;
+        alias /opt/{{ project_name }}/media/;
     }
 
 
     location / {
-        proxy_pass         http://127.0.0.1:{{ gunicorn_port }};
+        proxy_pass         http://127.0.0.1:{{ uwsgi_port }};
         proxy_redirect     off;
         proxy_set_header   Host             $http_host;
         proxy_set_header   X-Real-IP        $remote_addr;
