@@ -2,6 +2,7 @@
   gather_facts: true
   roles:
   - postgresql
+  - redis
   - webapp
   vars_files:
   - group_vars/production

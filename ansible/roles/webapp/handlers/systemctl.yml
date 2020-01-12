@@ -1,0 +1,21 @@
+- name: restart uwsgi
+  become: true
+  systemd:
+    name: "{{ project_name }}"
+    state: restarted
+    daemon_reload: yes
+  
+- name: restart celery
+  become: true
+  systemd:
+    name: "{{ project_name }}-celery"
+    state: restarted
+    daemon_reload: yes
+
+- name: restart rsyslog
+  become: true
+  systemd:
+    name: rsyslog
+    state: restarted
+    daemon_reload: no
+    

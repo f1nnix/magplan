@@ -6,5 +6,5 @@
 - include: virtualenv.yml
 # Run Django management commands.
 - include: django.yml
-# Install and configure supervisor.
-#- include: supervisor.yml
+- include: celery.yml
+- include: rsyslog.yml

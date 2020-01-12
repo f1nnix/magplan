@@ -25,7 +25,7 @@
     - python3-venv
 
 - name: manually figure out latest Git commit
-  command: git rev-parse HEAD chdir={{ srv_directory }}
+  command: git rev-parse HEAD chdir={{ source_directory }}
   register: git_status
 
 - name: determine if virtualenv with this Git hash exists
@@ -37,7 +37,7 @@
   when: venv_dir.stat.isdir is not defined
   notify:
     - delete other virtualenvs
-    - restart gunicorn
+    - restart uwsgi
 
 - name: move old "current" symlink to "previous" if virtualenv has changed
   shell: mv
@@ -65,7 +65,7 @@
 - name: update virtualenv with requirements
   shell: >
     {{ virtualenv_folder_root }}/current/bin/pip
-    install -r {{ srv_directory }}/requirements/{{ environment_type }}.txt
+    install -r {{ source_directory }}/requirements/{{ environment_type }}.txt
     --upgrade
   notify:
-    - restart gunicorn
+    - restart uwsgi
