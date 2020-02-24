@@ -1,6 +1,6 @@
 import datetime
 import os
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 import django_filters
 import html2text
@@ -80,35 +80,38 @@ def index(request):
     })
 
 
-def _get_suggestion_issues() -> Tuple[Issue, List[Issue]]:
-    """Get issues for Post form issues suggesion.
+def _get_suggestion_issues() -> Tuple[Optional[Issue], List[Issue]]:
+    """Returns issues suggesion for "new Post" form.
 
-    Retrieve last five issues and determine, which of them are opened
-    to set the oldest opened as intial placeholder for issues field.
+    Retrieves five last opened issues, where last in array is newest
     """
-    # Cast to list to provide List buil-ins
-    last_issues = list(Issue.objects.order_by('-number')[:4])
+    article_stages_for_opened_issues = (
+        'waiting',
+        'proofreading_editor',
+        'precheck',
+        'spellcheck',
+        'markup',
+        'proofreading_spell',
+        'proofreading_chief_dpt',
+        'proofreading_chief',
+        'publishing',
+    )
+    opened_issues = \
+        Issue.objects \
+            .filter(posts__stage__slug__in=article_stages_for_opened_issues) \
+            .order_by('number') \
+            .distinct() \
+            .all()[:5]
 
-    # Get all opened issues at once to prevent N+1 lookups
-    opened_issues = Issue.objects.filter(
-        posts__stage__slug__in=['waiting', 'proofreading_editor', 'precheck',
-                                'spellcheck', 'markup', 'proofreading_spell',
-                                'proofreading_chief_dpt', 'proofreading_chief',
-                                'publishing']) \
-        .distinct()
+    if not opened_issues:
+        return None, []
 
-    # By default we consider the newest issue to initial suggesion
-    issue_to_pop = 0
-    for i, last_issue in enumerate(last_issues):
-        # Determine, if issue is opened (perists in opened_issues)
-        # If found, update issue to initial suggesion with next found
-        if next((opened_issue for opened_issue in opened_issues if opened_issue.id == last_issue.id), None):
-            issue_to_pop = i
+    # Convert QuerySet to ordinary list to split for initial and least
+    opened_issues: List[Issue] = list(opened_issues)
+    initial_issue = opened_issues.pop()
+    opened_issues.reverse()
 
-    # Extract initial suggestion from list
-    # FIXME: this will fail if no issues exist in DB
-    initial_issue = last_issues.pop(issue_to_pop)
-    return initial_issue, last_issues
+    return initial_issue, opened_issues
 
 
 @login_required

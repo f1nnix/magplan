@@ -1,8 +1,7 @@
 import pytest
 from django.test import SimpleTestCase
-from faker import Faker
 from django_dynamic_fixture import G
-
+from faker import Faker
 
 from main.models import Post, Postype, Section, Stage, User, Idea, Comment, Issue
 
@@ -89,6 +88,20 @@ def stages():
 
 
 @pytest.fixture
+def make_stage():
+    stage_ = None
+
+    def make_stage_(**kwargs):
+        nonlocal stage_
+        stage_ = G(Stage, **kwargs)
+        return stage_
+
+    yield make_stage_
+    if stage_:
+        stage_.delete()
+
+
+@pytest.fixture
 def section():
     section_ = Section.objects.create(title=fake.word(ext_word_list=None).capitalize(),
                                       slug=fake.word(ext_word_list=None).lower(),
@@ -127,6 +140,25 @@ def post(user, users, postype, section, stages):
 
 
 @pytest.fixture
+def make_post():
+    post_ = None
+
+    def make_post_(**kwargs):
+        nonlocal post_
+        post_ = G(Post, **kwargs)
+
+        if 'issues' in kwargs:
+            post_.issues.set(kwargs['issues'])
+            post_.save()
+
+        return post_
+
+    yield make_post_
+    if post_:
+        post_.delete()
+
+
+@pytest.fixture
 def idea(user, post):
     idea_ = Idea.objects.create(
         title='foo',
@@ -149,7 +181,7 @@ def comment(user, post):
     comment_.commentable = post
     comment_.type = Comment.TYPE_PRIVATE
     comment_.user = user
-    
+
     comment_.save()
 
     yield comment_
@@ -171,13 +203,22 @@ def idea_comment(user, idea):
 
     comment_.delete()
 
+
 @pytest.fixture
-def issue():
-    issue_ = G(Issue)
+def make_issue():
+    issue_ = None
 
-    yield issue_
+    def make_issue_(**kwargs):
+        nonlocal issue_
+        issue_ = G(Issue, **kwargs)
+        return issue_
 
-    issue_.delete()
+    yield make_issue_
+
+    if issue_:
+        issue_.delete()
 
 
-
+@pytest.fixture
+def issue(make_issue):
+    yield make_issue()

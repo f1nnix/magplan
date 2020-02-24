@@ -1,6 +1,7 @@
 """
 Every block element test will be automatically
 wrapped inside `<p></p>\n`. Thats why every block
+
 test should include this wrapper tag.
 """
 from io import BytesIO
@@ -15,27 +16,20 @@ from main.models import Attachment
 from xmd.renderer import XMDRenderer
 from xmd.mappers import plan_internal_mapper
 
+
 @pytest.mark.django_db
 class TestImage(TestCase):
     MOCK_SRC = 'dummy.jpg'
     MOCK_TITLE = 'title'
     MOCK_ALT_TEXT = 'alt_text'
-    
+
     def setUp(self):
-        file1 = File(
-            name='file1.jpg',
-            file=BytesIO(b'abcdef')
-        )
+        file1 = File(name='file1.jpg', file=BytesIO(b'abcdef'))
         attachment1 = G(Attachment, original_filename='user_friendly_filename1.jpg', file=file1)
 
-        
-
         self.mock_image_mapper = Mock()
-        
-        self.renderer = XMDRenderer(
-            image_mapper=self.mock_image_mapper,
-            attachments=[attachment1],
-        )
+
+        self.renderer = XMDRenderer(image_mapper=self.mock_image_mapper, attachments=[attachment1])
 
         self.expected_html = (
             '<figure>'
@@ -45,7 +39,7 @@ class TestImage(TestCase):
 
     def test_render_image(self):
         self.mock_image_mapper.return_value = self.MOCK_SRC
-        
+
         html = self.renderer.image(self.MOCK_SRC, self.MOCK_TITLE, self.MOCK_ALT_TEXT)
 
         self.mock_image_mapper.assert_called_with(self.MOCK_SRC, self.renderer.attachments)
