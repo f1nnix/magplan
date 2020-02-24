@@ -54,6 +54,6 @@ class XMDEditorType(ChoicePreference):
         ('plain', 'Plain-text редактор'),
         ('markdown', 'Markdown-редактор'),
     ]
-    default = 'plain'
+    default = 'markdown'
     widget = forms.Select(attrs={'class': 'form-control'})
     verbose_name = 'Редактор для статей в XMD'
