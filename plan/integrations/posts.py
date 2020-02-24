@@ -8,12 +8,26 @@ from sshtunnel import SSHTunnelForwarder
 
 from xmd.mappers import s3_public_mapper
 
+img_pattern = re.compile(
+    '^'  # Only from beginning
+    ' *'  # Some leading spaces may persist
+    '!\[.*?\]\((.+)\)'  # MD image pattern
+    ' *?'  # Some ending spaces may persis
+    '$'  # Capture urls only from last section
+)
+
+url_replace_pattern = re.compile(
+    '\]\((.+)\)$'  # FIXME: match real last () group
+)
+
 
 @contextmanager
 def Lock(post):
     post.is_locked = True
     post.save()
+    
     yield
+    
     post.is_locked = False
     post.save()
 
@@ -32,18 +46,6 @@ def replace_images_paths(xmd: str, attachments: tp.List, mapper: tp.Callable = N
     """
     if not mapper:
         mapper = s3_public_mapper
-
-    img_pattern = re.compile(
-        '^'  # Only from beginning
-        ' *'  # Some leading spaces may persis 
-        '!\[.*?\]\((.+)\)'  # MD image pattern
-        ' *?'  # Some ending spaces may persis
-        '$'  # Capture urls only from last section
-    )
-
-    url_replace_pattern = re.compile(
-        '\]\((.+)\)$'  # FIXME: match real last () group
-    )
 
     result_lines = []
 
@@ -84,14 +86,25 @@ def update_ext_db_xmd(post_id: int, xmd: str):
         return
 
     conf = settings.EXT_DB
-    with SSHTunnelForwarder(
-            (conf['SSH_HOST'], int(conf['SSH_PORT'])),
-            ssh_username=conf['SSH_USER'],
-            ssh_password=conf['SSH_PASS'],
-            remote_bind_address=(conf['EXT_DB_HOST'], int(conf['EXT_DB_PORT']))) as tunnel:
-        conn = pymysql.connect(host=conf['EXT_DB_HOST'], user=conf['EXT_DB_USER'],
-                               passwd=conf['EXT_DB_PASS'], db=conf['EXT_DB_NAME'],
-                               port=tunnel.local_bind_port)
+    
+    # Prepare settings for SSH tunnel connection
+    ssh_conn_args = ((conf['SSH_HOST'], int(conf['SSH_PORT'])),)
+    ssh_conn_kwargs = {
+        'ssh_username': conf['SSH_USER'],
+        'ssh_password': conf['SSH_PASS'],
+        'remote_bind_address': (conf['EXT_DB_HOST'], int(conf['EXT_DB_PORT'])
+        )
+    }
+    
+    with SSHTunnelForwarder(*ssh_conn_args, **ssh_conn_kwargs) as tunnel:
+        mysql_conn_settings = {
+            'host': conf['EXT_DB_HOST'],
+            'user': conf['EXT_DB_USER'],
+            'passwd': conf['EXT_DB_PASS'],
+            'db': conf['EXT_DB_NAME'],
+            'port': tunnel.local_bind_port
+        }
+        conn = pymysql.connect(**mysql_conn_settings)
         with conn.cursor() as cursor:
             # TODO: rewrite with update or insert
             retrieve_query = 'SELECT meta_value FROM wp_postmeta WHERE post_id=%s and meta_key="md" limit 1;'

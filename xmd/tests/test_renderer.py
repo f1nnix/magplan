@@ -5,7 +5,7 @@ test should include this wrapper tag.
 """
 from io import BytesIO
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 
 import pytest
 from django.core.files import File
@@ -13,10 +13,14 @@ from django_dynamic_fixture import G
 
 from main.models import Attachment
 from xmd.renderer import XMDRenderer
-
+from xmd.mappers import plan_internal_mapper
 
 @pytest.mark.django_db
 class TestImage(TestCase):
+    MOCK_SRC = 'dummy.jpg'
+    MOCK_TITLE = 'title'
+    MOCK_ALT_TEXT = 'alt_text'
+    
     def setUp(self):
         file1 = File(
             name='file1.jpg',
@@ -24,23 +28,25 @@ class TestImage(TestCase):
         )
         attachment1 = G(Attachment, original_filename='user_friendly_filename1.jpg', file=file1)
 
+        
+
+        self.mock_image_mapper = Mock()
+        
         self.renderer = XMDRenderer(
-            attachments=[attachment1]
+            image_mapper=self.mock_image_mapper,
+            attachments=[attachment1],
         )
 
         self.expected_html = (
             '<figure>'
-            '<img src="dummy.jpg" alt="foo" /><figcaption>foo</figcaption>'
+            '<img src="dummy.jpg" alt="alt_text" /><figcaption>alt_text</figcaption>'
             '</figure>'
         )
 
-    @patch('xmd.renderer.get_attachment_original_filename')
-    def test_render_image(self, mock_get_attachment_original_filename):
-        mock_get_attachment_original_filename.return_value = 'dummy.jpg'
+    def test_render_image(self):
+        self.mock_image_mapper.return_value = self.MOCK_SRC
+        
+        html = self.renderer.image(self.MOCK_SRC, self.MOCK_TITLE, self.MOCK_ALT_TEXT)
 
-        html = self.renderer.image('bar', 'foo', 'foo')
-
-        mock_get_attachment_original_filename.assert_called_with(
-            'bar', self.renderer.attachments
-        )
+        self.mock_image_mapper.assert_called_with(self.MOCK_SRC, self.renderer.attachments)
         assert html == self.expected_html
