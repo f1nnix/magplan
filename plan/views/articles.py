@@ -1,39 +1,51 @@
 import datetime
+import typing as tp
 
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 from django.shortcuts import render, redirect
+from django.utils.timezone import now
 
-from main.models import Post, Postype, Stage
+from main.models import Post, Postype, Stage, User
 from plan.forms import WhitelistedPostExtendedModelForm, AdPostExtendedModelForm
+
+
+def _get_filtered_posts_queryset(filter_: tp.Optional[str], current_user: User) -> QuerySet:
+    """Returns articles QuerySet, based on user request filters.
+    """
+    posts = Post.objects \
+        .prefetch_related('section', 'stage', 'issues__magazine', 'editor__profile') \
+        .order_by('-updated_at')
+
+    # Get filtered queryset
+    if filter_ == 'self':
+        posts = posts.filter(editor=current_user)
+    elif filter_ == 'overdue':
+        posts = posts \
+            .filter(finished_at__lte=datetime.datetime.now()) \
+            .exclude(stage__slug='vault') \
+            .exclude(stage__slug='published')
+    elif filter_ == 'vault':
+        posts = posts.filter(stage__slug='vault')
+    else:
+        # Render recent by default
+        datetime_now = now()
+        filter_kwargs = {
+            'updated_at__gte': datetime_now - datetime.timedelta(2 * 30),
+            'updated_at__lte': datetime_now,
+        }
+        posts = posts.filter(**filter_kwargs)
+
+    return posts
 
 
 @login_required
 def index(request):
-    posts = Post.objects.order_by('-created_at') \
-        .prefetch_related('section', 'stage', 'issues__magazine', 'editor__profile') \
-        .order_by('-updated_at')
-
-    filter = request.GET.get('filter')
-
-    # render recent by default
-    if filter is None:
-        now = datetime.datetime.now()
-        posts = posts.filter(created_at__gte=(now - datetime.timedelta(2 * 30)),
-                             created_at__lte=now)
-
-    # get filtered queryset
-    if filter == 'self':
-        posts = posts.filter(editor=request.user)
-    elif filter == 'overdue':
-        posts = posts.filter(finished_at__lte=datetime.datetime.now()).exclude(stage__slug='vault').exclude(
-            stage__slug='published')
-    elif filter == 'vault':
-        posts = posts.filter(stage__slug='vault')
+    filter_ = request.GET.get('filter')
+    posts: QuerySet = _get_filtered_posts_queryset(filter_, request.user)
 
     return render(request, 'plan/articles/index.html', {
         'posts': posts,
-
         'filter_': filter,
     })
 
