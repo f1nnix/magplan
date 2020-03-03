@@ -8,7 +8,7 @@ django-debug-toolbar==1.10.1
 django-filter==2.0.0
 django-picklefield==1.1.0
 django-polymorphic==2.0.3
-Django==2.1.2
+Django==2.2.10
 html2text==2018.1.9
 idna==2.7
 mistune==0.8.4
