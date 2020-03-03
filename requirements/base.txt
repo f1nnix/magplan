@@ -25,3 +25,5 @@ django-dynamic-preferences==1.7.1
 boto3==1.10.45
 sshtunnel==0.1.5
 PyMySQL==0.9.3
+wiki==0.5
+django-decorator-include==2.1

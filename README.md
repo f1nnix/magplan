@@ -12,7 +12,8 @@ Project management system for publishers, magazines and content creators, writte
 * discussions, email notifications;
 * fees and payments management;
 * team actions logs;
-* publising content to S3 and WordPress with async tasks. 
+* publising content to S3 and WordPress with async tasks;
+* extensible [wiki](http://www.django-wiki.org).
 
 ![](docs/screenshot1.jpg)
 

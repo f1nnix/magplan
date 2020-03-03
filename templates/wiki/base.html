@@ -1,0 +1,127 @@
+{% extends "wiki/base_site.html" %}
+{% load i18n %}
+{% load sekizai_tags i18n wiki_tags static %}
+{% block wiki_site_title %} - Wiki{% endblock %}
+
+{% block wiki_navbar %}
+    <div class="navbar navbar-fixed-top navbar-inverse">
+        <div class="container">
+            <div class="navbar-header">
+                <!-- .navbar-toggle is used as the toggle for collapsed navbar content -->
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                {% block wiki_header_branding %}
+                    <a class="navbar-brand" href="/">Сводка</a>
+                {% endblock %}
+            </div>
+            <div class="navbar-collapse collapse">
+                <form class="navbar-form navbar-right" id="wiki-search-form" method="GET" action="{% spaceless %}
+              {% if article or urlpath %}
+                {% url 'wiki:search' article_id=article.id path=urlpath.path %}
+              {% else %}
+                {% url 'wiki:search' %}
+              {% endif %}
+            {% endspaceless %}"
+                >
+                    <div class="input-group">
+                        <input type="search" class="form-control search-query" name="q" placeholder="{% spaceless %}
+                {% if article or urlpath %}
+                   {% trans "Search from current article..." %}
+                {% else %}
+                  {% trans "Search whole wiki..." %}
+                {% endif %}
+              {% endspaceless %}"/>
+                        <span class="input-group-btn">
+                <button class="btn btn-default" type="submit">
+                  <span class="fa fa-search"></span>
+                </button>
+              </span>
+                    </div><!-- /input-group -->
+                </form>
+                <div class="navbar-right">
+                    {% if user.is_authenticated %}
+                        <ul class="nav navbar-nav">
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                    <span class="badge notification-cnt">0</span>
+                                    {{ user }}
+                                    <b class="caret"></b>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    {% if "ACCOUNT_HANDLING"|wiki_settings %}
+                                        <li>
+                                            <a href="{% url 'wiki:profile_update' %}">
+                                                <i class="fa fa-gear"></i>
+                                                {% trans "Account Settings" %}
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                    {# <li> #}
+                                    {#   <a href="{{ "LOGOUT_URL"|wiki_settings }}"> #}
+                                    {#     <i class="fa fa-power-off"></i> #}
+                                    {#     {% trans "Log out" %} #}
+                                    {#   </a> #}
+                                    {# </li> #}
+                                    {% if user.is_superuser %}
+                                        <li>
+                                            <a href="{% url 'wiki:deleted_list' %}">
+                                                <i class="fa fa-trash-o"></i>
+                                                {% trans "Deleted articles" %}
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                    {% if "wiki.plugins.notifications"|plugin_enabled %}
+                                        {% include "wiki/plugins/notifications/menubaritem.html" %}
+                                    {% endif %}
+                                    {% if "wiki.plugins.globalhistory"|plugin_enabled %}
+                                        {% include "wiki/plugins/globalhistory/menubaritem.html" %}
+                                    {% endif %}
+                                </ul>
+                            </li>
+                        </ul>
+                    {% else %}
+                        <ul class="nav navbar-nav">
+                            <li>
+                                <a href="{% login_url as wiki_login_url %}{{ wiki_login_url }}">{% trans "Log in" %}</a>
+                            </li>
+                            {% if "ACCOUNT_HANDLING"|wiki_settings %}
+                                <li>
+                                    <a href="{% url 'wiki:signup' %}">{% trans "Sign up" %}</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    {% endif %}
+                </div>
+                {% block wiki_header_navlinks %}
+                    <ul class="nav navbar-nav">
+
+                        {% if perms.main.manage_authors %}
+                            <li><a href="{% url 'authors_index' %}">Авторы</a></li>
+                        {% endif %}
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-haspopup="true"
+                               aria-expanded="false">Выпуски <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                {% for issue in navbar_issues %}
+                                    <li><a href="{% url 'issues_show' issue.id %}">{{ issue }}</a></li>
+                                {% endfor %}
+                                <li role="separator" class="divider"></li>
+                                <li><a href="{% url 'issues_index' %}">Все выпуски</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="{% url 'ideas_index' %}">Идеи</a></li>
+                        <li><a href="{% url 'articles_index' %}">Статьи</a></li>
+                        <li class="active"><a href="{% url 'wiki:root' %}">Wiki</a></li>
+
+                    </ul>
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+

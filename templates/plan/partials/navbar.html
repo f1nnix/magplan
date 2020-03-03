@@ -34,6 +34,10 @@
                 <li class="nav-item {% if navbar_current == 'articles' %}active{% endif %}">
                     <a class="nav-link" href="{% url 'articles_index' %} ">Статьи</a>
                 </li>
+                
+                <li class="nav-item {% if navbar_current == 'wiki' %}active{% endif %}">
+                    <a class="nav-link" href="{% url 'wiki:root' %} ">Вики</a>
+                </li>
             </ul>
 
 

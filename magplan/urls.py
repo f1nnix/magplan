@@ -17,6 +17,10 @@ from django.contrib import admin
 from django.urls import include, path  # For django versions from 2.0 and up
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.auth.decorators import login_required
+
+from decorator_include import decorator_include
+
 
 admin.site.site_header = 'Magplan'
 
@@ -25,7 +29,9 @@ urlpatterns = [
 
     path('admin/', include('plan.urls')),
     path('manage/', admin.site.urls),
-
+	
+	path('notifications/', include('django_nyt.urls')),
+    path('wiki/', decorator_include(login_required, 'wiki.urls')),
     path('', include('main.urls')),
 ]
 
