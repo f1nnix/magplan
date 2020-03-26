@@ -337,3 +337,4 @@ production
 tmtags
 .tm_properties
 ctags
+/.nova

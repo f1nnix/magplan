@@ -43,10 +43,9 @@ def _get_filtered_posts_queryset(filter_: tp.Optional[str], current_user: User) 
 def index(request):
     filter_ = request.GET.get('filter')
     posts: QuerySet = _get_filtered_posts_queryset(filter_, request.user)
-
     return render(request, 'plan/articles/index.html', {
         'posts': posts,
-        'filter_': filter,
+        'filter_': filter_,
     })
 
 
