@@ -156,8 +156,8 @@ def _authorize_stage_change(user: User, post: Post, new_stage_id: int) -> bool:
     :return: True if authorized, otherwise False
     """
     legit_stages = (post.stage.prev_stage_id, post.stage.next_stage_id)
-
-    if new_stage_id in legit_stages and post.stage.assignee == user:
+    
+    if new_stage_id in legit_stages and post.assignee == user:
         return True
 
     if user.has_perm("main.edit_extended_post_attrs"):
