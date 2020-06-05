@@ -225,4 +225,4 @@ SITE_ID = 1
 
 WIKI_ACCOUNT_HANDLING = False
 
-LOGIN_URL = '/accounts/login'
+LOGIN_URL = '/accounts/login/'
