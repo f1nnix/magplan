@@ -43,7 +43,7 @@ def index(request):
             if idea.author_type == Idea.AUTHOR_TYPE_EXISTING:
                 form.save_m2m()
 
-            # Clear idea form to prevent rendering prefilled form
+            # Clear idea form to prevent rendering pre-filled form
             form = IdeaModelForm()
 
             messages.add_message(
@@ -137,11 +137,10 @@ def vote(request, idea_id):
     idea = Idea.objects.prefetch_related('votes__user').get(id=idea_id)
 
     if request.method == 'POST':
-        vote = Vote(score=request.POST.get('score', 1),
-                    idea=idea, user=request.user)
+        vote = Vote(score=request.POST.get('score', 1), idea=idea, user=request.user)
         vote.save()
-        messages.add_message(request, messages.SUCCESS,
-                             'Ваш голос учтен. Спасибо!')
+
+        messages.add_message(request, messages.SUCCESS, 'Ваш голос учтен. Спасибо!')
 
     return redirect('ideas_show', idea_id=idea.id)
 
