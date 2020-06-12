@@ -1,3 +1,5 @@
+from typing import Optional
+
 import pytest
 from django.test import SimpleTestCase
 from django_dynamic_fixture import G
@@ -15,21 +17,23 @@ def _():
 
 
 @pytest.fixture
-def user_builder():
-    user = None
+def make_user():
+    user: Optional[User] = None
 
-    def make_user():
+    def make_user_(**kwargs):
         nonlocal user
-        user = User(
-            email=fake.safe_email(),
-            is_superuser=False,
-        )
+
+        kwargs['is_superuser'] = kwargs.get('is_superuser', False)
+        kwargs['email'] = kwargs.get('email', fake.safe_email())
+
+        user = User(**kwargs)
+
         user.set_password(fake.word(ext_word_list=None))
         user.save()
 
         return user
 
-    yield make_user
+    yield make_user_
 
     user.delete()
 
@@ -103,9 +107,11 @@ def make_stage():
 
 @pytest.fixture
 def section():
-    section_ = Section.objects.create(title=fake.word(ext_word_list=None).capitalize(),
-                                      slug=fake.word(ext_word_list=None).lower(),
-                                      color=fake.safe_hex_color()[1:])
+    section_ = Section.objects.create(
+        title=fake.word(ext_word_list=None).capitalize(),
+        slug=fake.word(ext_word_list=None).lower(),
+        color=fake.safe_hex_color()[1:]
+    )
     yield section_
     section_.delete()
 
@@ -217,6 +223,21 @@ def make_issue():
 
     if issue_:
         issue_.delete()
+
+
+@pytest.fixture
+def make_idea():
+    idea_: Optional[Idea] = None
+
+    def make_idea_(**kwargs):
+        nonlocal idea_
+
+        idea_ = Idea.objects.create(**kwargs)
+        return idea_
+
+    yield make_idea_
+
+    idea_.delete()
 
 
 @pytest.fixture
