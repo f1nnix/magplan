@@ -1,0 +1,10 @@
+<h1>Новая идея "{{ idea.title }}"</h1>
+
+<p>Ее предложил {{ idea.editor }}. Вот описание:</p>
+
+<blockquote>
+    {{ idea.description_html|safe }}
+</blockquote>
+
+<p>Посмотреть идею можно <a href="{{ APP_URL }}{% url 'ideas_show' idea.id %}">по этой ссылке</a>.
+</p>

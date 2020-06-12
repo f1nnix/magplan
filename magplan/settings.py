@@ -44,18 +44,18 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_admin_listfilter_dropdown',
     'dynamic_preferences',
-	# wiki
+    # wiki
     'django.contrib.sites.apps.SitesConfig',
-	'django.contrib.humanize.apps.HumanizeConfig',
-	'django_nyt.apps.DjangoNytConfig',
-	'mptt',
-	'sekizai',
-	'sorl.thumbnail',
-	'wiki.apps.WikiConfig',
-	'wiki.plugins.attachments.apps.AttachmentsConfig',
-	'wiki.plugins.notifications.apps.NotificationsConfig',
-	'wiki.plugins.images.apps.ImagesConfig',
-	'wiki.plugins.macros.apps.MacrosConfig',
+    'django.contrib.humanize.apps.HumanizeConfig',
+    'django_nyt.apps.DjangoNytConfig',
+    'mptt',
+    'sekizai',
+    'sorl.thumbnail',
+    'wiki.apps.WikiConfig',
+    'wiki.plugins.attachments.apps.AttachmentsConfig',
+    'wiki.plugins.notifications.apps.NotificationsConfig',
+    'wiki.plugins.images.apps.ImagesConfig',
+    'wiki.plugins.macros.apps.MacrosConfig',
     # Comment the following line if you don't want to use user preferences
     'dynamic_preferences.users.apps.UserPreferencesConfig',
     'main',
@@ -93,7 +93,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'plan.context_processors.inject_last_issues',  # TODO: use context processor only for plan app
                 'plan.context_processors.inject_app_url',  # TODO: use context processor only for plan app
-                 "sekizai.context_processors.sekizai", # wiki
+                "sekizai.context_processors.sekizai",  # wiki
             ]
         },
     }
@@ -219,7 +219,6 @@ EXT_DB = {
     'EXT_DB_USER': os.getenv('EXT_DB_USER'),
     'EXT_DB_PASS': os.getenv('EXT_DB_PASS'),
 }
-
 
 SITE_ID = 1
 
