@@ -48,17 +48,15 @@ def test_create(_, user, make_user, client):
 @pytest.mark.django_db
 @patch('plan.views.ideas.Idea._send_vote_notification')
 def test_send_vote_notifications(
-        mock_send_vote_notification,
-        _, anonymous_client, make_user, make_idea,
+        mock_send_vote_notification, make_user, make_idea,
 ):
     # HACK: deactivate all users, created by fixtures to clean test stand
     User.objects.update(is_active=False)
 
     idea_editor: User = make_user(is_active=True)
-    anonymous_client.force_login(user=idea_editor)
     idea: Idea = make_idea(editor=idea_editor)
 
-    user_1: User = make_user(is_active=False)
+    _: User = make_user(is_active=False)  # should not be sent to this user
     user_2: User = make_user(is_active=True)
 
     idea.send_vote_notifications()
