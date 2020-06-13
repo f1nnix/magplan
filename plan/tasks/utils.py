@@ -7,7 +7,7 @@ from main.models import Comment, User
 
 
 def _get_whitelisted_recipients(pref_name: str) -> set:
-    """Get all users, who should recieve all
+    """Get all users, who should receive all
     post comments notifications
 
     NB: relies on default setting == 'related'!
@@ -44,7 +44,7 @@ def _can_recieve_notification(
         logger.debug('Recipient %s decliened as it\'s system user' % user.email)
         return False
 
-    # Diable notification for restricted notification users.
+    # Disable notification for restricted notification users.
     # This util function is used only in plan app
     # so it's better to hardcode section name
     # for better re-usabillty

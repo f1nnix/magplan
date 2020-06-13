@@ -10,6 +10,6 @@ def client(user):
 
 
 @pytest.fixture
-def anonymous_client(user):
+def anonymous_client():
     test_client = Client()
     yield test_client

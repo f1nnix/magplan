@@ -14,6 +14,7 @@ from django.template.loader import render_to_string
 
 from main.models import Idea, Issue, Vote
 from plan.forms import CommentModelForm, IdeaModelForm, PostBaseModelForm
+from plan.tasks.send_idea_notification import send_idea_notification
 from plan.tasks.send_idea_comment_notification import send_idea_comment_notification
 
 IDEAS_PER_PAGE = 20
@@ -43,7 +44,9 @@ def index(request):
             if idea.author_type == Idea.AUTHOR_TYPE_EXISTING:
                 form.save_m2m()
 
-            # Clear idea form to prevent rendering prefilled form
+            send_idea_notification.delay(idea.id)
+
+            # Clear idea form to prevent rendering pre-filled form
             form = IdeaModelForm()
 
             messages.add_message(
@@ -135,13 +138,18 @@ def show(request, idea_id):
 @login_required
 def vote(request, idea_id):
     idea = Idea.objects.prefetch_related('votes__user').get(id=idea_id)
+    vote = Vote(idea=idea, user=request.user)
 
+    score: int
     if request.method == 'POST':
-        vote = Vote(score=request.POST.get('score', 1),
-                    idea=idea, user=request.user)
-        vote.save()
-        messages.add_message(request, messages.SUCCESS,
-                             'Ваш голос учтен. Спасибо!')
+        score = request.POST.get('score', 1)
+    else:
+        score = request.GET.get('score', 1)
+
+    vote.score = score
+    vote.save()
+
+    messages.add_message(request, messages.SUCCESS, 'Ваш голос учтен. Спасибо!')
 
     return redirect('ideas_show', idea_id=idea.id)
 

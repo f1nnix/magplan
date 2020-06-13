@@ -8,16 +8,21 @@ import typing as tp
 from typing import List
 
 import django
+import html2text
 from authtools.models import AbstractEmailUser
 from botocore.exceptions import ClientError
+from constance import config
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import JSONField
+from django.core.mail import EmailMultiAlternatives
 from django.db import models
 from django.db.models import Q
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
+from django.template.loader import render_to_string
 from django.utils import timezone
+from dynamic_preferences.users.models import UserPreferenceModel
 
 from plan.integrations.images import S3Client
 from plan.integrations.posts import update_ext_db_xmd, replace_images_paths
@@ -190,6 +195,33 @@ class Idea(AbstractBase):
         if vote:
             return True
         return False
+
+    def _send_vote_notification(self, recipient: User) -> None:
+        subject = f'Новая идея «{self.title}». Голосуйте!'
+
+        context = {
+            'idea': self,
+            'APP_URL': os.environ.get('APP_URL')
+        }
+        message_html_content: str = render_to_string('email/new_idea.html', context)
+        message_text_content: str = html2text.html2text(message_html_content)
+
+        msg = EmailMultiAlternatives(subject, message_text_content, config.PLAN_EMAIL_FROM, [recipient.email])
+        msg.attach_alternative(message_html_content, 'text/html')
+        msg.send()
+
+    def send_vote_notifications(self) -> None:
+        active_users: tp.Set[User] = set(
+            User.objects.filter(is_active=True).exclude(id=self.editor_id)
+        )
+        preferences: tp.List[UserPreferenceModel] = UserPreferenceModel.objects.prefetch_related('instance').filter(
+            section='plan', name='new_idea_notification', raw_value='yes'
+        )
+        users_allowed_ideas_notifications: tp.Set[User] = {p.instance for p in preferences}
+        recipients: tp.Set = active_users & users_allowed_ideas_notifications
+
+        for recipient in recipients:
+            self._send_vote_notification(recipient)
 
     def __str__(self):
         return self.title

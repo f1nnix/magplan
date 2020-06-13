@@ -57,3 +57,15 @@ class XMDEditorType(ChoicePreference):
     default = 'markdown'
     widget = forms.Select(attrs={'class': 'form-control'})
     verbose_name = 'Редактор для статей в XMD'
+
+@user_preferences_registry.register
+class NewIdeaNotificationType(ChoicePreference):
+    name = 'new_idea_notification'
+    section = plan
+    choices = [
+        ('yes', 'Да'),
+        ('no', 'Нет'),
+    ]
+    default = 'yes'
+    widget = forms.Select(attrs={'class': 'form-control'})
+    verbose_name = 'Присылать уведомелния о новых идеях?'
