@@ -60,7 +60,7 @@ class XMDEditorType(ChoicePreference):
 
 @user_preferences_registry.register
 class NewIdeaNotificationType(ChoicePreference):
-    name = 'new_editor_notification_type'
+    name = 'new_idea_notification'
     section = plan
     choices = [
         ('yes', 'Да'),

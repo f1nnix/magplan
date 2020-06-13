@@ -22,6 +22,7 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.utils import timezone
+from dynamic_preferences.users.models import UserPreferenceModel
 
 from plan.integrations.images import S3Client
 from plan.integrations.posts import update_ext_db_xmd, replace_images_paths
@@ -199,17 +200,26 @@ class Idea(AbstractBase):
         subject = f'Новая идея «{self.title}». Голосуйте!'
 
         context = {
-            'idea': self, 'APP_URL': os.environ.get('APP_URL', None)
+            'idea': self,
+            'APP_URL': os.environ.get('APP_URL')
         }
-        html_content: str = render_to_string('email/new_idea.html', context)
+        message_html_content: str = render_to_string('email/new_idea.html', context)
+        message_text_content: str = html2text.html2text(message_html_content)
 
-        text_content: str = html2text.html2text(html_content)
-        msg = EmailMultiAlternatives(subject, text_content, config.PLAN_EMAIL_FROM, [recipient.email])
-        msg.attach_alternative(html_content, 'text/html')
+        msg = EmailMultiAlternatives(subject, message_text_content, config.PLAN_EMAIL_FROM, [recipient.email])
+        msg.attach_alternative(message_html_content, 'text/html')
         msg.send()
 
     def send_vote_notifications(self) -> None:
-        recipients: List[User] = User.objects.filter(is_active=True).exclude(id=self.editor_id)
+        active_users: tp.Set[User] = set(
+            User.objects.filter(is_active=True).exclude(id=self.editor_id)
+        )
+        preferences: tp.List[UserPreferenceModel] = UserPreferenceModel.objects.prefetch_related('instance').filter(
+            section='plan', name='new_idea_notification', raw_value='yes'
+        )
+        users_allowed_ideas_notifications: tp.Set[User] = {p.instance for p in preferences}
+        recipients: tp.Set = active_users & users_allowed_ideas_notifications
+
         for recipient in recipients:
             self._send_vote_notification(recipient)
 

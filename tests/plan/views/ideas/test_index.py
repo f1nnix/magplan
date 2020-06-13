@@ -2,6 +2,7 @@ from unittest.mock import patch
 
 import pytest
 from django.urls import reverse
+from dynamic_preferences.users.models import UserPreferenceModel
 
 from main.models import User, Idea
 
@@ -57,7 +58,14 @@ def test_send_vote_notifications(
     idea: Idea = make_idea(editor=idea_editor)
 
     _: User = make_user(is_active=False)  # should not be sent to this user
+
     user_2: User = make_user(is_active=True)
+
+    # Add user preference to get new idea notifications
+    UserPreferenceModel.objects.create(
+        section='plan', name='new_idea_notification', raw_value='yes',
+        instance=user_2
+    )
 
     idea.send_vote_notifications()
 
