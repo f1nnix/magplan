@@ -135,12 +135,18 @@ def show(request, idea_id):
 @login_required
 def vote(request, idea_id):
     idea = Idea.objects.prefetch_related('votes__user').get(id=idea_id)
+    vote = Vote(idea=idea, user=request.user)
 
+    score: int
     if request.method == 'POST':
-        vote = Vote(score=request.POST.get('score', 1), idea=idea, user=request.user)
-        vote.save()
+        score = request.POST.get('score', 1)
+    else:
+        score = request.GET.get('score', 1)
 
-        messages.add_message(request, messages.SUCCESS, 'Ваш голос учтен. Спасибо!')
+    vote.score = score
+    vote.save()
+
+    messages.add_message(request, messages.SUCCESS, 'Ваш голос учтен. Спасибо!')
 
     return redirect('ideas_show', idea_id=idea.id)
 
