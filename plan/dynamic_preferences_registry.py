@@ -59,7 +59,7 @@ class XMDEditorType(ChoicePreference):
     verbose_name = 'Редактор для статей в XMD'
 
 @user_preferences_registry.register
-class NewIdeaNotificationType(ChoicePreference):
+class NewIdeaNotification(ChoicePreference):
     name = 'new_idea_notification'
     section = plan
     choices = [
