@@ -19,7 +19,11 @@ def test_index(_, client, idea):
 
 
 @pytest.mark.django_db
-def test_create(_, user, make_user, client):
+@patch('plan.views.ideas.send_idea_notification.delay')
+def test_create(
+        mock_send_idea_notification_delay,
+        _, user, make_user, client
+):
     MOCK_TITLE = 'MOCK_TITLE'
 
     expected_recipient: User = make_user()
@@ -39,6 +43,8 @@ def test_create(_, user, make_user, client):
     url = url_()
     response = client.post(url, idea_payload)
     _.assertEqual(response.status_code, 200)
+
+    mock_send_idea_notification_delay.assert_called()
 
     idea = Idea.objects.get(title=MOCK_TITLE)
 

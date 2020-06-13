@@ -1,6 +1,3 @@
-# Create your tasks here
-from __future__ import absolute_import, unicode_literals
-
 from celery import shared_task
 
 from main.models import Idea
@@ -8,7 +5,7 @@ from main.models import Idea
 
 @shared_task
 def send_idea_notification(idea_id: int) -> None:
-    """Send email notification for new idea with comment options
+    """Send email notification for new idea with vote options
 
     Notification is sent to:
 
@@ -22,4 +19,3 @@ def send_idea_notification(idea_id: int) -> None:
         return
 
     idea.send_vote_notifications()
-

@@ -14,6 +14,7 @@ from django.template.loader import render_to_string
 
 from main.models import Idea, Issue, Vote
 from plan.forms import CommentModelForm, IdeaModelForm, PostBaseModelForm
+from plan.tasks.send_idea_notification import send_idea_notification
 from plan.tasks.send_idea_comment_notification import send_idea_comment_notification
 
 IDEAS_PER_PAGE = 20
@@ -42,6 +43,8 @@ def index(request):
             # Save authors, if existing specified
             if idea.author_type == Idea.AUTHOR_TYPE_EXISTING:
                 form.save_m2m()
+
+            send_idea_notification.delay(idea.id)
 
             # Clear idea form to prevent rendering pre-filled form
             form = IdeaModelForm()
