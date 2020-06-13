@@ -3,9 +3,9 @@
 <h4>Быстрое голосование</h4>
 
 <ul>
-    <li><a href="{% url 'ideas_vote' idea.id %}?score=0">Не стану читать даже даром</a></li>
-    <li><a href="{% url 'ideas_vote' idea.id %}?score=1">Прочел бы, встретив в журнале</a></li>
-    <li><a href="{% url 'ideas_vote' idea.id %}?score=2">Ради таких статей готов купить журнал</a></li>
+    <li><a href="{{ APP_URL }}{% url 'ideas_vote' idea.id %}?score=0">Не стану читать даже даром</a></li>
+    <li><a href="{{ APP_URL }}{% url 'ideas_vote' idea.id %}?score=1">Прочел бы, встретив в журнале</a></li>
+    <li><a href="{{ APP_URL }}{% url 'ideas_vote' idea.id %}?score=2">Ради таких статей готов купить журнал</a></li>
 </ul>
 
 <hr/>
