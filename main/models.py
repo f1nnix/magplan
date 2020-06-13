@@ -29,6 +29,7 @@ from plan.integrations.posts import update_ext_db_xmd, replace_images_paths
 from xmd import render_md
 from xmd.mappers import s3_public_mapper as s3_image_mapper
 
+NEW_IDEA_NOTIFICATION_PREFERENCE_NAME = 'plan__new_idea_notification'
 
 class StorageType(enum.Enum):
     S3 = 1
@@ -211,14 +212,11 @@ class Idea(AbstractBase):
         msg.send()
 
     def send_vote_notifications(self) -> None:
-        active_users: tp.Set[User] = set(
-            User.objects.filter(is_active=True).exclude(id=self.editor_id)
-        )
-        preferences: tp.List[UserPreferenceModel] = UserPreferenceModel.objects.prefetch_related('instance').filter(
-            section='plan', name='new_idea_notification', raw_value='yes'
-        )
-        users_allowed_ideas_notifications: tp.Set[User] = {p.instance for p in preferences}
-        recipients: tp.Set = active_users & users_allowed_ideas_notifications
+        active_users: tp.List[User] = User.objects.filter(is_active=True).exclude(id=self.editor_id)
+        recipients: tp.List[User] = [
+            user for user in active_users
+            if user.preferences[NEW_IDEA_NOTIFICATION_PREFERENCE_NAME]
+        ]
 
         for recipient in recipients:
             self._send_vote_notification(recipient)
