@@ -5,6 +5,10 @@ verify_ssl = true
 
 [dev-packages]
 django-debug-toolbar = "*"
+pytest = "*"
+django-dynamic-fixture = "*"
+pytest-django = "*"
+faker = "*"
 
 [packages]
 django = "==2.2"
