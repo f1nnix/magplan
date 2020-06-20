@@ -25,6 +25,7 @@ pymysql = "*"
 sshtunnel = "*"
 mistune = "*"
 python-slugify = "*"
+uwsgi = "*"
 
 [requires]
 python_version = "3.7"
