@@ -65,7 +65,7 @@
 - name: update virtualenv with requirements
   shell: >
     {{ virtualenv_folder_root }}/current/bin/pip
-    install -r {{ source_directory }}/requirements/{{ environment_type }}.txt
+    install -r {{ source_directory }}requirements.txt
     --upgrade
   notify:
     - restart uwsgi

@@ -1,5 +1,0 @@
--r base.txt
-Faker==2.0.0
-pytest==5.1.0
-django-dynamic-fixture==2.0.0
-pytest-django==3.8.0
