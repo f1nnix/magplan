@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "de769178f37329f84be9082ffe8fcb3cc636c09faea6e24f3fb8106cc40f81da"
+            "sha256": "f1f9a855963ce9b22e6960a5d7f7248c7907c9ef49e4e6adec9e20a81e4024c3"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -79,6 +79,9 @@
             "version": "==1.17.7"
         },
         "celery": {
+            "extras": [
+                "redis"
+            ],
             "hashes": [
                 "sha256:c3f4173f83ceb5a5c986c5fdaefb9456de3b0729a72a5776e46bd405fda7b647",
                 "sha256:d1762d6065522879f341c3d67c2b9fe4615eb79756d59acb1434601d4aca474b"
@@ -448,6 +451,13 @@
                 "sha256:c35965d010ce31b23eeb663ed3cc8c906275d6be1a34393a1d73a41febf4a048"
             ],
             "version": "==2020.1"
+        },
+        "redis": {
+            "hashes": [
+                "sha256:0e7e0cfca8660dea8b7d5cd8c4f6c5e29e11f31158c0b0ae91a397f00e5a05a2",
+                "sha256:432b788c4530cfe16d8d943a09d40ca6c16149727e4afe8c2c9d5580c59d9f24"
+            ],
+            "version": "==3.5.3"
         },
         "s3transfer": {
             "hashes": [
