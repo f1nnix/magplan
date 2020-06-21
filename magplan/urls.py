@@ -13,16 +13,23 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from authtools import views as authtools_views
 from decorator_include import decorator_include
 from django.conf import settings
+from django.conf.urls import url
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 from django.urls import include, path  # For django versions from 2.0 and up
 
-admin.site.site_header = 'Magplan'
+admin.site.site_header = 'Plan'
 
 urlpatterns = [
+    url(
+        r'accounts/password_reset/$',
+        authtools_views.PasswordResetView.as_view(domain_override=settings.APP_HOST),
+        name='password_reset'
+    ),
     path('accounts/', include('authtools.urls')),
 
     path('admin/', include('plan.urls')),

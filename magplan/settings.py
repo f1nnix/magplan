@@ -30,6 +30,7 @@ SECRET_KEY = os.getenv(
 
 # SECURITY WARNING: don't run with debug turned on in production.sample!
 APP_ENV = os.getenv('APP_ENV')
+APP_HOST = os.getenv('APP_HOST', 'example.com')
 DEBUG = True if APP_ENV in (APP_ENV_DEVELOPMENT, APP_ENV_TESTING) else False
 
 ALLOWED_HOSTS = [] if DEBUG is True else [os.getenv('APP_HOST', None)]
