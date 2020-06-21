@@ -65,8 +65,14 @@ INSTALLED_APPS = [
     'django_filters',
 ]
 
+# settings.py
+if DEBUG:
+    INSTALLED_APPS += (
+        # Dev extensions
+        'debug_toolbar',
+    )
+
 MIDDLEWARE = [
-    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -77,6 +83,13 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'plan.middleware.SetLanguageMiddleware',
 ]
+
+# settings.py
+if DEBUG:
+    # Disabling as it raises a lot of CPU context switches
+    # MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
+    pass
+
 
 ROOT_URLCONF = 'magplan.urls'
 
@@ -91,8 +104,10 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'plan.context_processors.inject_last_issues',  # TODO: use context processor only for plan app
-                'plan.context_processors.inject_app_url',  # TODO: use context processor only for plan app
+                'plan.context_processors.inject_last_issues',
+                # TODO: use context processor only for plan app
+                'plan.context_processors.inject_app_url',
+                # TODO: use context processor only for plan app
                 "sekizai.context_processors.sekizai",  # wiki
             ]
         },
