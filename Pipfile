@@ -9,6 +9,7 @@ pytest = "*"
 django-dynamic-fixture = "*"
 pytest-django = "*"
 faker = "*"
+django-mail-viewer = "*"
 
 [packages]
 django = "==2.2"

@@ -16,6 +16,8 @@ from collections import OrderedDict
 # from django.utils.translation import gettext
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+APP_ENV_TESTING = 'TESTING'
+APP_ENV_DEVELOPMENT = 'DEVELOPMENT'
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production.sample
@@ -27,7 +29,8 @@ SECRET_KEY = os.getenv(
 )
 
 # SECURITY WARNING: don't run with debug turned on in production.sample!
-DEBUG = True if os.getenv('APP_ENV', None) in ('DEVELOPMENT', 'TESTING') else False
+APP_ENV = os.getenv('APP_ENV')
+DEBUG = True if APP_ENV in (APP_ENV_DEVELOPMENT, APP_ENV_TESTING) else False
 
 ALLOWED_HOSTS = [] if DEBUG is True else [os.getenv('APP_HOST', None)]
 # Application definition
@@ -70,6 +73,7 @@ if DEBUG:
     INSTALLED_APPS += (
         # Dev extensions
         'debug_toolbar',
+        'django_mail_viewer',
     )
 
 MIDDLEWARE = [
@@ -89,7 +93,6 @@ if DEBUG:
     # Disabling as it raises a lot of CPU context switches
     # MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
     pass
-
 
 ROOT_URLCONF = 'magplan.urls'
 
@@ -215,11 +218,13 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
 )
 CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
 
-if DEBUG is False:
-    EMAIL_BACKEND = 'main.email_backends.DefaultEmailBackend'
-
-else:
+# Email backend
+if DEBUG and APP_ENV == APP_ENV_DEVELOPMENT:
+    EMAIL_BACKEND = 'django_mail_viewer.backends.locmem.EmailBackend'
+elif DEBUG and APP_ENV == APP_ENV_TESTING:
     EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
+else:
+    EMAIL_BACKEND = 'main.email_backends.DefaultEmailBackend'
 
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://127.0.0.1:6379')
 
