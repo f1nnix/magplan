@@ -1,8 +1,8 @@
-import pytest
-
-
 from typing import List, Any, Optional
 from unittest.mock import patch
+
+import pytest
+
 from plan.tasks.utils import _get_whitelisted_recipients, _can_recieve_notification
 
 pref_name = 'post_comment_notification_level'
@@ -38,7 +38,7 @@ def get_(arr: List[Any], value: Any, key: str) -> Optional[Any]:
         search_results = [obj for obj in arr if obj[key] == value]
     except KeyError:
         raise KeyError('Key "%s" does not exist in list element(s)' % key)
-    
+
     if search_results:
         return list(search_results)[0]
 
@@ -65,25 +65,16 @@ def test_can_recieve_notification_no_permission(comment, users):
 
 @pytest.mark.django_db
 def test_can_recieve_notification_with_permission(user_with_permissions, comment):
-    assert (
-        _can_recieve_notification(user_with_permissions, comment, perm_name, pref_name)
-        == True
-    )
+    assert _can_recieve_notification(user_with_permissions, comment, perm_name, pref_name)
 
 
 @pytest.mark.django_db
 def test_can_recieve_notification_comment_owner(comment, user_with_permissions):
-    assert (
-        _can_recieve_notification(user_with_permissions, comment, perm_name, pref_name)
-        == True
-    )
+    assert _can_recieve_notification(user_with_permissions, comment, perm_name, pref_name)
 
     comment.user = user_with_permissions
     comment.save()
-    assert (
-        _can_recieve_notification(user_with_permissions, comment, perm_name, pref_name)
-        == False
-    )
+    assert not _can_recieve_notification(user_with_permissions, comment, perm_name, pref_name)
 
 
 @pytest.mark.django_db
@@ -91,15 +82,9 @@ def test_can_recieve_notification_comment_owner(comment, user_with_permissions):
 def test_can_recieve_notification_system_user(config, comment, user_with_permissions):
     config.SYSTEM_USER_ID = user_with_permissions.id
 
-    assert (
-        _can_recieve_notification(user_with_permissions, comment, perm_name, pref_name)
-        == False
-    )
+    assert not _can_recieve_notification(user_with_permissions, comment, perm_name, pref_name)
 
 
 @pytest.mark.django_db
 def test_can_recieve_notification_user_settings(comment, restricted_reciever):
-    assert (
-        _can_recieve_notification(restricted_reciever, comment, perm_name, pref_name)
-        == False
-    )
+    assert not _can_recieve_notification(restricted_reciever, comment, perm_name, pref_name)
