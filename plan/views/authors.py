@@ -1,10 +1,11 @@
-from django.shortcuts import render, redirect
-from main.models import User, Post
-from django.contrib.auth.decorators import login_required
-from plan.forms import UserModelForm, ProfileModelForm
 from django.contrib import messages
-from django.db.models import Q
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import permission_required
+from django.db.models import Q
+from django.shortcuts import render, redirect
+
+from main.models import User, Post
+from plan.forms import UserModelForm, ProfileModelForm
 
 
 @login_required
@@ -24,7 +25,10 @@ def new(request):
         profile_form = ProfileModelForm(request.POST)
 
         if user_form.is_valid() and profile_form.is_valid():
-            user = user_form.save()
+            user = user_form.save(commit=False)
+            # Authors should be inactive by default
+            user.is_active = False
+            user.save()
 
             profile_form = ProfileModelForm(request.POST, instance=user.profile)
             profile_form.save()
