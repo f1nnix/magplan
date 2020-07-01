@@ -31,6 +31,7 @@ sshtunnel = "*"
 mistune = "*"
 python-slugify = "*"
 uwsgi = "*"
+flower = "*"
 
 [requires]
 python_version = "3.7"

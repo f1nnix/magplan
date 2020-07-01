@@ -19,3 +19,5 @@ ssh_key_path: "{{ ansible_user_dir }}/.ssh/id_ed25519"
 
 # The root directory all of our virtualenvs live in.
 virtualenv_folder_root: "{{ ansible_user_dir }}/.virtualenvs"
+
+flower_port: 8091

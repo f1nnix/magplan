@@ -7,4 +7,5 @@
 # Run Django management commands.
 - include: django.yml
 - include: celery.yml
+- include: flower.yml
 - include: rsyslog.yml

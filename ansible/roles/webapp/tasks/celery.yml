@@ -1,4 +1,4 @@
-- name: add systemd unit file for main app
+- name: add systemd unit file for celery app
   template: src=celery.service.conf
             dest=/etc/systemd/system/{{ project_name }}-celery.service
   become: true
