@@ -11,3 +11,10 @@
   become: true
   notify:
     - restart rsyslog
+
+- name: add rsyslog config to flower app
+  template: src=rsyslog.flower.conf
+            dest=/etc/rsyslog.d/{{ project_name }}-flower.conf
+  become: true
+  notify:
+    - restart rsyslog
