@@ -32,6 +32,7 @@ mistune = "*"
 python-slugify = "*"
 uwsgi = "*"
 flower = "*"
+requests = "*"
 
 [requires]
 python_version = "3.7"
