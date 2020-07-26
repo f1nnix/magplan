@@ -9,6 +9,7 @@ from typing import List
 
 import django
 import html2text
+import requests
 from authtools.models import AbstractEmailUser
 from botocore.exceptions import ClientError
 from constance import config
@@ -27,9 +28,11 @@ from dynamic_preferences.users.models import UserPreferenceModel
 from plan.integrations.images import S3Client
 from plan.integrations.posts import update_ext_db_xmd, replace_images_paths
 from xmd import render_md
+from xmd.mappers import plan_internal_mapper as plan_image_mapper
 from xmd.mappers import s3_public_mapper as s3_image_mapper
 
 NEW_IDEA_NOTIFICATION_PREFERENCE_NAME = 'plan__new_idea_notification'
+
 
 class StorageType(enum.Enum):
     S3 = 1
@@ -207,7 +210,8 @@ class Idea(AbstractBase):
         message_html_content: str = render_to_string('email/new_idea.html', context)
         message_text_content: str = html2text.html2text(message_html_content)
 
-        msg = EmailMultiAlternatives(subject, message_text_content, config.PLAN_EMAIL_FROM, [recipient.email])
+        msg = EmailMultiAlternatives(subject, message_text_content, config.PLAN_EMAIL_FROM,
+                                     [recipient.email])
         msg.attach_alternative(message_html_content, 'text/html')
         msg.send()
 
@@ -584,14 +588,50 @@ def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
 
 
+def _render_with_external_parser(id: int, xmd: str) -> tp.Optional[str]:
+    FAILBACK_SYNTAX_LANG = 'cpp'
+
+    if not xmd:
+        return None
+
+    if not config.EXTERNAL_PARSER_URL:
+        return None
+
+    try:
+        request_payload: tp.Dict[str, str] = {
+            'id': id,
+            'md': xmd,
+            'lang': FAILBACK_SYNTAX_LANG
+        }
+        request_headers: tp.Dict[str, str] = {  # unusued
+            'content-type': 'application/x-www-form-urlencoded; charset=utf-8'
+        }
+        response = requests.post(
+            config.EXTERNAL_PARSER_URL, data=request_payload
+        )
+        return response.text
+
+    except Exception as exc:
+        # TODO: add logger, no need to handle
+        return None
+
+
 @receiver(pre_save, sender=Post)
 def render_xmd(sender, instance, **kwargs):
-    if instance.has_text:
+    if not instance.has_text:
+        return
+
+    prepared_xmd: str = replace_images_paths(
+        instance.xmd, instance.images, mapper=plan_image_mapper
+    )
+    instance.html = _render_with_external_parser(instance.id, prepared_xmd)
+
+    if not instance.html:
         instance.html = render_md(instance.xmd, attachments=instance.images)
 
-        # HACK: determine paywall status by persistance of
-        #       paywall markup tab. Fix, if renderer changes.
-        if '<div class="paywall-notice">' in instance.html:
-            instance.is_paywalled = True
-        else:
-            instance.is_paywalled = False
+    # HACK: determine paywall status by persistance of
+    #       paywall markup tab. Fix, if renderer changes.
+    if '<div class="paywall-notice">' in instance.html:
+        instance.is_paywalled = True
+    else:
+        instance.is_paywalled = False
