@@ -192,11 +192,16 @@ CONSTANCE_CONFIG = {
     'FINANCE_EMAIL_FROM': ('', '', str),
     'FINANCE_EMAIL_SUBJECT_PREFIX': ('[notify]', '', str),
     'SYSTEM_USER_ID': (1, '', int),
+    'EXTERNAL_PARSER_URL': ('', 'URL to external XML parser', str),
 }
 
 CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
     {
-        'General settings': ('SYSTEM_USER_ID', 'PLAN_POSTS_INSTANCE_CHUNK'),
+        'General settings': (
+            'SYSTEM_USER_ID',
+            'PLAN_POSTS_INSTANCE_CHUNK',
+            'EXTERNAL_PARSER_URL'
+        ),
         'Plan email settings': (
             'PLAN_EMAIL_HOST',
             'PLAN_EMAIL_PORT',
