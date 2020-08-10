@@ -32,6 +32,7 @@ from xmd.mappers import plan_internal_mapper as plan_image_mapper
 from xmd.mappers import s3_public_mapper as s3_image_mapper
 
 NEW_IDEA_NOTIFICATION_PREFERENCE_NAME = 'plan__new_idea_notification'
+PAYWALL_NOTICE_BLOCK = '<div class="paywall-notice">Продолжение статьи доступно только продписчикам</div>'
 
 
 class StorageType(enum.Enum):
@@ -588,7 +589,9 @@ def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
 
 
-def _render_with_external_parser(id: int, xmd: str) -> tp.Optional[str]:
+def _render_with_external_parser(
+        id: int, xmd: str, paywall_tag_html: str = PAYWALL_NOTICE_BLOCK
+) -> tp.Optional[str]:
     FAILBACK_SYNTAX_LANG = 'cpp'
 
     if not xmd:
@@ -601,7 +604,8 @@ def _render_with_external_parser(id: int, xmd: str) -> tp.Optional[str]:
         request_payload: tp.Dict[str, str] = {
             'id': id,
             'md': xmd,
-            'lang': FAILBACK_SYNTAX_LANG
+            'lang': FAILBACK_SYNTAX_LANG,
+            'xakepcut': paywall_tag_html,
         }
         request_headers: tp.Dict[str, str] = {  # unusued
             'content-type': 'application/x-www-form-urlencoded; charset=utf-8'
@@ -624,14 +628,12 @@ def render_xmd(sender, instance, **kwargs):
     prepared_xmd: str = replace_images_paths(
         instance.xmd, instance.images, mapper=plan_image_mapper
     )
-    instance.html = _render_with_external_parser(instance.id, prepared_xmd)
+    instance.html = _render_with_external_parser(instance.id, prepared_xmd, paywall_tag_html=PAYWALL_NOTICE_BLOCK)
 
     if not instance.html:
         instance.html = render_md(instance.xmd, attachments=instance.images)
 
-    # HACK: determine paywall status by persistance of
-    #       paywall markup tab. Fix, if renderer changes.
-    if '<div class="paywall-notice">' in instance.html:
+    if PAYWALL_NOTICE_BLOCK in instance.html:
         instance.is_paywalled = True
     else:
         instance.is_paywalled = False
