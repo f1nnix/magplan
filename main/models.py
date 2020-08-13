@@ -240,8 +240,12 @@ class Idea(AbstractBase):
 
     @property
     def score(self):
+        MAX_SCORE = 100
+
         all_scores = sum([v.score for v in self.votes.all()])
-        return round(all_scores / len(self.votes.all()) / 2 * 100)
+        max_scores = len(self.votes.all()) * MAX_SCORE
+
+        return round(all_scores/max_scores * 100)
 
     @property
     def description_html(self):
@@ -554,15 +558,19 @@ class Comment(AbstractBase):
 
 
 class Vote(AbstractBase):
-    SCORE_NEGATIVE = 0
-    SCORE_NEUTRAL = 1
-    SCORE_POSITIVE = 2
+    SCORE_0 = 0
+    SCORE_25 = 25
+    SCORE_50 = 50
+    SCORE_75 = 75
+    SCORE_100 = 100
     SCORE_CHOICES = (
-        (SCORE_NEGATIVE, 'Не стану читать даже даром'),
-        (SCORE_NEUTRAL, 'Прочел бы, встретив в журнале'),
-        (SCORE_POSITIVE, 'Ради таких статей готов купить журнал'),
+        (SCORE_0, 'Против таких статей в «Хакере»'),
+        (SCORE_25, 'Не верю, что выйдет хорошо'),
+        (SCORE_50, 'Тема нормальная, но не для меня'),
+        (SCORE_75, 'Почитал бы, встретив в журнале'),
+        (SCORE_100, 'Ради таких статей мог бы подписаться'),
     )
-    score = models.SmallIntegerField(choices=SCORE_CHOICES, default=SCORE_NEUTRAL)
+    score = models.SmallIntegerField(choices=SCORE_CHOICES, default=SCORE_50)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     idea = models.ForeignKey(Idea, on_delete=models.CASCADE, related_name='votes')
 
