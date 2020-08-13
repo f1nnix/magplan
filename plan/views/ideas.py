@@ -14,8 +14,8 @@ from django.template.loader import render_to_string
 
 from main.models import Idea, Issue, Vote
 from plan.forms import CommentModelForm, IdeaModelForm, PostBaseModelForm
-from plan.tasks.send_idea_notification import send_idea_notification
 from plan.tasks.send_idea_comment_notification import send_idea_comment_notification
+from plan.tasks.send_idea_notification import send_idea_notification
 
 IDEAS_PER_PAGE = 20
 
@@ -50,7 +50,8 @@ def index(request):
             form = IdeaModelForm()
 
             messages.add_message(
-                request, messages.SUCCESS, 'Идея «%s» успешно выдвинута на голосование!' % idea.title)
+                request, messages.SUCCESS,
+                'Идея «%s» успешно выдвинута на голосование!' % idea.title)
     else:
         form = IdeaModelForm()
 
@@ -137,14 +138,23 @@ def show(request, idea_id):
 
 @login_required
 def vote(request, idea_id):
+    DEFAULT_VOTE_SCORE = Vote.SCORE_50
+
     idea = Idea.objects.prefetch_related('votes__user').get(id=idea_id)
     vote = Vote(idea=idea, user=request.user)
-
     score: int
+
     if request.method == 'POST':
-        score = request.POST.get('score', 1)
+        score = request.POST.get('score', DEFAULT_VOTE_SCORE)
     else:
-        score = request.GET.get('score', 1)
+        score = request.GET.get('score', DEFAULT_VOTE_SCORE)
+
+    allowed_scored: List[int] = [
+        score_choice[0] for score_choice in Vote.SCORE_CHOICES
+    ]
+
+    if score not in allowed_scored:
+        score = Vote.SCORE_50
 
     vote.score = score
     vote.save()

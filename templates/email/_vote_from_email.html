@@ -3,9 +3,11 @@
 <h4>Быстрое голосование</h4>
 
 <ul>
-    <li><a href="{{ APP_URL }}{% url 'ideas_vote' idea.id %}?score=0">Не стану читать даже даром</a></li>
-    <li><a href="{{ APP_URL }}{% url 'ideas_vote' idea.id %}?score=1">Прочел бы, встретив в журнале</a></li>
-    <li><a href="{{ APP_URL }}{% url 'ideas_vote' idea.id %}?score=2">Ради таких статей готов купить журнал</a></li>
+    <li><a href="{{ APP_URL }}{% url 'ideas_vote' idea.id %}?score=0">Против таких статей в «Хакере»</a></li>
+    <li><a href="{{ APP_URL }}{% url 'ideas_vote' idea.id %}?score=25">Не верю, что выйдет хорошо</a></li>
+    <li><a href="{{ APP_URL }}{% url 'ideas_vote' idea.id %}?score=50">Тема нормальная, но не для меня</a></li>
+    <li><a href="{{ APP_URL }}{% url 'ideas_vote' idea.id %}?score=75">Почитал бы, встретив в журнале</a></li>
+    <li><a href="{{ APP_URL }}{% url 'ideas_vote' idea.id %}?score=100">Ради таких статей мог бы подписаться</a></li>
 </ul>
 
 <hr/>
