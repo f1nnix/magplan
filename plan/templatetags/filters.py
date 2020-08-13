@@ -20,7 +20,8 @@ def voted(value, user):
 
 @register.filter(name='humanize_score')
 def humanize_score(value):
-    return Vote.SCORE_CHOICES[value][1]
+    # Unsafe. but should work for fair use
+    return Vote.SCORE_CHOICES[value // 25][1]
 
 
 @register.filter(name='times')

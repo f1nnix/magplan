@@ -19,14 +19,14 @@
                 <h6>Как принимаются решения</h6>
                 <ul>
                     <li><strong>75%–100%:</strong> идея принимается;</li>
-                    <li><strong>50%–74%:</strong> решает ответственный;</li>
-                    <li><strong>0%–49%:</strong> идея отклоняется.</li>
+                    <li><strong>25%–74%:</strong> решает ответственный;</li>
+                    <li><strong>0%–24%:</strong> идея отклоняется.</li>
                 </ul>
                 <h6>
                     Текущая рекомендация:
-                    {% if current_score < 50 %}
+                    {% if current_score < 25 %}
                         отклонить статью.
-                    {% elif current_score > 49 and current_score < 75 %}
+                    {% elif current_score > 24 and current_score < 75 %}
                         решает ответственный.
                     {% else %}
                         принять статью.
@@ -60,12 +60,12 @@
             <strong>Выбери один из пунктов:</strong>
         </div>
         <div class="col-6">
-            {% for i in 3|times %}
+            {% for i in 5|times %}
                 <form method="POST" action="{% url 'ideas_vote' idea.id %}">
                     {% csrf_token %}
-                    <input type="hidden" name="score" value="{{ i }}"/>
+                    <input type="hidden" name="score" value="{%  widthratio i 1 25 %}"/>
                     <input style="margin-bottom: 0.5rem;" type="submit" class="btn btn-block btn-secondary"
-                           value="{{ i|humanize_score }} — {{ i }}"/>
+                           value="{{ i|humanize_score }}"/>
                 </form>
             {% endfor %}
         </div>

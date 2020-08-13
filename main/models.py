@@ -240,8 +240,12 @@ class Idea(AbstractBase):
 
     @property
     def score(self):
+        MAX_SCORE = 100
+
         all_scores = sum([v.score for v in self.votes.all()])
-        return round(all_scores / len(self.votes.all()) / 2 * 100)
+        max_scores = len(self.votes.all()) * MAX_SCORE
+
+        return round(all_scores/max_scores * 100)
 
     @property
     def description_html(self):
