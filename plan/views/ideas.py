@@ -53,8 +53,10 @@ def index(request):
             messages.add_message(
                 request, messages.SUCCESS,
                 'Идея «%s» успешно выдвинута на голосование!' % idea.title)
-    else:
-        form = IdeaModelForm()
+
+            return redirect('ideas_show', idea_id=idea.id)
+
+    form = IdeaModelForm()
 
     ideas = (Idea.objects
              .annotate(voted=Count("votes"))

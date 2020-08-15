@@ -42,7 +42,7 @@ def test_create(
 
     url = url_()
     response = client.post(url, idea_payload)
-    _.assertEqual(response.status_code, 200)
+    _.assertEqual(response.status_code, 302)
 
     mock_send_idea_notification_delay.assert_called()
 
