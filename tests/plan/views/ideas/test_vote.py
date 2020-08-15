@@ -42,7 +42,7 @@ def test_vote_get(_, client, make_user, make_idea):
     base_url = reverse('ideas_vote', kwargs=url_kwargs)
     query_params = urlencode(
         {
-            'score': 2
+            'score': 25
         },
         doseq=True
     )
@@ -52,11 +52,31 @@ def test_vote_get(_, client, make_user, make_idea):
     _.assertEqual(response.status_code, 302)
 
     # Can't simply get user here
-    assert Vote.objects.filter(score=2).exists()
+    assert Vote.objects.filter(score=25).exists()
 
 
 @pytest.mark.django_db
 def test_vote_post(_, client, make_user, make_idea, ):
+    idea_editor: User = make_user(is_active=True)
+    idea: Idea = make_idea(editor=idea_editor)
+
+    url_kwargs = {
+        'idea_id': idea.id
+    }
+    url = reverse('ideas_vote', kwargs=url_kwargs)
+
+    payload = {
+        'score': 100
+    }
+
+    response = client.post(url, payload)
+    _.assertEqual(response.status_code, 302)
+
+    # Can't simply get user here
+    assert Vote.objects.filter(score=100).exists()
+
+@pytest.mark.django_db
+def test_invalid_vote_post(_, client, make_user, make_idea, ):
     idea_editor: User = make_user(is_active=True)
     idea: Idea = make_idea(editor=idea_editor)
 
@@ -72,4 +92,4 @@ def test_vote_post(_, client, make_user, make_idea, ):
     _.assertEqual(response.status_code, 302)
 
     # Can't simply get user here
-    assert Vote.objects.filter(score=2).exists()
+    assert Vote.objects.filter(score=50).exists()

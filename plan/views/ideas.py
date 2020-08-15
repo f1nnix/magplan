@@ -16,6 +16,7 @@ from main.models import Idea, Issue, Vote
 from plan.forms import CommentModelForm, IdeaModelForm, PostBaseModelForm
 from plan.tasks.send_idea_comment_notification import send_idea_comment_notification
 from plan.tasks.send_idea_notification import send_idea_notification
+from utils import safe_cast
 
 IDEAS_PER_PAGE = 20
 
@@ -52,8 +53,10 @@ def index(request):
             messages.add_message(
                 request, messages.SUCCESS,
                 'Идея «%s» успешно выдвинута на голосование!' % idea.title)
-    else:
-        form = IdeaModelForm()
+
+            return redirect('ideas_show', idea_id=idea.id)
+
+    form = IdeaModelForm()
 
     ideas = (Idea.objects
              .annotate(voted=Count("votes"))
@@ -148,6 +151,8 @@ def vote(request, idea_id):
         score = request.POST.get('score', DEFAULT_VOTE_SCORE)
     else:
         score = request.GET.get('score', DEFAULT_VOTE_SCORE)
+
+    score = safe_cast(score, to=int, on_error=DEFAULT_VOTE_SCORE)
 
     allowed_scored: List[int] = [
         score_choice[0] for score_choice in Vote.SCORE_CHOICES
