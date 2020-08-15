@@ -10,6 +10,7 @@ django-dynamic-fixture = "*"
 pytest-django = "*"
 faker = "*"
 django-mail-viewer = "*"
+ipdb = "*"
 
 [packages]
 django = "==2.2"
