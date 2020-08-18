@@ -16,6 +16,21 @@ register = template.Library()
 MAX_VOTE_OPTIONS_NUMBER = len(Vote.SCORE_CHOICES)
 VOTE_SCORE_STEP = 100 // (MAX_VOTE_OPTIONS_NUMBER - 1)
 FAILBACK_VOTE_INDEX = 2
+CSS_COLORS = (
+    'danger',
+    'warning',
+    'light',
+    'info',
+    'success',
+)
+
+EMOJI_SCORES = (
+    '🤮',
+    '🤨',
+    '😐',
+    '😏',
+    '😍',
+)
 
 
 @register.filter(name='voted')
@@ -23,7 +38,7 @@ def voted(value, user):
     return value.voted(user)
 
 
-@register.filter(name='humanize_score')
+@register.filter(name='humanize_score_index')
 def humanize_score_index(index) -> str:
     if not isinstance(index, int):
         index = safe_cast(index, int, -1)
@@ -203,3 +218,31 @@ def get_attr(value, arg):
         return value[int(arg)]
     else:
         return settings.TEMPLATE_STRING_IF_INVALID
+
+
+@register.filter(name='score_css_color_by_index')
+def score_css_color_by_index(index):
+    if not isinstance(index, int):
+        index = safe_cast(index, int, -1)
+
+    if index == -1:  # error cast
+        return CSS_COLORS[FAILBACK_VOTE_INDEX]
+
+    if not (0 <= index <= (MAX_VOTE_OPTIONS_NUMBER - 1)):
+        return CSS_COLORS[FAILBACK_VOTE_INDEX]
+
+    return CSS_COLORS[index]
+
+
+@register.filter(name='emoji_sign_by_index')
+def emoji_sign_by_index(index):
+    if not isinstance(index, int):
+        index = safe_cast(index, int, -1)
+
+    if index == -1:  # error cast
+        return EMOJI_SCORES[FAILBACK_VOTE_INDEX]
+
+    if not (0 <= index <= (MAX_VOTE_OPTIONS_NUMBER - 1)):
+        return EMOJI_SCORES[FAILBACK_VOTE_INDEX]
+
+    return EMOJI_SCORES[index]
