@@ -64,8 +64,8 @@
                 <form method="POST" action="{% url 'ideas_vote' idea.id %}">
                     {% csrf_token %}
                     <input type="hidden" name="score" value="{%  widthratio i 1 25 %}"/>
-                    <input style="margin-bottom: 0.5rem;" type="submit" class="btn btn-block btn-secondary"
-                           value="{{ i|humanize_score }}"/>
+                    <input style="margin-bottom: 0.5rem;" type="submit" class="btn btn-block btn-{{ i|score_css_color_by_index }}"
+                           value="{{ i|emoji_sign_by_index }} {{ i|humanize_score_index }}"/>
                 </form>
             {% endfor %}
         </div>
