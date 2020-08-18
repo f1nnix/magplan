@@ -9,8 +9,13 @@ from django.urls import reverse
 from finance.models import Payment
 from main.models import Vote, Comment
 from plan.views import posts, ideas
+from utils import safe_cast
 
 register = template.Library()
+
+MAX_VOTE_OPTIONS_NUMBER = len(Vote.SCORE_CHOICES)
+VOTE_SCORE_STEP = 100 // (MAX_VOTE_OPTIONS_NUMBER - 1)
+FAILBACK_VOTE_INDEX = 2
 
 
 @register.filter(name='voted')
@@ -19,9 +24,37 @@ def voted(value, user):
 
 
 @register.filter(name='humanize_score')
-def humanize_score(value):
-    # Unsafe. but should work for fair use
-    return Vote.SCORE_CHOICES[value // 25][1]
+def humanize_score_index(index) -> str:
+    if not isinstance(index, int):
+        index = safe_cast(index, int, -1)
+
+    if index == -1:  # error cast
+        return Vote.SCORE_CHOICES[FAILBACK_VOTE_INDEX][1]
+
+    score = index * VOTE_SCORE_STEP
+
+    # Provide untrusted data
+    # Underlying function will validate data
+    return humanize_score(score)
+
+
+@register.filter(name='humanize_score')
+def humanize_score(value) -> str:
+    if not isinstance(value, int):
+        value = safe_cast(value, int, -1)
+
+    if value == -1:  # error cast
+        return Vote.SCORE_CHOICES[FAILBACK_VOTE_INDEX][1]
+
+    if value % VOTE_SCORE_STEP != 0:
+        return Vote.SCORE_CHOICES[FAILBACK_VOTE_INDEX][1]
+
+    if not (0 <= value <= 100):
+        return Vote.SCORE_CHOICES[FAILBACK_VOTE_INDEX][1]
+
+    choice_index = value // VOTE_SCORE_STEP
+
+    return Vote.SCORE_CHOICES[choice_index][1]
 
 
 @register.filter(name='times')
