@@ -63,7 +63,7 @@ class PostMetaForm(ModelForm):
 
     class Meta:
         model = Post
-        fields = ('issues', 'editor', 'finished_at', 'published_at',)
+        fields = ('issues', 'editor', 'finished_at', 'published_at', 'css')
 
         widgets = {
             'issues': forms.SelectMultiple(attrs={
@@ -73,6 +73,9 @@ class PostMetaForm(ModelForm):
             'editor': forms.Select(attrs={'class': 'form-control', }),
             'finished_at': forms.DateInput(attrs={'class': 'form-control date_picker', }),
             'published_at': forms.DateInput(attrs={'class': 'form-control date_picker', }),
+            'css': forms.Textarea(attrs={
+                'class': 'form-control', 'rows': '5', 'placeholder': 'h3 { font-weight: bold }',
+            })
         }
 
     def __init__(self, *args, **kwargs):

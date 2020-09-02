@@ -105,8 +105,17 @@
             left: 0.5em;
             margin-right: -50%;
         }
-    </style>
 
+        #id_css {
+            font-family: "Lucida Console", Monaco, monospace;
+        }
+    </style>
+    
+    {% if post.css %}
+    <style id='custom_css' type="text/css">
+        {{ post.css }}
+    </style>
+    {% endif %}
 {% endblock %}
 
 {% block content %}
@@ -151,20 +160,6 @@
                             <div class="row">
                                 {% with form=meta_form %}
                                     {% include "plan/posts/_form_meta.html" %}
-                                    {% if perms.main.edit_extended_post_attrs %}
-                                        <div class="col-6">
-                                            <div class="form-group">
-                                                {{ form.wp_id.label }}
-                                                {% if form.wp_id.errors %}
-                                                    <ul class="errors">
-                                                        {% for error in form.title.errors %}
-                                                            <li>{{ error }}</li>{% endfor %}
-                                                    </ul>
-                                                {% endif %}
-                                                {{ form.wp_id }}
-                                            </div>
-                                        </div>
-                                    {% endif %}
                                 {% endwith %}
                             </div>
                         </div>

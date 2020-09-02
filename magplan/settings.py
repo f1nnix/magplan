@@ -67,6 +67,8 @@ INSTALLED_APPS = [
     'finance',
     'authtools',
     'django_filters',
+    # 'django_ace',
+    'ace_overlay',
 ]
 
 # settings.py
