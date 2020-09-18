@@ -13,7 +13,7 @@ django-mail-viewer = "*"
 ipdb = "*"
 
 [packages]
-django = "==2.2"
+django = "==2.2.13"
 celery = {extras = ["redis"], version = "*"}
 django-constance = "*"
 django-decorator-include = "*"
