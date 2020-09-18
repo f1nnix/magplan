@@ -210,7 +210,7 @@ def show(request, post_id):
     ).get(id=post_id)
 
     post_meta_form = PostMetaForm(
-        initial={"wp_id": post.meta.get("wpid", None)}, instance=post
+        initial={'wp_id': post.meta.get('wpid')}, instance=post
     )
 
     return render(
