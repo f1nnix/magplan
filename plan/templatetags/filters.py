@@ -81,8 +81,8 @@ def times(number):
 def trim_filename(filename):
     if len(filename) > 30:
         return '%s...%s' % (
-            filename[:20],
-            filename[-5:]
+            filename[:10],
+            filename[-20:]
         )
     return filename
 
