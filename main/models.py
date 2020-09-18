@@ -245,7 +245,7 @@ class Idea(AbstractBase):
         all_scores = sum([v.score for v in self.votes.all()])
         max_scores = len(self.votes.all()) * MAX_SCORE
 
-        return round(all_scores/max_scores * 100)
+        return round(all_scores / max_scores * 100)
 
     @property
     def description_html(self):
@@ -427,6 +427,37 @@ class Post(AbstractBase):
     def wp_id(self):
         return self.meta.get('wpid')
 
+    def build_xmd_blob(self, prepared_xmd: str) -> str:
+        """Attaches CSS to XMD for remote CMS
+
+            >>> self.css ='foo'
+            'foo'
+
+            >>> xmd = 'bar'
+            'bar'
+
+            >>> self.build_xmd_blob(self.xmd)
+            %style type=text/css
+            foo
+            %style
+            bar
+        """
+        OPENING_STYLE_TAG = '%style type=text/css'
+        CLOSING_STYLE_TAG = '%style'
+
+        if not prepared_xmd:
+            return prepared_xmd
+
+        if not self.css:
+            return prepared_xmd
+
+        return '{}\n{}\n{}\n{}'.format(
+            OPENING_STYLE_TAG,
+            self.css,
+            CLOSING_STYLE_TAG,
+            prepared_xmd
+        )
+
     def upload(self):
         """Uploads post and attachments to remote CMS
         
@@ -446,12 +477,13 @@ class Post(AbstractBase):
             image.upload_to_storage()
 
         # Upload to external DB
-        xmd = replace_images_paths(
+        prepared_xmd = replace_images_paths(
             xmd=self.xmd,
             attachments=self.images,
             mapper=s3_image_mapper,
         )
-        update_ext_db_xmd(self.wp_id, xmd)
+        prepared_xmd = self.build_xmd_blob(prepared_xmd)
+        update_ext_db_xmd(self.wp_id, prepared_xmd)
 
 
 class Widget(AbstractBase):
