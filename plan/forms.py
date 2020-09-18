@@ -1,5 +1,6 @@
 from django import forms
 from django.forms import ModelForm
+from django_ace import AceWidget
 
 from main.models import Idea, Post, Comment, Section, Issue, User, Profile
 
@@ -64,6 +65,7 @@ class PostMetaForm(ModelForm):
     class Meta:
         model = Post
         fields = ('issues', 'editor', 'finished_at', 'published_at', 'css')
+        # css = forms.CharField(widget=AceWidget)
 
         widgets = {
             'issues': forms.SelectMultiple(attrs={
@@ -73,9 +75,9 @@ class PostMetaForm(ModelForm):
             'editor': forms.Select(attrs={'class': 'form-control', }),
             'finished_at': forms.DateInput(attrs={'class': 'form-control date_picker', }),
             'published_at': forms.DateInput(attrs={'class': 'form-control date_picker', }),
-            'css': forms.Textarea(attrs={
-                'class': 'form-control', 'rows': '5', 'placeholder': 'h3 { font-weight: bold }',
-            })
+            'css': AceWidget(
+                mode='css', theme='textmate', showinvisibles=True, toolbar=False
+            ),
         }
 
     def __init__(self, *args, **kwargs):

@@ -46,6 +46,12 @@
 </div>
 
 {% if perms.main.edit_extended_post_attrs %}
+    {{ form.media }}
+    <style type="text/css">
+        .django-ace-widget {
+            position: initial;
+        }
+    </style>
     <div class="col-4">
         <div class="form-group">
             <label>{{ form.published_at.label }}</label>

@@ -345,8 +345,7 @@ class Post(AbstractBase):
     css = models.TextField(
         null=True, blank=False, verbose_name='CSS-стили для статьи',
         help_text=(
-            'CSS, который будет применяться к превью статьи, '
-            'а также будет использоваться при загрузке во вншение CMS.'
+            'CSS, который будет применяться к превью статьи'
         )
     )
 
