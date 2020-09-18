@@ -61,6 +61,13 @@ class IssueModelForm(ModelForm):
 
 class PostMetaForm(ModelForm):
     wp_id = forms.IntegerField(widget=forms.TextInput(attrs={'class': 'form-control', }))
+    editor = forms.ModelChoiceField(queryset=(
+        User.objects.filter(is_active=True).prefetch_related('profile').order_by('profile__l_name').all()
+    ),
+        label="Редактор",
+        empty_label=None,
+        widget=forms.Select(attrs={'class': 'form-control', 'rows': 5})
+    )
 
     class Meta:
         model = Post
