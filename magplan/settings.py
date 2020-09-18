@@ -67,13 +67,14 @@ INSTALLED_APPS = [
     'finance',
     'authtools',
     'django_filters',
+    'django_ace',
 ]
 
 # settings.py
 if DEBUG:
     INSTALLED_APPS += (
         # Dev extensions
-        'debug_toolbar',
+        # 'debug_toolbar',
         'django_mail_viewer',
     )
 

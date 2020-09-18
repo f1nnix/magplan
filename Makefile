@@ -1,3 +1,7 @@
+migrate:
+	@python ./manage.py makemigrations
+	@python ./manage.py migrate
+
 dev:
 	export LIBRARY_PATH=$LIBRARY_PATH:/usr/local/opt/openssl/lib/
 	pipenv install --dev

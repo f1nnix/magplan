@@ -1,7 +1,7 @@
 {% if perms.main.edit_extended_post_attrs %}
     <div class="col-6">
         <div class="form-group">
-            {{ form.editor.label }}
+            <label>{{ form.editor.label }}</label>
             {% if form.editor.errors %}
                 <ul class="errors">
                     {% for error in form.section_id.errors %}
@@ -14,7 +14,7 @@
 {% endif %}
 <div class="col-6">
     <div class="form-group">
-        {{ form.issues.label }}
+        <label>{{ form.issues.label }}</label>
         {% if form.issues.errors %}
             <ul class="errors">
                 {% for error in form.issues.errors %}
@@ -32,9 +32,9 @@
     </div>
 </div>
 
-<div class="col-6">
+<div class="{% if perms.main.edit_extended_post_attrs %}col-4{% else %}col-6{% endif %}">
     <div class="form-group">
-        {{ form.finished_at.label }}
+        <label>{{ form.finished_at.label }}</label>
         {% if form.finished_at.errors %}
             <ul class="errors">
                 {% for error in form.finished_at.errors %}
@@ -44,10 +44,17 @@
         {{ form.finished_at }}
     </div>
 </div>
+
 {% if perms.main.edit_extended_post_attrs %}
-    <div class="col-6">
+    {{ form.media }}
+    <style type="text/css">
+        .django-ace-widget {
+            position: initial;
+        }
+    </style>
+    <div class="col-4">
         <div class="form-group">
-            {{ form.published_at.label }}
+            <label>{{ form.published_at.label }}</label>
             {% if form.published_at.errors %}
                 <ul class="errors">
                     {% for error in form.published_at.errors %}
@@ -57,6 +64,34 @@
             {{ form.published_at }}
         </div>
     </div>
+    
+    <div class="col-4">
+        <div class="form-group">
+            <label>{{ form.wp_id.label }}</label>
+            {% if form.wp_id.errors %}
+                <ul class="errors">
+                    {% for error in form.title.errors %}
+                        <li>{{ error }}</li>{% endfor %}
+                </ul>
+            {% endif %}
+            {{ form.wp_id }}
+        </div>
+    </div>
+    
+    <div class="col-12">
+        <div class="form-group">
+            <label>{{ form.css.label }}</label>
+            <p class="small">{{ form.css.help_text }}</p>
+            {% if form.css.errors %}
+                <ul class="errors">
+                    {% for error in form.title.errors %}
+                        <li>{{ error }}</li>{% endfor %}
+                </ul>
+            {% endif %}
+            {{ form.css }}
+        </div>
+    </div>
+    
 {% endif %}
 
 
