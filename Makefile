@@ -21,4 +21,4 @@ stage-production-dependancies:
 	export LIBRARY_PATH=$LIBRARY_PATH:/usr/local/opt/openssl/lib/
 	rm -rf `pipenv --venv`
 	pipenv install
-	pipenv run pip freeze > requirements
+	pipenv run pip freeze > requirements.txt
