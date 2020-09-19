@@ -12,7 +12,7 @@
     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
         {% for issue in navbar_issues %}
             <a class="dropdown-item"
-               href="{% url 'issues_show' issue.id %}">{{ issue }}</a>
+               href="{% url 'issues_show' issue.id %}">{{ issue.full_title }}</a>
         {% endfor %}
         <div class="dropdown-divider"></div>
         <a class="dropdown-item" href="{% url 'issues_index' %}">{% trans "Все выпуски" %}</a>
