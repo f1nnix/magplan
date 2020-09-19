@@ -18,7 +18,7 @@
                 <tr>
                     <td>{{ issue.number }}</td>
                     <td>
-                        <a href="{%  url 'issues_show' issue.id %}">{{ issue }}
+                        <a href="{%  url 'issues_show' issue.id %}">{{ issue.full_title }}
                     </td>
                     <td>{{ issue.count }}</td>
                     <td>{{ issue.magazine.title }}</td>
