@@ -491,7 +491,7 @@ class Post(AbstractBase):
 
         update_ext_db_xmd(
             self.wp_id,
-            xmd=prepared_xmd, title=self.title, css=self.css,
+            xmd=prepared_xmd, title=str(self), css=self.css,
         )
 
 
