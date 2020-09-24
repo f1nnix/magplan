@@ -94,7 +94,7 @@ def update_post_meta_field(conn: pymysql.Connection, object_id: int, meta_key: s
 def update_post_field(conn: pymysql.Connection, object_id: int, key: str, value: str):
     with conn.cursor() as cursor:
         update_query = f'UPDATE wp_posts SET {key}=%s WHERE ID=%s;'  # Injection-safe as key is trusted
-        cursor.execute(update_query, (key, value, object_id,))
+        cursor.execute(update_query, (value, object_id,))
 
     conn.commit()
 
