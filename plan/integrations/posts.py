@@ -75,18 +75,39 @@ def replace_images_paths(xmd: str, attachments: tp.List, mapper: tp.Callable = N
     return '\n'.join(result_lines)
 
 
-def update_ext_db_xmd(post_id: int, xmd: str):
-    """
+def update_post_meta_field(conn: pymysql.Connection, object_id: int, meta_key: str, meta_value: str):
+    with conn.cursor() as cursor:
+        retrieve_query = 'SELECT meta_value FROM wp_postmeta WHERE post_id=%s and meta_key="%s" limit 1;'
+        cursor.execute(retrieve_query, (object_id, meta_key))
 
-    :param post_id:
-    :param xmd:
-    :return:
+        # Update existing if found
+        existing_rows = cursor.fetchone()
+        if existing_rows:
+            update_query = 'UPDATE wp_postmeta SET meta_value=%s WHERE post_id=%s and meta_key="%s";'
+        else:
+            update_query = 'INSERT INTO wp_postmeta (meta_value, meta_key, post_id) VALUES (%s, "%s", %s);'
+        cursor.execute(update_query, (meta_key, object_id, meta_value))
+
+    conn.commit()
+
+
+def update_post_field(conn: pymysql.Connection, object_id: int, key: str, value: str):
+    with conn.cursor() as cursor:
+        update_query = 'UPDATE wp_posts SET %s=%s WHERE ID=%s;'
+        cursor.execute(update_query, (key, value, object_id,))
+
+    conn.commit()
+
+
+def update_ext_db_xmd(post_id: int, *, xmd: str, title: str, css: str) -> None:
+    """
+    Updates provided kwargs for post with post_id in external DB
     """
     if not all(settings.EXT_DB.get(key) for key in settings.EXT_DB.keys()):
         return
 
     conf = settings.EXT_DB
-    
+
     # Prepare settings for SSH tunnel connection
     ssh_conn_args = ((conf['SSH_HOST'], int(conf['SSH_PORT'])),)
     ssh_conn_kwargs = {
@@ -95,7 +116,7 @@ def update_ext_db_xmd(post_id: int, xmd: str):
         'remote_bind_address': (conf['EXT_DB_HOST'], int(conf['EXT_DB_PORT'])
         )
     }
-    
+
     with SSHTunnelForwarder(*ssh_conn_args, **ssh_conn_kwargs) as tunnel:
         mysql_conn_settings = {
             'host': conf['EXT_DB_HOST'],
@@ -105,18 +126,12 @@ def update_ext_db_xmd(post_id: int, xmd: str):
             'port': tunnel.local_bind_port
         }
         conn = pymysql.connect(**mysql_conn_settings)
-        with conn.cursor() as cursor:
-            # TODO: rewrite with update or insert
-            retrieve_query = 'SELECT meta_value FROM wp_postmeta WHERE post_id=%s and meta_key="md" limit 1;'
-            cursor.execute(retrieve_query, (post_id,))
 
-            # Update existing if found
-            existing_rows = cursor.fetchone()
-            if existing_rows:
-                update_query = 'UPDATE wp_postmeta SET meta_value=%s WHERE post_id=%s and meta_key="md";'
-            else:
-                update_query = 'INSERT INTO wp_postmeta (meta_value, meta_key, post_id) VALUES (%s, "md", %s);'
-            cursor.execute(update_query, (xmd, post_id))
-            conn.commit()
+        if xmd:
+            update_post_meta_field(conn, post_id, 'xmd', xmd)
+        if css:
+            update_post_meta_field(conn, post_id, 'css', css)
+        if title:
+            update_post_field(conn, post_id, 'post_title', title)
 
-        conn.close()
+    conn.close()

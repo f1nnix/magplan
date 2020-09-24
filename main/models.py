@@ -465,7 +465,7 @@ class Post(AbstractBase):
         )
 
     def upload(self):
-        """Uploads post and attachments to remote CMS
+        """Uploads post, metadata and attachments to remote CMS
         
         * self images uploaded to S3.
         * self content uploaded to WP with uploaded S3 images urls
@@ -488,8 +488,11 @@ class Post(AbstractBase):
             attachments=self.images,
             mapper=s3_image_mapper,
         )
-        prepared_xmd = self.build_xmd_blob(prepared_xmd)
-        update_ext_db_xmd(self.wp_id, prepared_xmd)
+
+        update_ext_db_xmd(
+            self.wp_id,
+            xmd=prepared_xmd, title=self.title, css=self.css,
+        )
 
 
 class Widget(AbstractBase):
