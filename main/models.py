@@ -349,7 +349,7 @@ class Post(AbstractBase):
     comments = GenericRelation('Comment')
     is_locked = models.BooleanField(default=False)
     css = models.TextField(
-        null=True, blank=False, verbose_name='CSS-стили для статьи',
+        null=True, blank=True, verbose_name='CSS-стили для статьи',
         help_text=(
             'CSS, который будет применяться к превью статьи'
         )
