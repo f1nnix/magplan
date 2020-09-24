@@ -85,7 +85,7 @@ def update_post_meta_field(conn: pymysql.Connection, object_id: int, meta_key: s
         if existing_rows:
             update_query = 'UPDATE wp_postmeta SET meta_value=%s WHERE post_id=%s and meta_key="%s";'
         else:
-            update_query = 'INSERT INTO wp_postmeta (meta_value, post_id, meta_key,) VALUES (%s, "%s", %s);'
+            update_query = 'INSERT INTO wp_postmeta (meta_value, post_id, meta_key) VALUES (%s, "%s", %s);'
         cursor.execute(update_query, (meta_value, object_id, meta_key,))
 
     conn.commit()
