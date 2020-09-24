@@ -93,7 +93,7 @@ def update_post_meta_field(conn: pymysql.Connection, object_id: int, meta_key: s
 
 def update_post_field(conn: pymysql.Connection, object_id: int, key: str, value: str):
     with conn.cursor() as cursor:
-        update_query = 'UPDATE wp_posts SET %s=%s WHERE ID=%s;'
+        update_query = f'UPDATE wp_posts SET {key}=%s WHERE ID=%s;'  # Injection-safe as key is trusted
         cursor.execute(update_query, (key, value, object_id,))
 
     conn.commit()
@@ -127,7 +127,7 @@ def update_ext_db_xmd(post_id: int, *, xmd: str, title: str, css: str) -> None:
         conn = pymysql.connect(**mysql_conn_settings)
 
         if xmd:
-            update_post_meta_field(conn, post_id, 'xmd', xmd)
+            update_post_meta_field(conn, post_id, 'md', xmd)
         if css:
             update_post_meta_field(conn, post_id, 'css', css)
         if title:
