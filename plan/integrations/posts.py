@@ -77,15 +77,15 @@ def replace_images_paths(xmd: str, attachments: tp.List, mapper: tp.Callable = N
 
 def update_post_meta_field(conn: pymysql.Connection, object_id: int, meta_key: str, meta_value: str):
     with conn.cursor() as cursor:
-        retrieve_query = 'SELECT meta_value FROM wp_postmeta WHERE post_id=%s and meta_key="%s" limit 1;'
+        retrieve_query = 'SELECT meta_value FROM wp_postmeta WHERE post_id=%s and meta_key=%s limit 1;'
         cursor.execute(retrieve_query, (object_id, meta_key))
 
         # Update existing if found
         existing_rows = cursor.fetchone()
         if existing_rows:
-            update_query = 'UPDATE wp_postmeta SET meta_value=%s WHERE post_id=%s and meta_key="%s";'
+            update_query = 'UPDATE wp_postmeta SET meta_value=%s WHERE post_id=%s and meta_key=%s;'
         else:
-            update_query = 'INSERT INTO wp_postmeta (meta_value, post_id, meta_key) VALUES (%s, "%s", %s);'
+            update_query = 'INSERT INTO wp_postmeta (meta_value, post_id, meta_key) VALUES (%s, %s, %s);'
         cursor.execute(update_query, (meta_value, object_id, meta_key,))
 
     conn.commit()
