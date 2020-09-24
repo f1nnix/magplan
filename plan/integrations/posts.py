@@ -25,9 +25,9 @@ url_replace_pattern = re.compile(
 def Lock(post):
     post.is_locked = True
     post.save()
-    
+
     yield
-    
+
     post.is_locked = False
     post.save()
 
@@ -85,8 +85,8 @@ def update_post_meta_field(conn: pymysql.Connection, object_id: int, meta_key: s
         if existing_rows:
             update_query = 'UPDATE wp_postmeta SET meta_value=%s WHERE post_id=%s and meta_key="%s";'
         else:
-            update_query = 'INSERT INTO wp_postmeta (meta_value, meta_key, post_id) VALUES (%s, "%s", %s);'
-        cursor.execute(update_query, (meta_key, object_id, meta_value))
+            update_query = 'INSERT INTO wp_postmeta (meta_value, post_id, meta_key,) VALUES (%s, "%s", %s);'
+        cursor.execute(update_query, (meta_value, object_id, meta_key,))
 
     conn.commit()
 
@@ -113,8 +113,7 @@ def update_ext_db_xmd(post_id: int, *, xmd: str, title: str, css: str) -> None:
     ssh_conn_kwargs = {
         'ssh_username': conf['SSH_USER'],
         'ssh_password': conf['SSH_PASS'],
-        'remote_bind_address': (conf['EXT_DB_HOST'], int(conf['EXT_DB_PORT'])
-        )
+        'remote_bind_address': (conf['EXT_DB_HOST'], int(conf['EXT_DB_PORT']))
     }
 
     with SSHTunnelForwarder(*ssh_conn_args, **ssh_conn_kwargs) as tunnel:
