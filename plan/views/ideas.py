@@ -14,6 +14,7 @@ from django.template.loader import render_to_string
 
 from main.models import Idea, Issue, Vote
 from plan.forms import CommentModelForm, IdeaModelForm, PostBaseModelForm, IDEA_AUTHOR_SELF_CHOICE
+from plan.tasks import send_idea_notification
 from plan.tasks.send_idea_comment_notification import send_idea_comment_notification
 from utils import safe_cast
 
