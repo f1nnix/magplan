@@ -51,7 +51,7 @@ def index(request):
                     idea.authors.add(request.user)
                     idea.save()
 
-            # send_idea_notification.delay(idea.id)
+            send_idea_notification.delay(idea.id)
 
             # Clear idea form to prevent rendering pre-filled form
             form = IdeaModelForm()
