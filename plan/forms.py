@@ -1,8 +1,13 @@
+from collections import namedtuple
+
 from django import forms
 from django.forms import ModelForm
 from django_ace import AceWidget
 
 from main.models import Idea, Post, Comment, Section, Issue, User, Profile
+
+SelectChoice = namedtuple('SelectChoice', ['slug', 'title'])
+IDEA_AUTHOR_SELF_CHOICE = SelectChoice('SELF', 'Напишу сам')
 
 
 class UserModelForm(ModelForm):
@@ -31,20 +36,49 @@ class ProfileModelForm(ModelForm):
             self.fields[f].required = False
 
 
+class IdeaAuthorTypeChoiceField(forms.ChoiceField):
+    def validate(self, value):
+        """Custom field, which allows virtual SELF field value"""
+        if value == IDEA_AUTHOR_SELF_CHOICE.slug:
+            return
+
+        super().validate(value)
+
+
 class IdeaModelForm(ModelForm):
+    # Add virtual field to extend default widget choices
+
+    EXTENDED_AUTHOR_TYPE_CHOICES = (
+        IDEA_AUTHOR_SELF_CHOICE, *reversed(Idea.AUTHOR_TYPE_CHOICES)
+    )
+
+    author_type = IdeaAuthorTypeChoiceField(
+        choices=EXTENDED_AUTHOR_TYPE_CHOICES,
+        widget=forms.Select(
+            attrs={'class': 'form-control'},
+        ),
+        label=Idea._meta.get_field('author_type').verbose_name
+    )
+
     class Meta:
         model = Idea
         fields = ['title', 'description', 'author_type', 'authors_new', 'authors']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', }),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
-            'author_type': forms.Select(attrs={'class': 'form-control'}),
             'authors_new': forms.TextInput(attrs={'class': 'form-control'}),
             'authors': forms.SelectMultiple(attrs={
                 'class': 'form-control live_multiselect',
                 'data-url': '/admin/api/users/search',
             }),
         }
+
+    def clean_author_type(self):
+        data = self.cleaned_data['author_type']
+        if data == IDEA_AUTHOR_SELF_CHOICE.slug:
+            return Idea.AUTHOR_TYPE_EXISTING
+
+        return data
 
 
 class IssueModelForm(ModelForm):
