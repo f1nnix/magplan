@@ -13,9 +13,8 @@ from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
 
 from main.models import Idea, Issue, Vote
-from plan.forms import CommentModelForm, IdeaModelForm, PostBaseModelForm
+from plan.forms import CommentModelForm, IdeaModelForm, PostBaseModelForm, IDEA_AUTHOR_SELF_CHOICE
 from plan.tasks.send_idea_comment_notification import send_idea_comment_notification
-from plan.tasks.send_idea_notification import send_idea_notification
 from utils import safe_cast
 
 IDEAS_PER_PAGE = 20
@@ -45,7 +44,14 @@ def index(request):
             if idea.author_type == Idea.AUTHOR_TYPE_EXISTING:
                 form.save_m2m()
 
-            send_idea_notification.delay(idea.id)
+                # Handle virtual SELF choice (which is actual AUTHOR_TYPE_EXISTING)
+                # We did it after actual m2m save as form.save_m2m()will overwrite any
+                # model assignments usgin empty Form authors field. So saving one more time
+                if request.POST.get('author_type') == IDEA_AUTHOR_SELF_CHOICE.slug:
+                    idea.authors.add(request.user)
+                    idea.save()
+
+            # send_idea_notification.delay(idea.id)
 
             # Clear idea form to prevent rendering pre-filled form
             form = IdeaModelForm()
