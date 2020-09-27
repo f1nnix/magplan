@@ -17,12 +17,15 @@
 
     {% if idea.approved is None %}
         {% include 'plan/ideas/_vote.html' %}
-
     {% else %}
         <br>
 
         {% if idea.approved == True %}
-            <p><strong>По результатам голосования идея статьи одобрена!</strong></p>
+            <h2 style="padding-bottom: 0.6rem;"><strong>По результатам голосования идея статьи одобрена! 👍 😊 🚀</strong></h2>
+            <div class="row">
+                {% include 'plan/ideas/_voting_results.html' %}
+            </div>
+            <br>
             <div class="card border-success">
                 {% if idea.post %}
                     <div class="card-header text-white bg-primary">Есть статья!</div>
@@ -44,8 +47,11 @@
 
             </div>
         {% else %}
-            <p><strong>По результатам голосования идея статьи отклонена.</strong> Сделать из нее статью на данный момент
-                нельзя.</p>
+            <h2 style="padding-bottom: 0.6rem;">По результатам голосования идея статьи отклонена ❌ 😵 ⛈</h2>
+            <p>Сделать из нее статью на данный момент нельзя.</p>
+            <div class="row">
+                {% include 'plan/ideas/_voting_results.html' %}
+            </div>
         {% endif %}
     {% endif %}
     <br/>
