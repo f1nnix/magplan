@@ -81,9 +81,10 @@ def index(request):
     elif filter_ == 'rejected':
         ideas = ideas.filter(approved=False)
     elif filter_ == 'no_author':
-        ideas = ideas.filter(author_type=Idea.AUTHOR_TYPE_NO)
-        # HACK:
-        ideas = ideas.filter(created_at__gte=AUTHOR_TYPE_DAY)
+        ideas = ideas.filter(
+            author_type=Idea.AUTHOR_TYPE_NO,
+            created_at__gte=AUTHOR_TYPE_DAY,  # HACK
+        )
 
     ideas = ideas.all()
 
