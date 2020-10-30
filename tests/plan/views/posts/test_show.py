@@ -22,13 +22,13 @@ def test_not_authenticated(anonymous_client, post):
 def test_show(_, client, post):
     url = route_url(post.id)
 
-    with _.assertTemplateUsed('plan/posts/show.html'):
+    with _.assertTemplateUsed('magplan/posts/show.html'):
         resp = client.get(url)
         assert resp.status_code == 200
 
 
 @pytest.mark.django_db
-@patch('plan.views.posts._get_arbitrary_chunk')
+@patch('magplan.views.posts._get_arbitrary_chunk')
 def test_instance_template_code_rendered(mock_get_arbitrary_chunk, _, client, post):
     arbitrary_chunk = 'instance-chunk'
     mock_get_arbitrary_chunk.return_value = arbitrary_chunk

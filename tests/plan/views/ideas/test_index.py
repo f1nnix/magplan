@@ -19,7 +19,7 @@ def test_index(_, client, idea):
 
 
 @pytest.mark.django_db
-@patch('plan.views.ideas.send_idea_notification.delay')
+@patch('magplan.views.ideas.send_idea_notification.delay')
 def test_create(
         mock_send_idea_notification_delay,
         _, user, make_user, client
@@ -53,7 +53,7 @@ def test_create(
 
 
 @pytest.mark.django_db
-@patch('plan.views.ideas.Idea._send_vote_notification')
+@patch('magplan.views.ideas.Idea._send_vote_notification')
 def test_send_vote_notifications(
         mock_send_vote_notification, make_user, make_idea,
 ):
@@ -69,7 +69,7 @@ def test_send_vote_notifications(
 
     # Add user preference to get new idea notifications
     UserPreferenceModel.objects.create(
-        section='plan', name='new_idea_notification', raw_value='yes',
+        section='magplan', name='new_idea_notification', raw_value='yes',
         instance=user_2
     )
 

@@ -1,0 +1,12 @@
+{% extends "layout_plan.html" %}
+{% block title %}Добавить автора{% endblock %}
+{% block content %}
+    <h1>Добавить авторв</h1>
+    <form action="{% url 'authors_new' %}"
+          method="post"
+          accept-charset="utf-8">
+        {% csrf_token %}
+        {% include "magplan/authors/_form.html" %}
+        <input id="save_post" class="btn btn-success float-right" type="submit" value="Добавить автора"/>
+    </form>
+{% endblock %}

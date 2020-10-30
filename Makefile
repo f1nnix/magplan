@@ -22,3 +22,7 @@ stage-production-dependancies:
 	rm -rf `pipenv --venv`
 	pipenv install
 	pipenv run pip freeze > requirements.txt
+
+package:
+	pipenv-setup sync
+	@python setup.py sdist

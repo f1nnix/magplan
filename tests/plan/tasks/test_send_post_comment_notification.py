@@ -39,9 +39,9 @@ def test_get_involved_users_commenters_added(comment, users):
 
 
 @pytest.mark.django_db
-@patch('plan.tasks.send_post_comment_notification._get_involved_users')
-@patch('plan.tasks.send_post_comment_notification._get_whitelisted_recipients')
-@patch('plan.tasks.send_post_comment_notification._can_recieve_notification')
+@patch('magplan.tasks.send_post_comment_notification._get_involved_users')
+@patch('magplan.tasks.send_post_comment_notification._get_whitelisted_recipients')
+@patch('magplan.tasks.send_post_comment_notification._can_recieve_notification')
 def test_get_recipients(
     mock_can_recieve_notification, mock_get_whitelisted_recipients, mock_get_involved_users, comment
 ):
@@ -54,15 +54,15 @@ def test_get_recipients(
 
 
 @pytest.mark.django_db
-@patch('plan.tasks.send_post_comment_notification.EmailMultiAlternatives.send')
+@patch('magplan.tasks.send_post_comment_notification.EmailMultiAlternatives.send')
 def test_send_email(mock_send, comment):
     _send_email(comment, ())
     mock_send.assert_called()
 
 
 @pytest.mark.django_db
-@patch('plan.tasks.send_post_comment_notification._get_recipients')
-@patch('plan.tasks.send_post_comment_notification._send_email')
+@patch('magplan.tasks.send_post_comment_notification._get_recipients')
+@patch('magplan.tasks.send_post_comment_notification._send_email')
 def test_send_post_comment_notification(mock_send_email, mock_get_recipients, users, comment):
     mock_get_recipients.return_value = users[:2]
 

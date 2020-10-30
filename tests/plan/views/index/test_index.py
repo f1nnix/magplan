@@ -15,6 +15,6 @@ def test_redirect_to_login_if_not_authenticated(_, anonymous_client):
 
 @pytest.mark.django_db
 def test_allow_access_to_page_if_has_auth(_, client):
-    with _.assertTemplateUsed('plan/index/index.html'):
+    with _.assertTemplateUsed('magplan/index/index.html'):
         resp = client.get(url)
         assert resp.status_code == 200

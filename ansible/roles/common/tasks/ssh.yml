@@ -1,7 +1,0 @@
-# Add custom sshd configuration file so that both password
-# authentication and authenticating as root are both disabled.
-- name: copy custom sshd configuration file
-  template: src=sshd_config dest=/etc/ssh/sshd_config
-  become: true
-  notify:
-    - restart ssh

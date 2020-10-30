@@ -1,7 +1,0 @@
-AcceptEnv LANG LC_*
-PasswordAuthentication no
-PermitRootLogin no
-PrintMotd no
-Subsystem sftp /usr/lib/openssh/sftp-server
-TCPKeepAlive yes
-UseDNS no

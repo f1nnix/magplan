@@ -1,7 +1,0 @@
-- name: add systemd unit file for main app
-  template: src=flower.service.conf
-            dest=/etc/systemd/system/{{ project_name }}-flower.service
-  become: true
-  notify:
-    - restart flower
-  tags: celery

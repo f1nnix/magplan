@@ -1,0 +1,12 @@
+{% extends "layout_plan.html" %}
+{% block title %}Редактирование автора «{{ user }}»{% endblock %}
+{% block content %}
+    <h1>Редактровать автора «{{ user }}»</h1>
+    <form action="{% url 'authors_edit' user.id %}"
+          method="post"
+          accept-charset="utf-8">
+        {% csrf_token %}
+        {% include "magplan/authors/_form.html" %}
+        <input id="save_post" class="btn btn-success float-right" type="submit" value="Сохранить автора"/>
+    </form>
+{% endblock %}

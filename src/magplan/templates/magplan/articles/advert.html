@@ -1,0 +1,28 @@
+{% extends "layout_plan.html" %}
+{% block title %}Создать рекламный материал{% endblock %}
+{% block styles %}
+    <style>
+        .select2-container {
+            width: 100% !important;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <h1>Создать рекламный материал</h1>
+
+    <div class="row">
+        <div class="col-12">
+            {% with form=form %}
+                <form action="{% url 'articles_advert' %}"
+                      method="POST"
+                      accept-charset="utf-8">
+                    {% csrf_token %}
+                    {% include 'magplan/posts/_form_base.html' %}
+                    <button type="submit" class="btn btn-success float-right">Создать рекламный материал</button>
+                </form>
+            {% endwith %}
+        </div>
+    </div>
+
+
+{% endblock %}

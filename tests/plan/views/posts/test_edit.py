@@ -20,6 +20,6 @@ def test_not_authenticated(anonymous_client, post):
 def test_edit(_, client, post):
     url = route_url(post.id)
 
-    with _.assertTemplateUsed('plan/posts/edit.html'):
+    with _.assertTemplateUsed('magplan/posts/edit.html'):
         resp = client.get(url)
         assert resp.status_code == 200

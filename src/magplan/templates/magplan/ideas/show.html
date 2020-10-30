@@ -1,0 +1,74 @@
+{% extends "layout_plan.html" %}
+{% block title %}Идея «{{ idea.title }}»{% endblock %}
+{% load filters %}
+{% block styles %}
+{% endblock %}
+{% block content %}
+    <h2 id='title' class="text-muted">{{ idea.title }}</h2>
+    <p>
+        <strong>Предложил</strong> {{ idea.editor }}
+    </p>
+    <p>
+        {% with idea=idea AUTHOR_TYPE_CHOICES=AUTHOR_TYPE_CHOICES %}
+            {% include 'magplan/ideas/_authors_list.html' %}
+        {% endwith %}
+    </p>
+    <div id="description">{{ idea.description_html|safe }}</div>
+
+    {% if idea.approved is None %}
+        {% include 'magplan/ideas/_vote.html' %}
+    {% else %}
+        <br>
+
+        {% if idea.approved == True %}
+            <h2 style="padding-bottom: 0.6rem;"><strong>По результатам голосования идея статьи одобрена! 👍 😊 🚀</strong></h2>
+            <div class="row">
+                {% include 'magplan/ideas/_voting_results.html' %}
+            </div>
+            <br>
+            <div class="card border-success">
+                {% if idea.post %}
+                    <div class="card-header text-white bg-primary">Есть статья!</div>
+                    <div class="card-body"> К этой идее создана статья:
+                        <a class="btn btn-secondary btn-sm" href="{% url 'posts_show' idea.post.id %}">посмотреть</a>
+                    </div>
+                {% else %}
+                    <div class="card-header text-white bg-success">Сделать из идеи статью</div>
+                    <div class="card-body text-success">
+                        <form action="{% url 'posts_create' %}" method="POST" accept-charset="utf-8">
+                            {% csrf_token %}
+                            {% include 'magplan/posts/_form_base.html' %}
+                            <input type="hidden" name="idea_id" value="{{ idea.id }}"/>
+                            <button type="submit" class="btn btn-success float-right">Создать статью из идеи!</button>
+                        </form>
+                    </div>
+                {% endif %}
+
+
+            </div>
+        {% else %}
+            <h2 style="padding-bottom: 0.6rem;">По результатам голосования идея статьи отклонена ❌ 😵 ⛈</h2>
+            <p>Сделать из нее статью на данный момент нельзя.</p>
+            <div class="row">
+                {% include 'magplan/ideas/_voting_results.html' %}
+            </div>
+        {% endif %}
+    {% endif %}
+    <br/>
+
+    {# Support for generic comments template #}
+    {% with comments=idea.comments_ form=comment_form action_url=idea|url_for_idea_comments %}
+        {% include 'magplan/partials/comments.html' %}
+    {% endwith %}
+
+{% endblock %}
+{% block scripts %}
+    <script type="text/javascript">
+        $('.issues-suggestions .suggestion a').click(function (e) {
+            e.preventDefault()
+            let id = $(this).data('id')
+
+            $('#id_issues').val(id).trigger('change');
+        })
+    </script>
+{% endblock %}

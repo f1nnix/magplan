@@ -1,9 +1,0 @@
-- hosts: all
-  gather_facts: true
-  roles:
-  - postgresql
-  - redis
-  - webapp
-  vars_files:
-  - group_vars/production
-  - secret_vars/production

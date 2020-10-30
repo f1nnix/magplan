@@ -1,0 +1,214 @@
+{% extends "layout_plan.html" %}
+
+{% block title %}Редактирование «{{ post.title }}»{% endblock %}
+{% block styles %}
+    <style>
+        .attachment-image {
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+            height: 8rem;
+        }
+
+        span.twitter-typeahead {
+            width: auto !important;
+        }
+
+        section {
+            padding-bottom: 1rem;
+        }
+
+        #editor {
+            position: relative;
+            height: 40rem;
+        }
+
+        .select2-container {
+            width: 100% !important;
+        }
+
+        #header h1 {
+            display: inline;
+            font-weight: bold;
+        }
+
+        .edit_hidden {
+            display: none;
+        }
+
+        #images_status > p {
+            color: #ddd;
+        }
+
+        #images_status > #missing.active {
+            color: lightcoral;
+        }
+
+        #images_status > #extra.active {
+            /* Also red, as extra image is also treated as error */
+            /* color: cadetblue; */
+            color: lightcoral;
+        }
+
+        footer {
+            z-index: 1;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+{% endblock %}
+
+{% block content %}
+    {% if post.is_locked == True %}
+        <div class="flash_messages">
+            <div class="alert alert-warning" role="alert">
+                Этот пост сейчас публикуется в Wordpress. Пожалуйта, не редактируйте его до окончания обновления.
+                Вы можете обновить страницу чтобы убедиться, что публикация завершена.
+            </div>
+        </div>
+    {% endif %}
+
+    <h2>Редактирование «<a href="{% url 'posts_show' post.id %}">{{ post }}</a>»</h2>
+    <div class="meta">
+        <p>В номерах: {% for issue in post.issues.all %}
+            <a href="{% url 'issues_show' issue.id %}">{{ issue }}</a>{% if forloop.last is False %}, {% else %}.
+            {% endif %}
+        {% endfor %}</p>
+    </div>
+    <form id="save_post_form"
+          action="{% url 'posts_edit' post.id %}"
+          method="post"
+          accept-charset="utf-8"
+          enctype='multipart/form-data'>
+        {% csrf_token %}
+
+        <div class="row">
+            {% with field="kicker" size=4 %}{% include 'magplan/posts/_field_col.html' %}{% endwith %}
+            {% with field="title" size=8 %}{% include 'magplan/posts/_field_col.html' %}{% endwith %}
+            {% with field="description" size=12 %}{% include 'magplan/posts/_field_col.html' %}{% endwith %}
+            {% with field="section" size=6 %}{% include 'magplan/posts/_field_col.html' %}{% endwith %}
+            {% with field="authors" size=6 %}{% include 'magplan/posts/_field_col.html' %}{% endwith %}
+        </div>
+
+
+        <section id="attachments" style="margin-bottom: 1rem;">
+            {% with is_locked=post.is_locked images=post.images pdfs=post.pdfs files=post.files %}
+                {% include 'magplan/posts/_attachments.html' %}
+            {% endwith %}
+
+            <div id="images_status">
+                <p id="missing"></p>
+                <p id="extra"></p>
+            </div>
+        </section>
+
+        <div class="row">
+            {% with field="xmd" size=12 %}{% include 'magplan/posts/_field_col.html' %}{% endwith %}
+        </div>
+    </form>
+{% endblock %}
+
+{% block footer %}
+    <footer class="footer">
+        <div class="container">
+            <span class="small d-none d-sm-inline">Изменено {{ post.updated_at }}{% if post.last_updater %} —
+                {{ post.last_updater }}{% endif %}</span>
+            <div class="float-right">
+                <input type="submit" id="save_post" form="save_post_form"
+                       class="btn btn-success" value="Сохранить"
+                       {% if post.is_locked == True %}disabled="disabled"{% endif %}
+                />
+            </div>
+        </div>
+    </footer>
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript">
+        window.DELETE_ATTACHMENT_URL = "{% url 'posts_attachment_delete' post.id %}";
+    </script>
+
+    <script type="text/javascript">
+        let INITIAL = [
+            {% for image in post.images %}
+                '{{ image.original_filename }}',
+            {% endfor %}
+
+        ];
+
+        let getUsedImages = function (currentText) {
+            const matchedImagesGroups = currentText.match(/!\[(.*?)\]\(.+?\)/gm);
+            if (matchedImagesGroups === null) {
+                return [];
+            }
+            return matchedImagesGroups.map(function (currentValue, index, array) {
+                // TODO: improve lazy matching group to catch first ( from $
+                let img = currentValue.match(/\]\((.+?)\)$/)[0].slice(2, -1);
+
+                // if its a video with preview
+                if (img.indexOf(' ') > -1) {
+                    let chunks = img.split(' ');
+                    if (chunks[0].indexOf('youtube.com') > -1) return chunks[1];
+                    if (chunks[0].indexOf('vimeo.com') > -1) return chunks[1]
+                }
+
+                // if its a gallery
+                if (img.indexOf(',') > -1) return img.split(',');
+
+                return img
+            })
+        };
+
+
+        let countStats = function () {
+            let currentText = $('#id_xmd').val()
+            let usedImages = getUsedImages(currentText)
+
+            let missingImages = [...new Set(usedImages.filter(x => !INITIAL.includes(x)))]
+            let extraImages = [...new Set(INITIAL.filter(x => !usedImages.includes(x)))]
+
+            return [missingImages, extraImages]
+        }
+
+        let updateStats = function () {
+            let [missing, extra] = countStats()
+            let missingClass = '',
+                missingText = '',
+                extraClass = '',
+                extraText = '';
+
+
+            if (missing.length > 0) {
+                missingText = 'Не хватает картинок: ' + missing.join(', ');
+                missingClass = 'active'
+            } else {
+                missingText = 'Все картинки приложены'
+            }
+            $('#images_status #missing').text(missingText).attr('class', missingClass)
+
+
+            if (extra.length > 0) {
+                extraText = 'Лишние картинки: ' + extra.join(', ');
+                extraClass = 'active'
+            } else {
+                extraText = 'Лишних картинок нет'
+            }
+            $('#images_status #extra').text(extraText).attr('class', extraClass)
+        };
+
+        $(document).ready(function () {
+            {% if request.user.preferences.plan__xmd_editor_type == 'markdown' %}
+                const simpleMDE = new SimpleMDE({
+                    element: $("#id_xmd")[0],
+                    spellChecker: false,
+                    forceSync: true
+                });
+            {% endif %}
+
+            updateStats();
+            $("#id_xmd").on('change keyup paste', function () {
+                updateStats()
+            });
+        })
+    </script>
+    <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+{% endblock %}

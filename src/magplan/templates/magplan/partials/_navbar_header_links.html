@@ -1,0 +1,32 @@
+{% load i18n %}
+
+{% if perms.main.manage_authors %}
+    <li class="nav-item {% if navbar_current == 'authors' %}active{% endif %}">
+        <a class="nav-link" href="{% url 'authors_index' %} ">Авторы</a>
+    </li>
+{% endif %}
+
+<li class="nav-item dropdown {% if navbar_current == 'issues' %}active{% endif %}">
+    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{% trans "issues" %}</a>
+    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+        {% for issue in navbar_issues %}
+            <a class="dropdown-item"
+               href="{% url 'issues_show' issue.id %}">{{ issue.full_title }}</a>
+        {% endfor %}
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item" href="{% url 'issues_index' %}">{% trans "Все выпуски" %}</a>
+    </div>
+</li>
+
+<li class="nav-item {% if navbar_current == 'ideas' %}active{% endif %}">
+    <a class="nav-link" href="{% url 'ideas_index' %}?filter=voted">Идеи</a>
+</li>
+
+<li class="nav-item {% if navbar_current == 'articles' %}active{% endif %}">
+    <a class="nav-link" href="{% url 'articles_index' %} ">Статьи</a>
+</li>
+
+{#<li class="nav-item {% if navbar_current == 'wiki' %}active{% endif %}">#}
+{#    <a class="nav-link" href="{% url 'wiki:root' %} ">Вики</a>#}
+{#</li>#}

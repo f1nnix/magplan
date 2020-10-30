@@ -1,0 +1,3 @@
+include README.md
+include setup.cfg
+recursive-include src *.html *.txt *.png *.js *.css *.gif *.scss *.mo *.po *.svg *.woff *.woff2 *.eot *.ttf *.map

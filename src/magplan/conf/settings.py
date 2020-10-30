@@ -1,0 +1,1 @@
+PLAN_EMAIL_FROM = 'foo@bar.baz'
