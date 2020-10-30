@@ -53,13 +53,13 @@ extras_requirements = {
 
 setup(
     name="magplan",
-    version="0.33",
+    version="2.0.1",
     author="Ilya Rusanen",
     author_email="ilya@rusanen.co.uk",
     url="",
-    description="A wiki system written for the Django framework.",
-    license="GPLv3",
-    keywords=["django", "wiki", "markdown"],
+    description='Project management system for publishers, magazines and content creators',
+    license="MIT",
+    keywords=["django", "crm", "markdown"],
     packages=find_packages("src"),
     package_dir={"": "src"},
     py_modules=[
