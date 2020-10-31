@@ -72,7 +72,10 @@ class User(UserModel, AbstractBase):
         return self.__str__()
 
     class Meta:
-        permissions = (("manage_authors", "Can manage authors"),)
+        permissions = (
+            ("access_magplan", "Can access magplan"),
+            ("manage_authors", "Can manage authors"),
+        )
 
     def is_member(self, group_name: str) -> bool:
         """Check if user is member of group
