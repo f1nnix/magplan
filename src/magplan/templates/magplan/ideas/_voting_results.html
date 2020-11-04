@@ -1,0 +1,49 @@
+{% load filters %}
+
+<div class="col-6">
+    <strong>✅ Вы голосовали по этой идее.</strong>
+
+    <hr>
+    {% with current_score=idea.score %}
+        <h4>Текущая оценка {{ current_score }}%</h4>
+
+
+        <h6>Как принимаются решения</h6>
+        <ul>
+            <li><strong>75%–100%:</strong> идея принимается;</li>
+            <li><strong>25%–74%:</strong> решает ответственный;</li>
+            <li><strong>0%–24%:</strong> идея отклоняется.</li>
+        </ul>
+        <h6>
+            Текущая рекомендация:
+            {% if current_score < 25 %}
+                отклонить статью.
+            {% elif current_score > 24 and current_score < 75 %}
+                решает ответственный.
+            {% else %}
+                принять статью.
+            {% endif %}
+        </h6>
+    {% endwith %}
+
+    {% if perms.main.edit_extended_idea_attrs %}
+        {% include 'magplan/ideas/_approve_ideas.html' %}
+    {% endif %}
+</div>
+<div class="col-6">
+    <table class="table table-bordered">
+        <thead>
+        <th>Голосующий</th>
+        <th>Мнение</th>
+        </thead>
+        <tbody>
+        {% for vote in idea.votes.all %}
+            <tr>
+                <td>{{ vote.user }}</td>
+                <td>{{ vote.score|humanize_score }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+</div>

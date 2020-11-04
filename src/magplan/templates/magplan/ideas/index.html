@@ -1,0 +1,116 @@
+{% extends "layout_plan.html" %}
+{% block title %}Идеи{% endblock %}
+{% block styles %}
+<style>
+    /* Fix for select2 initial render in hidden mode */
+    .select2.select2-container {
+        width: 100% !important; }
+
+    #authors_new.form-group>span.label-hidable,
+    #authors.form-group>span.label-hidable {
+        visibility: hidden;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<h1>Идеи</h1>
+<div class="card border-success">
+
+    <div class="card-header text-white bg-success">Предложить идею статьи</div>
+    <div class="card-body">
+        <form action="{% url 'ideas_index' %}" method="post" accept-charset="utf-8">
+            {% csrf_token %}
+            {% include 'magplan/ideas/_form_base.html' %}
+            <button type="submit" class="btn btn-success float-right">На голосование!</button>
+        </form>
+    </div>
+</div>
+<br />
+<br />
+
+<h2>На голосовании и ожидании</h2>
+
+<ul class="nav nav-tabs">
+    <li class="nav-item">
+        <a class="nav-link {% if filter_ == none %}active{% endif %}" href="{% url 'ideas_index' %}">Все</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if filter_ == 'voted' %}active{% endif %}" href="{% url 'ideas_index' %}?filter=voted">На
+            голосовании</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if filter_ == 'self' %}active{% endif %}"
+            href="{% url 'ideas_index' %}?filter=self">Свои</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if filter_ == 'approved' %}active{% endif %}"
+            href="{% url 'ideas_index' %}?filter=approved">Принятые</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if filter_ == 'rejected' %}active{% endif %}"
+            href="{% url 'ideas_index' %}?filter=rejected">Отклоненные</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if filter_ == 'no_author' %}active{% endif %}"
+            href="{% url 'ideas_index' %}?filter=no_author">Нет автора</a>
+    </li>
+</ul>
+<br />
+
+<div class="table-responsive">
+    <table class="table table-striped table-sm table-interactive">
+        <thead>
+            <th>Редактор</th>
+            <th>Название</th>
+            <th>Голосование</th>
+        </thead>
+        <tbody>
+
+            {% for idea in ideas %}
+            <tr class="">
+                <td>{{ idea.editor }} </td>
+                <td>
+                    <a href="{% url 'ideas_show' idea.id %}">{{ idea.title }}</a>
+                    <p>{{ idea.description|truncatechars:512 }}</p>
+                <td>
+                    {% if idea.approved is True %}
+                    <span class="badge badge-success">Одобрено</span>
+                    {% elif idea.approved is False %}
+                    <span class="badge badge-danger">Отклонено</span>
+                    {% else %}
+                    Идет голосование. Проголосовали {{ idea.voted }}
+                    {% endif %}
+
+                    {% if idea.post %}
+                    <br />
+                    <br />
+                    <a href="{% url 'posts_show' idea.post.id %}">Посмотреть
+                        статью</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script type='text/javascript'>
+    $('#id_author_type').change(function () {
+        let $newContainer = $('#id_authors_new').parent()
+        let $extContainer = $('#id_authors').parent()
+        let newValue = $(this).val()
+
+        $newContainer.hide()
+        $extContainer.hide()
+
+        if (newValue === 'NW') {
+            $newContainer.show()
+        } else if (newValue === 'EX') {
+            $extContainer.show()
+        }
+    })
+</script>
+{% endblock %}

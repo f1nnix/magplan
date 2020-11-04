@@ -1,0 +1,123 @@
+{% extends "layout_plan.html" %}
+{% load filters %}
+{% block title %}Сводка{% endblock %}
+{% block styles %}
+    <style type="text/css">
+        #schedule > tbody > .separator {
+            height: 1rem;
+            min-height: 1rem;
+        }
+
+        #schedule .past td,
+        #schedule .past td a {
+            color: #aaa;
+        }
+        
+        #schedule .today td {
+           font-weight: bold; 
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    {% if opened_issues|length > 0 %}
+        <h4>Открытые выпуски:
+            {% for issue in opened_issues %}
+                <a href="{% url 'issues_show' issue.id %}">{{ issue }}</a>{% if forloop.last is False %}, {% else %}.
+            {% endif %}
+            {% endfor %}
+        </h4>
+    {% endif %}
+
+    <br>
+
+    {% if need_to_vote|length > 0 %}
+        <div class="alert alert-warning" role="alert">
+            <h5>Нужен твой голос!</h5>
+            <ol>
+                {% for idea in need_to_vote %}
+                    <li>
+                        <a href="{% url 'ideas_show' idea.id %}">{{ idea.title }}</a>
+                    </li>
+                {% endfor %}
+            </ol>
+        </div>
+    {% endif %}
+
+    <h3>Материалы на мне</h3>
+    {% with posts=self_posts %}
+        {% include 'magplan/partials/posts_table.html' %}
+    {% endwith %}
+
+    <br>
+    <h3>План публикаций</h3>
+    <div class="table-responsive">
+        <table id="schedule" class="table table-bordered table-stripped">
+        <thead>
+            <th>День</th>
+            <th>Дата</th>
+            <th>Статья</th>
+            <th>Редактор</th>
+            <th>Этап</th>
+        </thead>
+        <tbody>
+            {% for day, posts in schedule.items %}
+                {% if posts|length > 1 %}
+                    {% for post in posts %}
+                        {% if forloop.first is True %}
+                            <tr class="{{ day|date_class }}">
+                                <td rowspan="{{ posts|length }}">{{ day|date:'D' }}</td>
+                                <td rowspan="{{ posts|length }}">
+                                    <nobr>{{ day|date:'j M' }}</nobr>
+                                </td>
+                        {% else %}
+                            <tr class="{{ day|date_class }}">
+                        {% endif %}
+                            <td>
+                                <a href="{% url 'posts_show' post_id=post.id %}">{{ post }}</a>
+                                (<a href="{% url 'posts_edit' post_id=post.id %}">ред</a>)
+                            </td>
+                            <td>
+                                {{ post.editor }}
+                            </td>
+                            <td>
+                                {{ post.stage }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% elif posts|length == 1 %}
+                    <tr class="{{ day|date_class }}">
+                        <td>{{ day|date:'D' }}</td>
+                        <td>
+                            <nobr>{{ day|date:'j M' }}</nobr>
+                        </td>
+
+                        <td>
+                            <a href="{% url 'posts_show' post_id=posts.0.id %}">{{ posts.0 }}</a>
+                            (<a href="{% url 'posts_edit' post_id=posts.0.id %}">ред</a>)
+                        </td>
+                        <td>
+                            {{ posts.0.editor }}
+                        </td>
+                        <td>
+                            {{ posts.0.stage }}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr class="{{ day|date_class }}">
+                        <td>{{ day|date:'D' }}</td>
+                        <td>
+                            <nobr>{{ day|date:'j M' }}</nobr>
+                        </td>
+                        <td colspan="3">
+                        </td>
+                    </tr>
+                {% endif %}
+                
+                {% if forloop.counter == 5 %}
+                    <tr class="separator"></tr>
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="table-responsive">
+{% endblock %}

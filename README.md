@@ -10,20 +10,60 @@ Project management system for publishers, magazines and content creators, writte
 * extendable Markdown engine;
 * posts ideas with voting system;
 * discussions, email notifications;
-* fees and payments management;
 * team actions logs;
 * publising content to S3 and WordPress with async tasks;
-* extensible [wiki](http://www.django-wiki.org).
+* fees and payments management*;
+* extensible [wiki](http://www.django-wiki.org)*.
+
+
+_* Removed from v2. See  v1 branch_
 
 ![](docs/screenshot1.jpg)
 
-**Current status:** alfa, under development. Feel free to PR.
 
-# Install and run
+## Install and run
 
-Magplan requires Python 3.6+ and Postgres for minimal setup. Nginx for serving static files is also highly appreciated.
+1. Install with your favourite package manager:
 
-## Deploy with Ansible
+    ```
+    pip install django-magplan
+    ```
+    
+    or
+    
+    ```
+    pipenv install django-magplan
+    ```
+2. Add Magplan to Django `INSTALLED_APPS` in your projects `settings.py`:
+
+    ```
+    # Application definition
+    INSTALLED_APPS = [
+        ...
+        'django.contrib.sessions',
+        'django.contrib.messages',
+        'django.contrib.staticfiles',
+        'magplan'
+    ]
+    ```
+3. Add Magplan to Django in your project `urls.py`:
+    ```
+    urlpatterns = [
+        ...    
+        path('plan/', include('magplan.urls')),
+        
+    ]
+    ```
+4. Go to `http://localhost:8080/plan/`.
+
+
+Magplan requires Python 3.6+ and Postgres for minimal setup.
+
+Please, note you **must** be authenticated in Django app as each Magplan View is protected by `@login_requred` decorator.
+
+## Deploy with Ansible (deprecated in v2)
+
+_Removed from v2. See  v1 branch_ 
 
 To deploy Magplagn to DEB-based VPS, a complete set of Ansible roles is provided. It includes:
 
@@ -57,7 +97,7 @@ For more info, please, refer to `ansible/` directory. For regular deploy:
 4. Run `ansible-playbook ansible/main.yml`
 6. Go to `https://<your_host>:80/` and import test site or create single superuer.
 
-## Running locally
+### Running locally
 
 To run Magplan, the following env vars should be set for Python interpreter and Celery worker:
 
@@ -88,7 +128,7 @@ django-admin runserver 0.0.0.0:8000
 
 If you plan to run tests, please ensure your user has permissions to create databases.
 
-## Importing test site
+### Importing test site (deprecated in v2)
 
 To import test site in dev environment, run:
 
@@ -100,7 +140,7 @@ Login as superuser: `alexander72@example.com:pass123`.
 
 More information can be found [here](https://docs.djangoproject.com/en/2.1/howto/initial-data/). 
 
-## Configuration
+### Configuration (deprecated in v2)
 
 After importing test site, please go to `<your_domain>/manage/constance/config/` and set up at least:
 

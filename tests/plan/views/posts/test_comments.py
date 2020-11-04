@@ -12,7 +12,7 @@ def route_url(post_id: int) -> str:
 
 
 @pytest.mark.django_db
-@patch('plan.views.posts.send_post_comment_notification.delay')
+@patch('magplan.views.posts.send_post_comment_notification.delay')
 def test_comments_notifcation_task_runs(mock_send_task_delay, _, client, post):
     url = route_url(post.id)
     response = client.post(url, {

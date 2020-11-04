@@ -78,7 +78,7 @@ def test_can_recieve_notification_comment_owner(comment, user_with_permissions):
 
 
 @pytest.mark.django_db
-@patch('plan.tasks.utils.config')
+@patch('magplan.tasks.utils.config')
 def test_can_recieve_notification_system_user(config, comment, user_with_permissions):
     config.SYSTEM_USER_ID = user_with_permissions.id
 

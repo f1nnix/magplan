@@ -1,0 +1,50 @@
+{% load filters %}
+{% load i18n %}
+<div class="row" id="stages">
+    <div class="col-4">
+        {% if post.stage.prev_stage %}
+            {% if post|can_be_moved_to_stage_by:request.user == True %}
+                <form action="{% url 'posts_set_stage' post.id %}" method="post" accept-charset="utf-8">
+                    {% csrf_token %}
+                    <input type="hidden" name="new_stage_id" value="{{ post.stage.prev_stage.id }}">
+                    <input type="submit" class="btn btn-block btn-danger"
+                           value=" &lArr; {{ post.stage.prev_stage.title }} ({{ post.prev_stage_assignee }})"/>
+                </form>
+            {% else %}
+                {% blocktrans with prev_stage=post.stage.prev_stage assignee=post.assignee %}
+                    Вернуть на этап <strong>{{ prev_stage }}</strong> может только {{ assignee }}
+                {% endblocktrans %}
+            {% endif %}
+        {% else %}
+            <p>Статья в копилке. Может пора достать?</p>
+        {% endif %}
+    </div>
+
+    <div class="col-4" style="text-align: center;">
+        {% blocktrans with stage=post.stage.title assignee=post.assignee finished_at=post.finished_at %}
+            Сейчас на <strong>{{ stage }}</strong> ({{ assignee }}) до {{ finished_at }}
+        {% endblocktrans %}
+
+
+        {% if perms.main.edit_extended_post_attrs %}
+            {% include 'magplan/posts/_admin_set_stage.html' %}
+        {% endif %}
+    </div>
+
+    <div class="col-4">
+        {% if post.stage.next_stage %}
+            {% if post|can_be_moved_to_stage_by:request.user == True %}
+                <form action="{% url 'posts_set_stage' post.id %}" method="post" accept-charset="utf-8">
+                    {% csrf_token %}
+                    <input type="hidden" name="new_stage_id" value="{{ post.stage.next_stage.id }}">
+                    <input type="submit" class="btn btn-block btn-success"
+                           value="{{ post.stage.next_stage }} ({{ post.next_stage_assignee }}) &rArr;"/>
+                </form>
+            {% else %}
+                Передать на этап <strong>{{ post.stage.next_stage }}</strong> может только {{ post.assignee }}
+            {% endif %}
+        {% else %}
+            <p>Статья опубликована. Можно отдыхать!</p>
+        {% endif %}
+    </div>
+</div>

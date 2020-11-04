@@ -1,3 +1,0 @@
-- include: nginx.yml
-- include: systemctl.yml
-- include: virtualenv.yml

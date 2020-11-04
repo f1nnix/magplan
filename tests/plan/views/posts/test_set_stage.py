@@ -36,7 +36,7 @@ def test_redirect_to_post_for_get(_, client, post):
 
 
 @pytest.mark.django_db
-@patch('plan.views.posts._create_system_comment')
+@patch('magplan.views.posts._create_system_comment')
 def test_allow_set_next_stage(mock_create_system_comment, _, client, user, post, stages):
     next_stage_id = post.stage.next_stage.id
     url = route_url(post.id)
@@ -58,7 +58,7 @@ def test_allow_set_next_stage(mock_create_system_comment, _, client, user, post,
 
 
 @pytest.mark.django_db
-@patch('plan.views.posts._create_system_comment')
+@patch('magplan.views.posts._create_system_comment')
 def test_allow_set_prev_stage(mock_create_system_comment, _, client, user, post, stages):
     prev_stage_id = post.stage.prev_stage_id
     url = route_url(post.id)
@@ -80,7 +80,7 @@ def test_allow_set_prev_stage(mock_create_system_comment, _, client, user, post,
 
 
 @pytest.mark.django_db
-@patch('plan.views.posts._create_system_comment')
+@patch('magplan.views.posts._create_system_comment')
 def test_forbid_set_arbitrary_stage_wo_perm(mock_create_system_comment, _, client, post, stages):
     # Select arbitrary stage
     old_stage_id = post.stage_id
@@ -99,7 +99,7 @@ def test_forbid_set_arbitrary_stage_wo_perm(mock_create_system_comment, _, clien
 
 
 @pytest.mark.django_db
-@patch('plan.views.posts._create_system_comment')
+@patch('magplan.views.posts._create_system_comment')
 def test_forbid_set_arbitrary_stage_wo_perm(mock_create_system_comment, _, client, user, post, stages):
     # Select arbitrary stage
     old_stage_id = post.stage_id
