@@ -66,6 +66,7 @@ setup(
         os.path.splitext(os.path.basename(path))[0] for path in glob("src/*.py")
     ],
     long_description=open("README.md").read(),
+    long_description_content_type='text/markdown',
     zip_safe=False,
     install_requires=[
         "amqp==5.0.1; python_version >= '3.6'",
