@@ -51,7 +51,10 @@ class AbstractBase(models.Model):
         abstract = True
 
 
-class User(UserModel, AbstractBase):
+class User(UserModel):
+    class Meta:
+        proxy = True
+
     meta = JSONField(default=dict)
 
     def __str__(self):
