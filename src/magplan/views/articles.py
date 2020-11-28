@@ -6,7 +6,7 @@ from django.db.models import Q, QuerySet
 from django.shortcuts import render, redirect
 from django.utils.timezone import now
 
-from magplan.models import Post, Postype, Stage, User
+from magplan.models import Post, Stage, User
 from magplan.forms import WhitelistedPostExtendedModelForm, AdPostExtendedModelForm
 
 
@@ -59,7 +59,6 @@ def whitelisted(request):
         if form.is_valid():
             post = form.save(commit=False)
             post.editor = request.user
-            post.postype = Postype.objects.get(slug='article')
             post.stage = Stage.objects.get(slug='waiting')
 
             post.save()
@@ -82,7 +81,6 @@ def advert(request):
         if form.is_valid():
             post = form.save(commit=False)
             post.editor = request.user
-            post.postype = Postype.objects.get(slug='article')
             post.stage = Stage.objects.get(slug='waiting')
 
             post.save()

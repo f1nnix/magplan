@@ -268,18 +268,6 @@ class Idea(AbstractBase):
         return render_md(self.description)
 
 
-class Postype(AbstractBase):
-    slug = models.SlugField(null=False, blank=False, max_length=255)
-    title = models.CharField(null=False, blank=False, max_length=255)
-    meta = JSONField(default=dict)
-
-
-class Widgetype(AbstractBase):
-    slug = models.SlugField(null=False, blank=False, max_length=255)
-    title = models.CharField(null=False, blank=False, max_length=255)
-    meta = JSONField(default=dict)
-
-
 class Post(AbstractBase):
     # Used for external parser configuration
     PAYWALL_NOTICE_HEAD = '<div class="paywall-notice">'
@@ -336,7 +324,6 @@ class Post(AbstractBase):
         verbose_name='Редактор',
     )
     authors = models.ManyToManyField(User, verbose_name='Авторы')
-    postype = models.ForeignKey(Postype, on_delete=models.CASCADE)
     stage = models.ForeignKey(Stage, on_delete=models.CASCADE, verbose_name='Этап')
     issues = models.ManyToManyField(Issue, related_name='posts', verbose_name='Выпуски')
     section = models.ForeignKey(
@@ -503,10 +490,6 @@ class Post(AbstractBase):
             self.wp_id,
             xmd=prepared_xmd, title=str(self), css=self.css,
         )
-
-
-class Widget(AbstractBase):
-    content = models.TextField()
 
 
 class Attachment(AbstractBase):

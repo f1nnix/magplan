@@ -53,11 +53,11 @@ extras_requirements = {
 
 setup(
     name="magplan",
-    version="2.0.0",
+    version="2.0.2",
     author="Ilya Rusanen",
     author_email="ilya@rusanen.co.uk",
     url="",
-    description='Project management system for publishers, magazines and content creators',
+    description="Project management system for publishers, magazines and content creators",
     license="MIT",
     keywords=["django", "crm", "markdown"],
     packages=find_packages("src"),
@@ -66,7 +66,7 @@ setup(
         os.path.splitext(os.path.basename(path))[0] for path in glob("src/*.py")
     ],
     long_description=open("README.md").read(),
-    long_description_content_type='text/markdown',
+    long_description_content_type="text/markdown",
     zip_safe=False,
     install_requires=[
         "amqp==5.0.1; python_version >= '3.6'",
