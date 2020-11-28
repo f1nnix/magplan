@@ -23,7 +23,6 @@ from magplan.models import (
     Comment,
     Idea,
     Post,
-    Postype,
     Stage,
     User,
 )
@@ -236,7 +235,6 @@ def create(request):
         if form.is_valid():
             post = form.save(commit=False)
             post.editor = request.user
-            post.postype = Postype.objects.get(slug="article")
             post.stage = Stage.objects.get(slug="waiting")
 
             post.save()
