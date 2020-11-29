@@ -22,7 +22,7 @@ from magplan.integrations.posts import replace_images_paths, update_ext_db_xmd
 from magplan.xmd import render_md
 from magplan.xmd.mappers import s3_public_mapper as s3_image_mapper
 
-NEW_IDEA_NOTIFICATION_PREFERENCE_NAME = 'plan__new_idea_notification'
+NEW_IDEA_NOTIFICATION_PREFERENCE_NAME = 'magplan__new_idea_notification'
 
 import enum
 import hashlib
