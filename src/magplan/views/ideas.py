@@ -38,7 +38,7 @@ def index(request):
         form = IdeaModelForm(request.POST)
         if form.is_valid():
             idea = form.save(commit=False)
-            idea.editor = request.user
+            idea.editor = request.user.user
             idea.save()
 
             # Save authors, if existing specified
@@ -49,7 +49,7 @@ def index(request):
                 # We did it after actual m2m save as form.save_m2m()will overwrite any
                 # model assignments usgin empty Form authors field. So saving one more time
                 if request.POST.get('author_type') == IDEA_AUTHOR_SELF_CHOICE.slug:
-                    idea.authors.add(request.user)
+                    idea.authors.add(request.user.user)
                     idea.save()
 
             send_idea_notification.delay(idea.id)
@@ -75,7 +75,7 @@ def index(request):
     if filter_ == 'voted':
         ideas = ideas.filter(approved=None)
     elif filter_ == 'self':
-        ideas = ideas.filter(editor=request.user)
+        ideas = ideas.filter(editor=request.user.user)
     elif filter_ == 'approved':
         ideas = ideas.filter(approved=True)
     elif filter_ == 'rejected':
@@ -152,7 +152,7 @@ def vote(request, idea_id):
     DEFAULT_VOTE_SCORE = Vote.SCORE_50
 
     idea = Idea.objects.prefetch_related('votes__user').get(id=idea_id)
-    vote = Vote(idea=idea, user=request.user)
+    vote = Vote(idea=idea, user=request.user.user)
     score: int
 
     if request.method == 'POST':
@@ -188,7 +188,7 @@ def approve(request, idea_id):
         messages.add_message(request, messages.INFO, 'Статус идеи изменен.')
 
         # send email
-        if idea.approved is True and idea.editor != request.user:
+        if idea.approved is True and idea.editor != request.user.user:
             subject = f'Идея «{idea}» прошла голосование! Ждем статью'
             html_content = render_to_string('email/idea_approved.html', {
                 'idea': idea,
@@ -212,7 +212,7 @@ def comments(request, idea_id):
 
         comment = comment_form.save(commit=False)
         comment.commentable = idea
-        comment.user = request.user
+        comment.user = request.user.user
 
         if comment_form.is_valid():
             comment_form.save()
