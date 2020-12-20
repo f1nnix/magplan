@@ -5,6 +5,7 @@ from typing import List
 from zipfile import ZIP_DEFLATED, ZipFile
 
 import html2text
+from django.conf import settings
 
 from magplan.conf import settings as config
 from django.contrib import messages
@@ -234,7 +235,7 @@ def create(request):
 
         if form.is_valid():
             post = form.save(commit=False)
-            post.editor = request.user
+            post.editor = request.user.user
             post.stage = Stage.objects.get(slug="waiting")
 
             post.save()
@@ -260,15 +261,15 @@ def edit(request, post_id):
         form = PostExtendedModelForm(request.POST, request.FILES, instance=post)
 
         files = request.FILES.getlist("attachments")
-        attachments = _save_attachments(files, post, request.user)
+        attachments = _save_attachments(files, post, request.user.user)
 
         if form.is_valid():
-            post.imprint_updater(request.user)
+            post.imprint_updater(request.user.user)
             form.save()
 
             _create_system_comment(
                 Comment.SYSTEM_ACTION_UPDATE,
-                request.user,
+                request.user.user,
                 post,
                 attachments=attachments,
             )
@@ -322,7 +323,7 @@ def edit_meta(request, post_id):
         changelog = _generate_changelog_for_form(form)
         if len(changelog) > 0:
             _create_system_comment(
-                Comment.SYSTEM_ACTION_CHANGE_META, request.user, post, changelog
+                Comment.SYSTEM_ACTION_CHANGE_META, request.user.user, post, changelog
             )
 
         messages.add_message(request, messages.INFO, f"Пост {post} успешно обновлен!")
@@ -338,7 +339,7 @@ def set_stage(request, post_id, system=Comment.TYPE_SYSTEM):
 
     if request.method == "POST" and request.POST.get("new_stage_id"):
         if not _authorize_stage_change(
-                request.user, post, int(request.POST.get("new_stage_id"))
+                request.user.user, post, int(request.POST.get("new_stage_id"))
         ):
             return HttpResponseForbidden()
 
@@ -348,7 +349,7 @@ def set_stage(request, post_id, system=Comment.TYPE_SYSTEM):
         duration = stage.duration if stage.duration else 1
         post.finished_at = post.finished_at + +datetime.timedelta(days=duration)
         post.stage = stage
-        post.imprint_updater(request.user)
+        post.imprint_updater(request.user.user)
         post.save()
         messages.add_message(
             request, messages.INFO, "Текущий этап статьи «%s» обновлен" % post
@@ -356,12 +357,12 @@ def set_stage(request, post_id, system=Comment.TYPE_SYSTEM):
 
         # Create system comment
         _create_system_comment(
-            Comment.SYSTEM_ACTION_SET_STAGE, request.user, post, stage=post.stage
+            Comment.SYSTEM_ACTION_SET_STAGE, request.user.user, post, stage=post.stage
         )
 
         # TODO: extract method
         # Send email if stage allows it
-        if post.assignee != request.user and stage.skip_notification is False:
+        if post.assignee != request.user.user and stage.skip_notification is False:
             subject = f"На вас назначена статья «{post}»"
             html_content = render_to_string(
                 "email/assigned_to_you.html",
@@ -390,7 +391,7 @@ def comments(request, post_id):
 
         comment = form.save(commit=False)
         comment.commentable = post
-        comment.user = request.user
+        comment.user = request.user.user
 
         if form.is_valid():
             form.save()
