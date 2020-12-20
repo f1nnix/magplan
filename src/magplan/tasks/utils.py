@@ -48,7 +48,7 @@ def _can_recieve_notification(
     # This util function is used only in magplan app
     # so it's better to hardcode section name
     # for better re-usabillty
-    if user.preferences['plan__' + pref_name] == 'none':
+    if user.preferences['magplan__' + pref_name] == 'none':
         logger.debug(
             'Recipient %s decliened as it has turned notifications off' % user.email
         )
