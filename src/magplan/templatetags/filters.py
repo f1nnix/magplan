@@ -5,6 +5,7 @@ from typing import List
 from django import template
 from django.conf import settings
 from django.urls import reverse
+from django.utils.functional import SimpleLazyObject
 
 from magplan.models import Vote, Comment
 from magplan.utils import safe_cast
@@ -124,9 +125,10 @@ def set_var(parser, token):
 
 
 @register.filter
-def can_be_moved_to_stage_by(post, user):
-    return (post.stage.assignee and post.stage.assignee == user) or \
-           (not post.stage.assignee and post.editor == user)
+def can_be_moved_to_stage_by(post, user: SimpleLazyObject):
+    import pdb; pdb.set_trace()
+    return (post.stage.assignee and post.stage.assignee == user.user) or \
+           (not post.stage.assignee and post.editor == user.user)
 
 
 @register.filter
