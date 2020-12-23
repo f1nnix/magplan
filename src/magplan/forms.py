@@ -69,7 +69,7 @@ class IdeaModelForm(ModelForm):
             'authors_new': forms.TextInput(attrs={'class': 'form-control'}),
             'authors': forms.SelectMultiple(attrs={
                 'class': 'form-control live_multiselect',
-                'data-url': '/admin/api/users/search',
+                'data-url': 'api/users/search',
             }),
         }
 
@@ -111,7 +111,7 @@ class PostMetaForm(ModelForm):
         widgets = {
             'issues': forms.SelectMultiple(attrs={
                 'class': 'form-control live_multiselect wiih_suggestions',
-                'data-url': '/admin/api/issues/search',
+                'data-url': 'api/issues/search',
             }),
             'editor': forms.Select(attrs={'class': 'form-control', }),
             'finished_at': forms.DateInput(attrs={'class': 'form-control date_picker', }),
@@ -127,10 +127,12 @@ class PostMetaForm(ModelForm):
 
 
 class PostBaseModelForm(ModelForm):
-    section = forms.ModelChoiceField(queryset=Section.objects.filter(is_whitelisted=False, is_archived=False),
-                                     label="Рубрика",
-                                     empty_label=None,
-                                     widget=forms.Select(attrs={'class': 'form-control', 'rows': 5}))
+    section = forms.ModelChoiceField(
+        queryset=Section.objects.filter(is_whitelisted=False, is_archived=False),
+        label="Рубрика",
+        empty_label=None,
+        widget=forms.Select(attrs={'class': 'form-control', 'rows': 5})
+    )
 
     class Meta:
         model = Post
@@ -140,11 +142,11 @@ class PostBaseModelForm(ModelForm):
             'description': forms.Textarea(attrs={'class': 'form-control', }),
             'issues': forms.SelectMultiple(attrs={
                 'class': 'form-control live_multiselect wiih_suggestions',
-                'data-url': '/admin/api/issues/search',
+                'data-url': 'api/issues/search',
             }),
             'authors': forms.SelectMultiple(attrs={
                 'class': 'form-control live_multiselect',
-                'data-url': '/admin/api/users/search',
+                'data-url': 'api/users/search',
             }),
             'finished_at': forms.DateInput(attrs={'class': 'form-control date_picker', }),
         }
@@ -155,10 +157,12 @@ class PostBaseModelForm(ModelForm):
 
 
 class PostExtendedModelForm(ModelForm):
-    section = forms.ModelChoiceField(queryset=Section.objects.filter(is_archived=False),
-                                     label="Рубрика",
-                                     empty_label=None,
-                                     widget=forms.Select(attrs={'class': 'form-control', 'rows': 5}))
+    section = forms.ModelChoiceField(
+        queryset=Section.objects.filter(is_archived=False),
+        label="Рубрика",
+        empty_label=None,
+        widget=forms.Select(attrs={'class': 'form-control', 'rows': 5})
+    )
 
     class Meta(PostBaseModelForm.Meta):
         model = Post
@@ -169,7 +173,7 @@ class PostExtendedModelForm(ModelForm):
             'description': forms.HiddenInput(),
             'authors': forms.SelectMultiple(attrs={
                 'class': 'form-control live_multiselect',
-                'data-url': '/admin/api/users/search',
+                'data-url': 'api/users/search',
             }),
             'kicker': forms.TextInput(attrs={'class': 'form-control', }, ),
             'xmd': forms.Textarea(attrs={'class': 'form-control', 'rows': 20, }),
@@ -183,16 +187,20 @@ class PostExtendedModelForm(ModelForm):
 
 
 class WhitelistedPostExtendedModelForm(PostBaseModelForm):
-    section = forms.ModelChoiceField(queryset=Section.objects.filter(is_archived=False, is_whitelisted=True),
-                                     label="Рубрика",
-                                     empty_label=None,
-                                     widget=forms.Select(attrs={'class': 'form-control', 'rows': 5}))
+    section = forms.ModelChoiceField(
+        queryset=Section.objects.filter(is_archived=False, is_whitelisted=True),
+        label="Рубрика",
+        empty_label=None,
+        widget=forms.Select(attrs={'class': 'form-control', 'rows': 5})
+    )
 
 
 class AdPostExtendedModelForm(PostBaseModelForm):
-    issues = forms.ModelChoiceField(queryset=Issue.objects.filter(number=0),
-                                    empty_label=None,
-                                    widget=forms.Select(attrs={'class': 'form-control', 'rows': 5}))
+    issues = forms.ModelChoiceField(
+        queryset=Issue.objects.filter(number=0),
+        empty_label=None,
+        widget=forms.Select(attrs={'class': 'form-control', 'rows': 5})
+    )
 
 
 class CommentModelForm(ModelForm):
