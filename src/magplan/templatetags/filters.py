@@ -126,7 +126,6 @@ def set_var(parser, token):
 
 @register.filter
 def can_be_moved_to_stage_by(post, user: SimpleLazyObject):
-    import pdb; pdb.set_trace()
     return (post.stage.assignee and post.stage.assignee == user.user) or \
            (not post.stage.assignee and post.editor == user.user)
 
