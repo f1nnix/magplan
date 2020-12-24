@@ -26,10 +26,14 @@ def Lock(post):
     post.is_locked = True
     post.save()
 
-    yield
-
-    post.is_locked = False
-    post.save()
+    try:
+        yield
+    except Exception:
+        # TODO: write to Senrty or log
+        pass  # noqa
+    finally:
+        post.is_locked = False
+        post.save()
 
 
 def replace_images_paths(xmd: str, attachments: tp.List, mapper: tp.Callable = None) -> str:
