@@ -1,4 +1,4 @@
-{% if perms.main.edit_extended_post_attrs %}
+{% if perms.magplan.edit_extended_post_attrs %}
     <div class="col-6">
         <div class="form-group">
             <label>{{ form.editor.label }}</label>
@@ -32,7 +32,7 @@
     </div>
 </div>
 
-<div class="{% if perms.main.edit_extended_post_attrs %}col-4{% else %}col-6{% endif %}">
+<div class="{% if perms.magplan.edit_extended_post_attrs %}col-4{% else %}col-6{% endif %}">
     <div class="form-group">
         <label>{{ form.finished_at.label }}</label>
         {% if form.finished_at.errors %}
@@ -45,7 +45,7 @@
     </div>
 </div>
 
-{% if perms.main.edit_extended_post_attrs %}
+{% if perms.magplan.edit_extended_post_attrs %}
     {{ form.media }}
     <style type="text/css">
         .django-ace-widget {
