@@ -1,6 +1,6 @@
 {% load i18n %}
 
-{% if perms.main.manage_authors %}
+{% if perms.magplan.manage_authors %}
     <li class="nav-item {% if navbar_current == 'authors' %}active{% endif %}">
         <a class="nav-link" href="{% url 'authors_index' %} ">Авторы</a>
     </li>

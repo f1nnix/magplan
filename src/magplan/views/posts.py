@@ -160,7 +160,7 @@ def _authorize_stage_change(user: User, post: Post, new_stage_id: int) -> bool:
     if new_stage_id in legit_stages and post.assignee == user:
         return True
 
-    if user.has_perm("main.edit_extended_post_attrs"):
+    if user.has_perm("magplan.edit_extended_post_attrs"):
         return True
 
     return False

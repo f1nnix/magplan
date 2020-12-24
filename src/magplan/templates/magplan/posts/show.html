@@ -178,7 +178,7 @@
             {% if post.authors.all|length > 0 %}
                 {% trans "writes" %}
                 {% for author in post.authors.all %}
-                    {% if perms.main.manage_authors %}
+                    {% if perms.magplan.manage_authors %}
                         <a href="{% url 'authors_show' author.id %}">{{ author }}</a>{% if forloop.last is False %},
                     {% else %}.{% endif %}
                     {% else %}
@@ -189,7 +189,7 @@
                 {% trans "no_author" %}.
             {% endif %}
 
-            {% if perms.main.manage_authors %}
+            {% if perms.magplan.manage_authors %}
                 {% trans "edits" %} <a href="{% url 'authors_show' post.editor.id %}">{{ post.editor }}</a>
                 {% if forloop.last is False %}, {% else %}.{% endif %}
             {% else %}

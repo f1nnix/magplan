@@ -4,7 +4,7 @@
 {% elif idea.author_type == AUTHOR_TYPE_CHOICES.2.0 %} {# AUTHOR_TYPE_EXISTING #}
     <strong>Напишут наши авторы:</strong>
     {% for author in idea.authors.all %}
-        {% if perms.main.manage_authors %}
+        {% if perms.magplan.manage_authors %}
             <a href="{% url 'authors_show' author.id %}">{{ author }}</a>{% if forloop.last is False %},
         {% else %}.{% endif %}
         {% else %}

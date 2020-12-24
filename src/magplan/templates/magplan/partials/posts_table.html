@@ -30,7 +30,7 @@
                 </td>
                 <td>
                     {% for author in post.authors.all %}
-                        {% if perms.main.manage_authors %}
+                        {% if perms.magplan.manage_authors %}
                             <a href="{% url 'authors_show' author.id %}">{{ author }}</a>
                         {% else %}
                             {{ author }}
@@ -38,7 +38,7 @@
                     {% endfor %}
                 </td>
                 <td>
-                    {% if perms.main.manage_authors %}
+                    {% if perms.magplan.manage_authors %}
                         <a href="{% url 'authors_show' post.editor.id %}">{{ post.editor }}</a>
                     {% else %}
                         {{ post.editor }}
