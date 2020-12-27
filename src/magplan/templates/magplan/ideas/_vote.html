@@ -7,7 +7,7 @@
 </div>
 <div class="row">
     {# if user already voted #}
-    {% if idea|voted:request.user %}
+    {% if idea|voted:request.user.user %}
         {% include 'magplan/ideas/_voting_results.html' %}
     {% else %}
         <div class="col-6">

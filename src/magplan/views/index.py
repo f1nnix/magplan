@@ -56,14 +56,14 @@ def index(request):
     self_posts = (
         Post.objects.prefetch_related('stage')
         .filter(
-            Q(stage__assignee__isnull=False, stage__assignee=request.user)
-            | Q(stage__assignee__isnull=True, editor=request.user)
+            Q(stage__assignee__isnull=False, stage__assignee=request.user.user)
+            | Q(stage__assignee__isnull=True, editor=request.user.user)
         )
         .exclude(stage__slug__in=['vault', 'published'])
     )
 
     need_to_vote = Idea.objects.filter(approved__isnull=True).exclude(
-        votes__user=request.user
+        votes__user=request.user.user
     )
 
     opened_issues = Issue.objects.filter(
