@@ -196,7 +196,7 @@
         };
 
         $(document).ready(function () {
-            {% if request.user.preferences.plan__xmd_editor_type == 'markdown' %}
+            {% if request.user.user.preferences.magplan__xmd_editor_type == 'markdown' %}
                 const simpleMDE = new SimpleMDE({
                     element: $("#id_xmd")[0],
                     spellChecker: false,

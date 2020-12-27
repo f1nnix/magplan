@@ -4,4 +4,4 @@ import pytest
 def test_visual_editor_is_default(make_user):
 	user = make_user()
 	
-	assert user.preferences.get('plan__xmd_editor_type') == 'markdown'
+	assert user.preferences.get('magplan__xmd_editor_type') == 'markdown'
