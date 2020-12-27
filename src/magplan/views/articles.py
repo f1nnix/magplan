@@ -42,7 +42,7 @@ def _get_filtered_posts_queryset(filter_: tp.Optional[str], current_user: User) 
 @login_required
 def index(request):
     filter_ = request.GET.get('filter')
-    posts: QuerySet = _get_filtered_posts_queryset(filter_, request.user)
+    posts: QuerySet = _get_filtered_posts_queryset(filter_, request.user.user)
     return render(request, 'magplan/articles/index.html', {
         'posts': posts,
         'filter_': filter_,
@@ -58,7 +58,7 @@ def whitelisted(request):
 
         if form.is_valid():
             post = form.save(commit=False)
-            post.editor = request.user
+            post.editor = request.user.user
             post.stage = Stage.objects.get(slug='waiting')
 
             post.save()
@@ -80,7 +80,7 @@ def advert(request):
 
         if form.is_valid():
             post = form.save(commit=False)
-            post.editor = request.user
+            post.editor = request.user.user
             post.stage = Stage.objects.get(slug='waiting')
 
             post.save()
