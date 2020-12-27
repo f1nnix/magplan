@@ -49,7 +49,7 @@ def get_(arr: List[Any], value: Any, key: str) -> Optional[Any]:
 def test_get_whitelisted_recipients(users):
     user1, user2, user3 = users[-1:-4:-1]
     for user in (user1, user2, user3):
-        user.preferences['plan__' + pref_name] = 'all'
+        user.preferences['magplan__' + pref_name] = 'all'
 
     whitelisted_recipients = _get_whitelisted_recipients(pref_name)
     assert len(whitelisted_recipients) == 3
