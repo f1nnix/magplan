@@ -1,3 +1,5 @@
+{% load widget_tweaks %}
+
 <div class="row">
     <div class="col-12">
         <div class="form-group">
@@ -65,7 +67,7 @@
                     {% endfor %}
                 </ul>
             {% endif %}
-            {{ form.authors }}
+            {% render_field form.authors data-url=api_authors_search_url %}
         </div>
     </div>
 </div>
