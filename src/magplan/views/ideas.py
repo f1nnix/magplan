@@ -138,12 +138,17 @@ def show(request, idea_id):
         'finished_at': datetime.datetime.now() + datetime.timedelta(days=3),
     }, instance=idea)
 
+    api_authors_search_url = reverse('api_authors_search')
+    api_issues_search_url = reverse('api_issues_search')
+
     return render(request, 'magplan/ideas/show.html', {
         'idea': idea,
         'form': form,
         'issues_suggesions': issues_suggesions,
         'comment_form': CommentModelForm(),
         'AUTHOR_TYPE_CHOICES': Idea.AUTHOR_TYPE_CHOICES,
+        'api_authors_search_url': api_authors_search_url,
+        'api_issues_search_url': api_issues_search_url,
     })
 
 
