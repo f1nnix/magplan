@@ -69,7 +69,6 @@ class IdeaModelForm(ModelForm):
             'authors_new': forms.TextInput(attrs={'class': 'form-control'}),
             'authors': forms.SelectMultiple(attrs={
                 'class': 'form-control live_multiselect',
-                'data-url': 'api/users/search',
             }),
         }
 

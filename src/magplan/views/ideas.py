@@ -4,16 +4,16 @@ from typing import List, Tuple, Optional
 
 import django_filters
 import html2text
-from magplan.conf import settings as config
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.mail import EmailMultiAlternatives
 from django.db.models import Count
 from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
-
-from magplan.models import Idea, Issue, Vote
+from django.urls import reverse
+from magplan.conf import settings as config
 from magplan.forms import CommentModelForm, IdeaModelForm, PostBaseModelForm, IDEA_AUTHOR_SELF_CHOICE
+from magplan.models import Idea, Issue, Vote
 from magplan.tasks.send_idea_comment_notification import send_idea_comment_notification
 from magplan.tasks.send_idea_notification import send_idea_notification
 from magplan.utils import safe_cast
@@ -54,9 +54,6 @@ def index(request):
 
             send_idea_notification.delay(idea.id)
 
-            # Clear idea form to prevent rendering pre-filled form
-            form = IdeaModelForm()
-
             messages.add_message(
                 request, messages.SUCCESS,
                 'Идея «%s» успешно выдвинута на голосование!' % idea.title)
@@ -88,10 +85,13 @@ def index(request):
 
     ideas = ideas.all()
 
+    api_authors_search_url = reverse('api_authors_search')
+
     return render(request, 'magplan/ideas/index.html', {
         'ideas': ideas,
         'form': form,
         'filter_': filter_,
+        'api_authors_search_url': api_authors_search_url
     })
 
 
