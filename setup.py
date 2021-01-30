@@ -27,6 +27,7 @@ prod_requirements = [
     "django-filter",
     "django-picklefield",
     "django-polymorphic",
+    "django-widget-tweaks",
     "django>=3.1",
     "html2text",
     "mistune",
@@ -68,7 +69,7 @@ extras_requirements = {
 
 setup(
     name="magplan",
-    version="2.0.13",
+    version="2.0.14",
     author="Ilya Rusanen",
     author_email="ilya@rusanen.co.uk",
     url="",
