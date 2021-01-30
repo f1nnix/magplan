@@ -69,7 +69,6 @@ class IdeaModelForm(ModelForm):
             'authors_new': forms.TextInput(attrs={'class': 'form-control'}),
             'authors': forms.SelectMultiple(attrs={
                 'class': 'form-control live_multiselect',
-                'data-url': 'api/users/search',
             }),
         }
 
@@ -111,7 +110,6 @@ class PostMetaForm(ModelForm):
         widgets = {
             'issues': forms.SelectMultiple(attrs={
                 'class': 'form-control live_multiselect wiih_suggestions',
-                'data-url': 'api/issues/search',
             }),
             'editor': forms.Select(attrs={'class': 'form-control', }),
             'finished_at': forms.DateInput(attrs={'class': 'form-control date_picker', }),
@@ -142,11 +140,9 @@ class PostBaseModelForm(ModelForm):
             'description': forms.Textarea(attrs={'class': 'form-control', }),
             'issues': forms.SelectMultiple(attrs={
                 'class': 'form-control live_multiselect wiih_suggestions',
-                'data-url': 'api/issues/search',
             }),
             'authors': forms.SelectMultiple(attrs={
                 'class': 'form-control live_multiselect',
-                'data-url': 'api/users/search',
             }),
             'finished_at': forms.DateInput(attrs={'class': 'form-control date_picker', }),
         }
@@ -173,7 +169,6 @@ class PostExtendedModelForm(ModelForm):
             'description': forms.HiddenInput(),
             'authors': forms.SelectMultiple(attrs={
                 'class': 'form-control live_multiselect',
-                'data-url': 'api/users/search',
             }),
             'kicker': forms.TextInput(attrs={'class': 'form-control', }, ),
             'xmd': forms.Textarea(attrs={'class': 'form-control', 'rows': 20, }),

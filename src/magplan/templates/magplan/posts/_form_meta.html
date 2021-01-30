@@ -1,3 +1,5 @@
+{% load widget_tweaks %}
+
 {% if perms.magplan.edit_extended_post_attrs %}
     <div class="col-6">
         <div class="form-group">
@@ -21,7 +23,9 @@
                     <li>{{ error }}</li>{% endfor %}
             </ul>
         {% endif %}
-        {{ form.issues }}
+
+        {% render_field form.issues data-url=api_issues_search_url %}
+
         <div class="issues-suggestions">
             {% for issue in issues_suggesions %}
                 <div class="suggestion">

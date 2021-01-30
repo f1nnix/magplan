@@ -49,7 +49,7 @@ extras_requirements = {
 
 setup(
     name="magplan",
-    version="2.0.11",
+    version="2.0.12",
     author="Ilya Rusanen",
     author_email="ilya@rusanen.co.uk",
     url="",
@@ -84,6 +84,7 @@ setup(
         "django-ace==1.0.10",
         "django-admin-list-filter-dropdown==1.0.3",
         "django-dynamic-preferences==1.10.1",
+        "django-widget-tweaks==1.4.8",
         "django-filter==2.4.0",
         "django-picklefield==3.0.1",
         "django-polymorphic==3.0.0",

@@ -4,6 +4,7 @@ import typing as tp
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q, QuerySet
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.utils.timezone import now
 
 from magplan.models import Post, Stage, User
@@ -27,6 +28,9 @@ def _get_filtered_posts_queryset(filter_: tp.Optional[str], current_user: User) 
             .exclude(stage__slug='published')
     elif filter_ == 'vault':
         posts = posts.filter(stage__slug='vault')
+    elif filter_ == 'all':
+        # Don't apply any filters to get all posts
+        pass
     else:
         # Render recent by default
         datetime_now = now()
@@ -66,8 +70,13 @@ def whitelisted(request):
 
             return redirect('posts_show', post.id)
 
+    api_authors_search_url = reverse('api_authors_search')
+    api_issues_search_url = reverse('api_issues_search')
+
     return render(request, 'magplan/articles/whitelisted.html', {
         'form': form,
+        'api_authors_search_url': api_authors_search_url,
+        'api_issues_search_url': api_issues_search_url,
     })
 
 
@@ -90,8 +99,11 @@ def advert(request):
 
             return redirect('posts_show', post.id)
 
+    api_authors_search_url = reverse('api_authors_search')
+
     return render(request, 'magplan/articles/advert.html', {
         'form': form,
+        'api_authors_search_url': api_authors_search_url,
     })
 
 

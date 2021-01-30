@@ -1,4 +1,6 @@
 {% extends "layout_plan.html" %}
+{% load filters %}
+{% load widget_tweaks %}
 
 {% block title %}Редактирование «{{ post.title }}»{% endblock %}
 {% block styles %}
@@ -86,7 +88,30 @@
             {% with field="title" size=8 %}{% include 'magplan/posts/_field_col.html' %}{% endwith %}
             {% with field="description" size=12 %}{% include 'magplan/posts/_field_col.html' %}{% endwith %}
             {% with field="section" size=6 %}{% include 'magplan/posts/_field_col.html' %}{% endwith %}
-            {% with field="authors" size=6 %}{% include 'magplan/posts/_field_col.html' %}{% endwith %}
+            {% with field_name="authors" size=6 %}
+                {% with field=form|get_item:field_name %}
+                    <div class="col-xl-{{ size }} col-lg-{{ size }} col-md-{{ size }} col-sm-12">
+                        {% if field.field.widget.is_hidden is True %}
+                            {{ field }}
+                        {% else %}
+                            <div class="form-group">
+                                {% if field.field.widget.is_hidden is False %}
+                                    {{ field.label }}
+                                {% endif %}
+
+                                {% if field.errors %}
+                                    <ul class="errors">
+                                        {% for error in field.errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                                {% render_field field data-url=api_authors_search_url %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endwith %}
+            {% endwith %}
         </div>
 
 

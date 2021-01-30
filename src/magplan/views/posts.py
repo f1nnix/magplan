@@ -6,8 +6,6 @@ from zipfile import ZIP_DEFLATED, ZipFile
 
 import html2text
 from django.conf import settings
-
-from magplan.conf import settings as config
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.mail import EmailMultiAlternatives
@@ -17,8 +15,14 @@ from django.shortcuts import HttpResponse, redirect, render
 from django.shortcuts import get_object_or_404
 from django.template import Context, Template
 from django.template.loader import render_to_string
-from slugify import slugify
-
+from django.urls import reverse
+from magplan.conf import settings as config
+from magplan.forms import (
+    CommentModelForm,
+    PostBaseModelForm,
+    PostExtendedModelForm,
+    PostMetaForm,
+)
 from magplan.models import (
     Attachment,
     Comment,
@@ -27,14 +31,9 @@ from magplan.models import (
     Stage,
     User,
 )
-from magplan.forms import (
-    CommentModelForm,
-    PostBaseModelForm,
-    PostExtendedModelForm,
-    PostMetaForm,
-)
 from magplan.tasks.send_post_comment_notification import send_post_comment_notification
 from magplan.tasks.upload_post_to_wp import upload_post_to_wp
+from slugify import slugify
 
 
 def _get_arbitrary_chunk(post: Post) -> str:
@@ -156,7 +155,7 @@ def _authorize_stage_change(user: User, post: Post, new_stage_id: int) -> bool:
     :return: True if authorized, otherwise False
     """
     legit_stages = (post.stage.prev_stage_id, post.stage.next_stage_id)
-    
+
     if new_stage_id in legit_stages and post.assignee == user:
         return True
 
@@ -210,8 +209,13 @@ def show(request, post_id):
     ).get(id=post_id)
 
     post_meta_form = PostMetaForm(
-        initial={'wp_id': post.meta.get('wpid')}, instance=post
+        initial={
+            'wp_id': post.meta.get('wpid')
+        },
+        instance=post
     )
+
+    api_issues_search_url = reverse('api_issues_search')
 
     return render(
         request,
@@ -224,6 +228,8 @@ def show(request, post_id):
             "meta_form": post_meta_form,
             "TYPE_CHOICES": Comment.TYPE_CHOICES,
             "SYSTEM_ACTION_CHOICES": Comment.SYSTEM_ACTION_CHOICES,
+            'api_issues_search_url': api_issues_search_url,
+
         },
     )
 
@@ -287,7 +293,13 @@ def edit(request, post_id):
     else:
         form = PostExtendedModelForm(instance=post)
 
-    return render(request, "magplan/posts/edit.html", {"post": post, "form": form})
+    api_authors_search_url = reverse('api_authors_search')
+
+    return render(request, "magplan/posts/edit.html", {
+        "post": post,
+        "form": form,
+        'api_authors_search_url': api_authors_search_url
+    })
 
 
 @login_required

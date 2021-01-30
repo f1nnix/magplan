@@ -1,3 +1,5 @@
+{% load widget_tweaks %}
+
 <style>
     .issues-suggestions .suggestion {
         display: inline;
@@ -61,7 +63,9 @@
                 <li>{{ error }}</li>{% endfor %}
             </ul>
             {% endif %}
-            {{ form.issues }}
+
+            {% render_field form.issues data-url=api_issues_search_url %}
+
             <div class="issues-suggestions">
                 {% for issue in issues_suggesions %}
                 <div class="suggestion">
@@ -84,7 +88,7 @@
                 {% endfor %}
             </ul>
             {% endif %}
-            {{ form.authors }}
+            {% render_field form.authors data-url=api_authors_search_url %}
         </div>
     </div>
     <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12">
