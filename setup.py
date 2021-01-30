@@ -49,7 +49,7 @@ extras_requirements = {
 
 setup(
     name="magplan",
-    version="2.0.11",
+    version="2.0.12",
     author="Ilya Rusanen",
     author_email="ilya@rusanen.co.uk",
     url="",
