@@ -35,6 +35,12 @@ from magplan.tasks.send_post_comment_notification import send_post_comment_notif
 from magplan.tasks.upload_post_to_wp import upload_post_to_wp
 from slugify import slugify
 
+IMAGE_MIME_TYPES = {
+    'image/gif',
+    'image/jpeg',
+    'image/png',
+}
+
 
 def _get_arbitrary_chunk(post: Post) -> str:
     """Render instance specific template code
@@ -189,7 +195,7 @@ def _save_attachments(files: List, post: Post, user: User) -> List[Attachment]:
             # original is copied by value
             attachment.file = file
 
-            if file.content_type in ("image/png", "image/jpeg"):
+            if file.content_type in IMAGE_MIME_TYPES:
                 attachment.type = Attachment.TYPE_IMAGE
             elif file.content_type == "application/pdf":
                 attachment.type = Attachment.TYPE_PDF
