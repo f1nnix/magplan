@@ -13,15 +13,35 @@
     {% else %}
         <h1>Все статьи</h1>
     {% endif %}
-    <div class="row">
-        <div class="col-12">
-            <a class="btn btn-light" href="{% url 'articles_whitelisted' %}">Добавить статью из регулярной
-                рубрики</a>
-            <a class="btn btn-light" href="{% url 'articles_advert' %}">Добавить рекламный материал</a>
-        </div>
-    </div>
 
-    <hr/>
+    {% if has_create_articles_permissions %}
+        <div class="row">
+            <div class="col-12">
+                <div class="dropdown">
+                    <button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="bi bi-plus-circle"></i> Создать статью
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        {% if perms.magplan.create_generic_post %}
+                            <a class="dropdown-item" href="{% url 'articles_default' %}">Обычную</a>
+                        {% endif %}
+                        {% if perms.magplan.create_archive_post %}
+                            <a class="dropdown-item" href="{% url 'articles_archived' %}">Архивную</a>
+                        {% endif %}
+                        {% if perms.magplan.create_advert_post %}
+                            <a class="dropdown-item" href="{% url 'articles_advert' %}">Рекламную</a>
+                        {% endif %}
+                        {% if perms.magplan.create_regular_post %}
+                            <a class="dropdown-item" href="{% url 'articles_whitelisted' %}">Из регулярной рубрики</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr/>
+    {% endif %}
+
     <ul class="nav nav-tabs">
         <li class="nav-item">
             <a class="nav-link {% if filter_ == none %}active{% endif %}" href="{% url 'articles_index' %}">Недавние</a>

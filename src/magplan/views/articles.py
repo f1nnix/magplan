@@ -7,8 +7,9 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.utils.timezone import now
 
+from magplan.forms import WhitelistedPostExtendedModelForm, AdPostExtendedModelForm, DefaultPostModelForm, \
+    ArchivedPostModelForm
 from magplan.models import Post, Stage, User
-from magplan.forms import WhitelistedPostExtendedModelForm, AdPostExtendedModelForm
 
 
 def _get_filtered_posts_queryset(filter_: tp.Optional[str], current_user: User) -> QuerySet:
@@ -43,13 +44,78 @@ def _get_filtered_posts_queryset(filter_: tp.Optional[str], current_user: User) 
     return posts
 
 
+def get_api_urls() -> tp.Dict[str, str]:
+    return {
+        'api_authors_search_url': reverse('api_authors_search'),
+        'api_issues_search_url': reverse('api_issues_search'),
+    }
+
+
 @login_required
 def index(request):
     filter_ = request.GET.get('filter')
     posts: QuerySet = _get_filtered_posts_queryset(filter_, request.user.user)
+
+    # If user has any permissions to create any type of articles
+    has_create_articles_permissions = any((
+        request.user.has_perm('magplan.create_generic_post'),
+        request.user.has_perm('magplan.create_archive_post'),
+        request.user.has_perm('magplan.create_advert_post'),
+        request.user.has_perm('magplan.create_regular_post'),
+    ))
+
     return render(request, 'magplan/articles/index.html', {
         'posts': posts,
         'filter_': filter_,
+        'has_create_articles_permissions': has_create_articles_permissions,
+    })
+
+
+@login_required
+def default(request):
+    form = DefaultPostModelForm()
+
+    if request.method == 'POST':
+        form = DefaultPostModelForm(request.POST)
+
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.editor = request.user.user
+            post.stage = Stage.objects.get(slug='waiting')
+
+            post.save()
+            form.save_m2m()
+
+            return redirect('posts_show', post.id)
+
+    return render(request, 'magplan/articles/default.html', {
+        'form': form,
+        **get_api_urls(),
+    })
+
+
+@login_required
+def archived(request):
+    form = ArchivedPostModelForm()
+
+    if request.method == 'POST':
+        form = ArchivedPostModelForm(request.POST)
+
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.editor = request.user.user
+            post.stage = Stage.objects.get(slug='waiting')
+
+            post.features = Post.POST_FEATURES_ARCHIVE
+
+            post.save()
+            form.save_m2m()
+
+            return redirect('posts_show', post.id)
+
+    return render(request, 'magplan/articles/default.html', {
+        'form': form,
+        **get_api_urls(),
     })
 
 
@@ -91,6 +157,8 @@ def advert(request):
             post = form.save(commit=False)
             post.editor = request.user.user
             post.stage = Stage.objects.get(slug='waiting')
+
+            post.features = Post.POST_FEATURES_ADVERT
 
             post.save()
 

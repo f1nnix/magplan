@@ -310,13 +310,6 @@ def edit(request, post_id):
 
 @login_required
 def edit_meta(request, post_id):
-    def _get_value_repr(value) -> str:
-        try:
-            iter(value)
-            return ", ".join(list(map(str(o) for o in value)))
-        except TypeError as te:
-            return str(value)
-
     try:
         post = Post.objects.get(id=post_id)
     except Post.DoesNotExist:

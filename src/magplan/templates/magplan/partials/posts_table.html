@@ -27,6 +27,15 @@
                     {% if post.has_text == True %}
                         <span class="badge badge-success">{% trans "has_text" %}</span>
                     {% endif %}
+                    {% if post.is_archive %}
+                        <span class="badge badge-secondary">Архивный</span>
+                    {% endif %}
+                    {% if post.is_advert %}
+                        <span class="badge badge-warning">Рекламный</span>
+                    {% endif %}
+                    {% if post.is_regular %}
+                        <span class="badge badge-warning">Регулярный</span>
+                    {% endif %}
                 </td>
                 <td>
                     {% for author in post.authors.all %}
