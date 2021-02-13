@@ -530,6 +530,25 @@ class Post(AbstractBase):
             xmd=prepared_xmd, title=str(self), css=self.css,
         )
 
+    def render_xmd(self):
+        if not self.has_text:
+            return
+
+        prepared_xmd: str = replace_images_paths(
+            self.xmd, self.images, mapper=plan_image_mapper
+        )
+        self.html = _render_with_external_parser(
+            self.id, prepared_xmd, paywall_tag_html=Post.PAYWALL_NOTICE_RENDERED
+        )
+
+        if not self.html:
+            self.html = render_md(self.xmd, attachments=self.images)
+
+        if Post.PAYWALL_NOTICE_HEAD in self.html:
+            self.is_paywalled = True
+        else:
+            self.is_paywalled = False
+
 
 class Attachment(AbstractBase):
     TYPE_IMAGE = 0
@@ -714,22 +733,13 @@ def _render_with_external_parser(
         return None
 
 
+
+
 @receiver(pre_save, sender=Post)
-def render_xmd(sender, instance, **kwargs):
-    if not instance.has_text:
-        return
+def on_post_pre_save(sender, instance: Post, **kwargs):
+    instance.render_xmd()
 
-    prepared_xmd: str = replace_images_paths(
-        instance.xmd, instance.images, mapper=plan_image_mapper
-    )
-    instance.html = _render_with_external_parser(
-        instance.id, prepared_xmd, paywall_tag_html=Post.PAYWALL_NOTICE_RENDERED
-    )
-
-    if not instance.html:
-        instance.html = render_md(instance.xmd, attachments=instance.images)
-
-    if Post.PAYWALL_NOTICE_HEAD in instance.html:
-        instance.is_paywalled = True
-    else:
-        instance.is_paywalled = False
+    if instance.features == Post.POST_FEATURES_ARCHIVE:
+        if instance.issues.count():
+            target_issue: Issue = instance.issues.first()
+            instance.published_at = target_issue.published_at
