@@ -298,12 +298,12 @@ class Post(AbstractBase):
     POST_FEATURES_DEFAULT = 0
     POST_FEATURES_ARCHIVE = 1
     POST_FEATURES_ADVERT = 2
-    POST_FEATURES_TRANSLATION = 2
+    POST_FEATURES_TRANSLATED = 2
     POST_FEATURES_CHOICES = (
         (POST_FEATURES_DEFAULT, 'Default'),
         (POST_FEATURES_ARCHIVE, 'Archive'),
         (POST_FEATURES_ADVERT, 'Advert'),
-        (POST_FEATURES_TRANSLATION, 'Translation'),
+        (POST_FEATURES_TRANSLATED, 'Translated'),
     )
     features = models.SmallIntegerField(choices=POST_FEATURES_CHOICES, default=POST_FEATURES_DEFAULT)
 
@@ -427,6 +427,12 @@ class Post(AbstractBase):
         permissions = (
             ('recieve_post_email_updates', 'Recieve email updates for Post'),
             ('edit_extended_post_attrs', 'Edit extended Post attributes'),
+            # Direct article creation
+            ('create_generic_post', 'Create generic post'),
+            ('create_archive_post', 'Create archive post'),
+            ('create_advert_post', 'Create advert post'),
+            ('create_regular_post', 'Create regular post'),
+            ('create_translated_post', 'Create translated post'),
         )
 
     @property

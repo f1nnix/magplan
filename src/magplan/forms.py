@@ -181,7 +181,24 @@ class PostExtendedModelForm(ModelForm):
         self.fields['section'].empty_label = None
 
 
-class WhitelistedPostExtendedModelForm(PostBaseModelForm):
+class PostDirectCreateModelForm(PostBaseModelForm):
+    class Meta(PostBaseModelForm.Meta):
+        fields = ('title', 'issues', 'authors', 'finished_at', 'section',)
+
+
+class DefaultPostModelForm(PostDirectCreateModelForm):
+    pass
+
+class ArchivedPostModelForm(PostDirectCreateModelForm):
+    section = forms.ModelChoiceField(
+        queryset=Section.objects.all(),
+        label="Рубрика",
+        empty_label=None,
+        widget=forms.Select(attrs={'class': 'form-control', 'rows': 5})
+    )
+
+
+class WhitelistedPostExtendedModelForm(PostDirectCreateModelForm):
     section = forms.ModelChoiceField(
         queryset=Section.objects.filter(is_archived=False, is_whitelisted=True),
         label="Рубрика",
@@ -190,7 +207,7 @@ class WhitelistedPostExtendedModelForm(PostBaseModelForm):
     )
 
 
-class AdPostExtendedModelForm(PostBaseModelForm):
+class AdPostExtendedModelForm(PostDirectCreateModelForm):
     issues = forms.ModelChoiceField(
         queryset=Issue.objects.filter(number=0),
         empty_label=None,
