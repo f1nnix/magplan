@@ -294,6 +294,19 @@ class Post(AbstractBase):
     format = models.SmallIntegerField(
         choices=POST_FORMAT_CHOICES, default=POST_FORMAT_DEFAULT
     )
+
+    POST_FEATURES_DEFAULT = 0
+    POST_FEATURES_ARCHIVE = 1
+    POST_FEATURES_ADVERT = 2
+    POST_FEATURES_TRANSLATION = 2
+    POST_FEATURES_CHOICES = (
+        (POST_FEATURES_DEFAULT, 'Default'),
+        (POST_FEATURES_ARCHIVE, 'Archive'),
+        (POST_FEATURES_ADVERT, 'Advert'),
+        (POST_FEATURES_TRANSLATION, 'Translation'),
+    )
+    features = models.SmallIntegerField(choices=POST_FEATURES_CHOICES, default=POST_FEATURES_DEFAULT)
+
     finished_at = models.DateTimeField(
         null=False,
         blank=False,
