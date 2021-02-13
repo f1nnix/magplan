@@ -423,6 +423,26 @@ class Post(AbstractBase):
     def has_text(self):
         return self.xmd is not None and self.xmd != ''
 
+    @property
+    def is_default(self):
+        return self.features == self.POST_FEATURES_DEFAULT
+
+    @property
+    def is_archive(self):
+        return self.features == self.POST_FEATURES_ARCHIVE
+
+    @property
+    def is_advert(self):
+        return self.features == self.POST_FEATURES_ADVERT
+
+    @property
+    def is_regular(self):
+        return self.section.is_whitelisted == True
+
+    @property
+    def is_translated(self):
+        return self.features == self.POST_FEATURES_TRANSLATED
+
     class Meta:
         permissions = (
             ('recieve_post_email_updates', 'Recieve email updates for Post'),
