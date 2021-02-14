@@ -36,6 +36,8 @@ from .xmd.mappers import plan_internal_mapper as plan_image_mapper
 
 UserModel = get_user_model()
 
+logger = logging.getLogger()
+
 
 class StorageType(enum.Enum):
     S3 = 1
@@ -150,11 +152,12 @@ class Issue(AbstractBase):
         null=False, blank=False, default=datetime.date.today
     )
 
-    @property
-    def full_title(self) -> str:
-        return '{} #{} {}'.format(
-            'Хакер', self.number, self.title or ''
-        )
+
+@property
+def full_title(self) -> str:
+    return '{} #{} {}'.format(
+        'Хакер', self.number, self.title or ''
+    )
 
 
 class Stage(AbstractBase):
@@ -515,11 +518,14 @@ class Post(AbstractBase):
             with Lock():
                 post.upload()
         """
+        logger.debug('Staring Post.upload')
         if not self.wp_id:
+            logger.warning('No wp_id, exiting')
             return
 
         for image in self.images:
             image.upload_to_storage()
+        logger.debug('Uploaded images')
 
         # Upload to external DB
         prepared_xmd = replace_images_paths(
@@ -527,19 +533,25 @@ class Post(AbstractBase):
             attachments=self.images,
             mapper=s3_image_mapper,
         )
+        logger.debug('Replaced images paths')
 
         upload_kwargs: tp.Dict[str, str] = {
             'xmd': prepared_xmd,
             'title': str(self),
             'css': self.css,
         }
+        logger.debug('Prepared upload kwargs')
+
         if self.published_at and self.features == self.POST_FEATURES_ARCHIVE:
+            logger.debug('Running on archived post. Adding issues datetimes as publication dates')
             post_date_gmt: str = self.published_at.strftime(WP_DATE_FORMAT_STRING)
             post_date: str = self.published_at.astimezone().strftime(WP_DATE_FORMAT_STRING)
 
             upload_kwargs['post_date_gmt'] = post_date_gmt
             upload_kwargs['post_date'] = post_date
+            logger.debug('Added publication dates')
 
+        logger.debug('Ready to run upload to WP')
         update_ext_db_xmd(self.wp_id, **upload_kwargs)
 
     def render_xmd(self):
@@ -754,4 +766,10 @@ def on_post_pre_save(sender, instance: Post, **kwargs):
         if instance.features == Post.POST_FEATURES_ARCHIVE:
             if instance.issues.count():
                 target_issue: Issue = instance.issues.first()
-                instance.published_at = target_issue.published_at
+
+                # Convert date to datetime
+                published_date: datetime.date = target_issue.published_at
+                published_datetime: datetime.datetime = datetime.datetime.combine(
+                    published_date, datetime.datetime.min.time()
+                )
+                instance.published_at = published_datetime
