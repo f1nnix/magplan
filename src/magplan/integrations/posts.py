@@ -1,3 +1,4 @@
+import logging
 import re
 import typing as tp
 from contextlib import contextmanager
@@ -20,6 +21,8 @@ url_replace_pattern = re.compile(
     '\]\((.+)\)$'  # FIXME: match real last () group
 )
 
+logger = logging.getLogger()
+
 
 @contextmanager
 def Lock(post):
@@ -28,9 +31,8 @@ def Lock(post):
 
     try:
         yield
-    except Exception:
-        # TODO: write to Senrty or log
-        pass  # noqa
+    except Exception as e:
+        raise e
     finally:
         post.is_locked = False
         post.save()
@@ -48,6 +50,7 @@ def replace_images_paths(xmd: str, attachments: tp.List, mapper: tp.Callable = N
         ![](image1.jpg)
         ![](image1.jpg,image2.jpg)
     """
+    logger.debug('Started replace_images_paths')
     if not mapper:
         mapper = s3_public_mapper
 
@@ -76,6 +79,7 @@ def replace_images_paths(xmd: str, attachments: tp.List, mapper: tp.Callable = N
 
         result_lines.append(res_line)
 
+    logger.debug('Finishing replace_images_paths')
     return '\n'.join(result_lines)
 
 
@@ -111,6 +115,8 @@ def update_ext_db_xmd(
     """
     Updates provided kwargs for post with post_id in external DB
     """
+    logger.info('Staring updating external database')
+
     if not all(settings.EXT_DB.get(key) for key in settings.EXT_DB.keys()):
         return
 
