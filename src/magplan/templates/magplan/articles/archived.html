@@ -1,0 +1,28 @@
+{% extends "layout_plan.html" %}
+{% block title %}Создать архивную статью{% endblock %}
+{% block styles %}
+    <style>
+        .select2-container {
+            width: 100% !important;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <h1>Создать архивную статью</h1>
+
+    <div class="row">
+        <div class="col-12">
+            {% with form=form %}
+                <form action="{% url 'articles_archived' %}"
+                      method="POST"
+                      accept-charset="utf-8">
+                    {% csrf_token %}
+                    {% include 'magplan/posts/_form_base.html' %}
+                    <button type="submit" class="btn btn-success float-right">Создать статью</button>
+                </form>
+            {% endwith %}
+        </div>
+    </div>
+
+
+{% endblock %}

@@ -26,8 +26,10 @@ urlpatterns = [
     path('ideas/', ideas.index, name='ideas_index'),
 
     path('articles/search', articles.search, name='articles_search'),
-    path('articles/whitelisted', articles.whitelisted, name='articles_whitelisted'),
+    path('articles/default', articles.default, name='articles_default'),
+    path('articles/archived', articles.archived, name='articles_archived'),
     path('articles/advert', articles.advert, name='articles_advert'),
+    path('articles/whitelisted', articles.whitelisted, name='articles_whitelisted'),
     path('articles/', articles.index, name='articles_index'),
 
     path('issues/<int:issue_id>/', issues.show, name='issues_show'),

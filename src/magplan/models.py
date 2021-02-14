@@ -1,18 +1,25 @@
 import datetime
+import enum
+import hashlib
 import logging
 import mimetypes
 import os
 import typing as tp
 from typing import List
 
+import django
 import html2text
+import requests
+from botocore.exceptions import ClientError
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.postgres.fields import JSONField
 from django.core.mail import EmailMultiAlternatives
 from django.db import models
 from django.db.models import Q
 from django.db.models.signals import post_save, pre_save
+from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.utils import timezone
 
@@ -23,15 +30,7 @@ from magplan.xmd import render_md
 from magplan.xmd.mappers import s3_public_mapper as s3_image_mapper
 
 NEW_IDEA_NOTIFICATION_PREFERENCE_NAME = 'magplan__new_idea_notification'
-
-import enum
-import hashlib
-
-import django
-import requests
-from botocore.exceptions import ClientError
-from django.contrib.postgres.fields import JSONField
-from django.dispatch import receiver
+WP_DATE_FORMAT_STRING = '%Y-%m-%d %H:%M:%S'
 
 from .xmd.mappers import plan_internal_mapper as plan_image_mapper
 
@@ -277,12 +276,16 @@ class Post(AbstractBase):
         PAYWALL_NOTICE_HEAD, PAYWALL_NOTICE_BODY, PAYWALL_NOTICE_TAIL
     )
 
-    def __str__(self):
+    @property
+    def full_title(self) -> str:
         if self.kicker is None:
             return self.title
 
         separator = ' ' if self.kicker.endswith(('!', ':', '?')) else '. '
         return f'{self.kicker}{separator}{self.title}'
+
+    def __str__(self) -> str:
+        return self.full_title
 
     POST_FORMAT_DEFAULT = 0
     POST_FORMAT_FEATURED = 1
@@ -294,6 +297,19 @@ class Post(AbstractBase):
     format = models.SmallIntegerField(
         choices=POST_FORMAT_CHOICES, default=POST_FORMAT_DEFAULT
     )
+
+    POST_FEATURES_DEFAULT = 0
+    POST_FEATURES_ARCHIVE = 1
+    POST_FEATURES_ADVERT = 2
+    POST_FEATURES_TRANSLATED = 2
+    POST_FEATURES_CHOICES = (
+        (POST_FEATURES_DEFAULT, 'Default'),
+        (POST_FEATURES_ARCHIVE, 'Archive'),
+        (POST_FEATURES_ADVERT, 'Advert'),
+        (POST_FEATURES_TRANSLATED, 'Translated'),
+    )
+    features = models.SmallIntegerField(choices=POST_FEATURES_CHOICES, default=POST_FEATURES_DEFAULT)
+
     finished_at = models.DateTimeField(
         null=False,
         blank=False,
@@ -410,10 +426,36 @@ class Post(AbstractBase):
     def has_text(self):
         return self.xmd is not None and self.xmd != ''
 
+    @property
+    def is_default(self):
+        return self.features == self.POST_FEATURES_DEFAULT
+
+    @property
+    def is_archive(self):
+        return self.features == self.POST_FEATURES_ARCHIVE
+
+    @property
+    def is_advert(self):
+        return self.features == self.POST_FEATURES_ADVERT
+
+    @property
+    def is_regular(self):
+        return self.section.is_whitelisted == True
+
+    @property
+    def is_translated(self):
+        return self.features == self.POST_FEATURES_TRANSLATED
+
     class Meta:
         permissions = (
             ('recieve_post_email_updates', 'Recieve email updates for Post'),
             ('edit_extended_post_attrs', 'Edit extended Post attributes'),
+            # Direct article creation
+            ('create_generic_post', 'Create generic post'),
+            ('create_archive_post', 'Create archive post'),
+            ('create_advert_post', 'Create advert post'),
+            ('create_regular_post', 'Create regular post'),
+            ('create_translated_post', 'Create translated post'),
         )
 
     @property
@@ -486,10 +528,38 @@ class Post(AbstractBase):
             mapper=s3_image_mapper,
         )
 
-        update_ext_db_xmd(
-            self.wp_id,
-            xmd=prepared_xmd, title=str(self), css=self.css,
+        upload_kwargs: tp.Dict[str, str] = {
+            'xmd': prepared_xmd,
+            'title': str(self),
+            'css': self.css,
+        }
+        if self.published_at and self.features == self.POST_FEATURES_ARCHIVE:
+            post_date_gmt: str = self.published_at.strftime(WP_DATE_FORMAT_STRING)
+            post_date: str = self.published_at.astimezone().strftime(WP_DATE_FORMAT_STRING)
+
+            upload_kwargs['post_date_gmt'] = post_date_gmt
+            upload_kwargs['post_date'] = post_date
+
+        update_ext_db_xmd(self.wp_id, **upload_kwargs)
+
+    def render_xmd(self):
+        if not self.has_text:
+            return
+
+        prepared_xmd: str = replace_images_paths(
+            self.xmd, self.images, mapper=plan_image_mapper
         )
+        self.html = _render_with_external_parser(
+            self.id, prepared_xmd, paywall_tag_html=Post.PAYWALL_NOTICE_RENDERED
+        )
+
+        if not self.html:
+            self.html = render_md(self.xmd, attachments=self.images)
+
+        if Post.PAYWALL_NOTICE_HEAD in self.html:
+            self.is_paywalled = True
+        else:
+            self.is_paywalled = False
 
 
 class Attachment(AbstractBase):
@@ -676,21 +746,12 @@ def _render_with_external_parser(
 
 
 @receiver(pre_save, sender=Post)
-def render_xmd(sender, instance, **kwargs):
-    if not instance.has_text:
-        return
+def on_post_pre_save(sender, instance: Post, **kwargs):
+    instance.render_xmd()
 
-    prepared_xmd: str = replace_images_paths(
-        instance.xmd, instance.images, mapper=plan_image_mapper
-    )
-    instance.html = _render_with_external_parser(
-        instance.id, prepared_xmd, paywall_tag_html=Post.PAYWALL_NOTICE_RENDERED
-    )
-
-    if not instance.html:
-        instance.html = render_md(instance.xmd, attachments=instance.images)
-
-    if Post.PAYWALL_NOTICE_HEAD in instance.html:
-        instance.is_paywalled = True
-    else:
-        instance.is_paywalled = False
+    # If we're modifying existing object, not creating a new one
+    if not instance._state.adding:
+        if instance.features == Post.POST_FEATURES_ARCHIVE:
+            if instance.issues.count():
+                target_issue: Issue = instance.issues.first()
+                instance.published_at = target_issue.published_at
