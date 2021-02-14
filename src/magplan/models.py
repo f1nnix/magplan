@@ -1,18 +1,25 @@
 import datetime
+import enum
+import hashlib
 import logging
 import mimetypes
 import os
 import typing as tp
 from typing import List
 
+import django
 import html2text
+import requests
+from botocore.exceptions import ClientError
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.postgres.fields import JSONField
 from django.core.mail import EmailMultiAlternatives
 from django.db import models
 from django.db.models import Q
 from django.db.models.signals import post_save, pre_save
+from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.utils import timezone
 
@@ -23,15 +30,7 @@ from magplan.xmd import render_md
 from magplan.xmd.mappers import s3_public_mapper as s3_image_mapper
 
 NEW_IDEA_NOTIFICATION_PREFERENCE_NAME = 'magplan__new_idea_notification'
-
-import enum
-import hashlib
-
-import django
-import requests
-from botocore.exceptions import ClientError
-from django.contrib.postgres.fields import JSONField
-from django.dispatch import receiver
+WP_DATE_FORMAT_STRING = '%Y-%m-%d %H:%M:%S'
 
 from .xmd.mappers import plan_internal_mapper as plan_image_mapper
 
@@ -277,12 +276,16 @@ class Post(AbstractBase):
         PAYWALL_NOTICE_HEAD, PAYWALL_NOTICE_BODY, PAYWALL_NOTICE_TAIL
     )
 
-    def __str__(self):
+    @property
+    def full_title(self) -> str:
         if self.kicker is None:
             return self.title
 
         separator = ' ' if self.kicker.endswith(('!', ':', '?')) else '. '
         return f'{self.kicker}{separator}{self.title}'
+
+    def __str__(self) -> str:
+        return self.full_title
 
     POST_FORMAT_DEFAULT = 0
     POST_FORMAT_FEATURED = 1
@@ -525,10 +528,19 @@ class Post(AbstractBase):
             mapper=s3_image_mapper,
         )
 
-        update_ext_db_xmd(
-            self.wp_id,
-            xmd=prepared_xmd, title=str(self), css=self.css,
-        )
+        upload_kwargs: tp.Dict[str, str] = {
+            'xmd': prepared_xmd,
+            'title': str(self),
+            'css': self.css,
+        }
+        if self.published_at and self.features == self.POST_FEATURES_ARCHIVE:
+            post_date_gmt: str = self.published_at.strftime(WP_DATE_FORMAT_STRING)
+            post_date: str = self.published_at.astimezone().strftime(WP_DATE_FORMAT_STRING)
+
+            upload_kwargs['post_date_gmt'] = post_date_gmt
+            upload_kwargs['post_date'] = post_date
+
+        update_ext_db_xmd(self.wp_id, **upload_kwargs)
 
     def render_xmd(self):
         if not self.has_text:
@@ -731,8 +743,6 @@ def _render_with_external_parser(
     except Exception as exc:
         # TODO: add logger, no need to handle
         return None
-
-
 
 
 @receiver(pre_save, sender=Post)

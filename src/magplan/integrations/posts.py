@@ -103,7 +103,11 @@ def update_post_field(conn: pymysql.Connection, object_id: int, key: str, value:
     conn.commit()
 
 
-def update_ext_db_xmd(post_id: int, *, xmd: str, title: str, css: str) -> None:
+def update_ext_db_xmd(
+        post_id: int,
+        *,
+        xmd: str = None, title: str = None, css: str = None, post_date: str = None, post_date_gmt: str = None
+) -> None:
     """
     Updates provided kwargs for post with post_id in external DB
     """
@@ -136,5 +140,9 @@ def update_ext_db_xmd(post_id: int, *, xmd: str, title: str, css: str) -> None:
             update_post_meta_field(conn, post_id, 'css', css)
         if title:
             update_post_field(conn, post_id, 'post_title', title)
+        if post_date:
+            update_post_field(conn, post_id, 'post_date', post_date)
+        if post_date_gmt:
+            update_post_field(conn, post_id, 'post_date_gmt', post_date_gmt)
 
     conn.close()
