@@ -1,5 +1,5 @@
 {% extends "layout_plan.html" %}
-{% block title %}Создать обычную статью{% endblock %}
+{% block title %}Создать архивную статью{% endblock %}
 {% block styles %}
     <style>
         .select2-container {
@@ -8,12 +8,12 @@
     </style>
 {% endblock %}
 {% block content %}
-    <h1>Создать обычную статью</h1>
+    <h1>Создать архивную статью</h1>
 
     <div class="row">
         <div class="col-12">
             {% with form=form %}
-                <form action="{% url 'articles_default' %}"
+                <form action="{% url 'articles_archived' %}"
                       method="POST"
                       accept-charset="utf-8">
                     {% csrf_token %}

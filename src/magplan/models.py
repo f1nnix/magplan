@@ -749,7 +749,9 @@ def _render_with_external_parser(
 def on_post_pre_save(sender, instance: Post, **kwargs):
     instance.render_xmd()
 
-    if instance.features == Post.POST_FEATURES_ARCHIVE:
-        if instance.issues.count():
-            target_issue: Issue = instance.issues.first()
-            instance.published_at = target_issue.published_at
+    # If we're modifying existing object, not creating a new one
+    if not instance._state.adding:
+        if instance.features == Post.POST_FEATURES_ARCHIVE:
+            if instance.issues.count():
+                target_issue: Issue = instance.issues.first()
+                instance.published_at = target_issue.published_at

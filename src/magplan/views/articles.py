@@ -113,7 +113,7 @@ def archived(request):
 
             return redirect('posts_show', post.id)
 
-    return render(request, 'magplan/articles/default.html', {
+    return render(request, 'magplan/articles/archived.html', {
         'form': form,
         **get_api_urls(),
     })
