@@ -152,12 +152,11 @@ class Issue(AbstractBase):
         null=False, blank=False, default=datetime.date.today
     )
 
-
-@property
-def full_title(self) -> str:
-    return '{} #{} {}'.format(
-        'Хакер', self.number, self.title or ''
-    )
+    @property
+    def full_title(self) -> str:
+        return '{} #{} {}'.format(
+            'Хакер', self.number, self.title or ''
+        )
 
 
 class Stage(AbstractBase):
