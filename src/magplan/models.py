@@ -15,9 +15,11 @@ from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import JSONField
+from django.contrib.sites.managers import CurrentSiteManager
+from django.contrib.sites.models import Site
 from django.core.mail import EmailMultiAlternatives
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.template.loader import render_to_string
@@ -50,6 +52,25 @@ class AbstractBase(models.Model):
 
     class Meta:
         abstract = True
+
+
+class AbstractSiteModel(models.Model):
+    """
+    Support for multisite managers
+    """
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
+    objects = models.Manager()
+    on_current_site = CurrentSiteManager()
+
+    class Meta:
+        abstract = True
+
+    @classmethod
+    def on_site(cls, site: tp.Optional[Site]) -> QuerySet:
+        if not site:
+            return cls.objects
+
+        return cls.objects.filter(site=site)
 
 
 class User(UserModel):
@@ -269,7 +290,7 @@ class Idea(AbstractBase):
         return render_md(self.description)
 
 
-class Post(AbstractBase):
+class Post(AbstractSiteModel, AbstractBase):
     # Used for external parser configuration
     PAYWALL_NOTICE_HEAD = '<div class="paywall-notice">'
     PAYWALL_NOTICE_BODY = 'Продолжение статьи доступно только продписчикам'
