@@ -136,7 +136,7 @@ class Profile(AbstractBase):
     notes = models.TextField('Примечания', blank=True, null=True)
 
 
-class Section(AbstractBase):
+class Section(AbstractSiteModel, AbstractBase):
     def __str__(self):
         return self.title
 
@@ -180,7 +180,7 @@ class Issue(AbstractBase):
         )
 
 
-class Stage(AbstractBase):
+class Stage(AbstractSiteModel, AbstractBase):
     def __str__(self):
         return self.title
 

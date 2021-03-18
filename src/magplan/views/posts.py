@@ -210,6 +210,7 @@ def _save_attachments(files: List, post: Post, user: User) -> List[Attachment]:
 
 @login_required
 def show(request, post_id):
+    # Alllow display post from any domain
     post = Post.objects.prefetch_related(
         "editor", "authors", "stage", "section", "issues", "comments__user"
     ).get(id=post_id)
@@ -228,7 +229,7 @@ def show(request, post_id):
         "magplan/posts/show.html",
         {
             "post": post,
-            "stages": Stage.objects.order_by("sort").all(),
+            "stages": Stage.on_current_site.order_by("sort").all(),
             "instance_chunk": _get_arbitrary_chunk(post),
             "comment_form": CommentModelForm(),
             "meta_form": post_meta_form,
@@ -243,8 +244,9 @@ def show(request, post_id):
 @login_required
 def create(request):
     if request.method == "POST":
-        form = PostBaseModelForm(request.POST)
+        form: Post = PostBaseModelForm(request.POST)
 
+        # Set post site scope
         if form.is_valid():
             post = form.save(commit=False)
             post.editor = request.user.user
