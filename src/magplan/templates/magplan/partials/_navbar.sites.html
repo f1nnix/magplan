@@ -7,7 +7,7 @@
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
             {% for site in sites %}
-                <a class="dropdown-item" href="">{{ site.name }}</a>
+                <a class="dropdown-item" href="{{ request.scheme }}://{{ site }}{{ request.path }}">{{ site.name }}</a>
             {% endfor %}
 
         </div>
