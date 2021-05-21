@@ -95,7 +95,7 @@ def default(request: HttpRequest):
 
             post.site = current_site
             post.editor = request.user.user
-            post.stage = Stage.objects.get(slug='waiting')
+            post.stage = Stage.on_current_site.get(slug='waiting')
 
             post.save()
             form.save_m2m()
