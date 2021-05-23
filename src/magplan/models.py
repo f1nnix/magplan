@@ -498,6 +498,25 @@ class Post(AbstractSiteModel, AbstractBase):
     @property
     def wp_id(self):
         return self.meta.get('wpid')
+    
+    @property
+    def lead(self) -> str:
+        if not self.xmd:
+            return ''
+
+        paragraphs: List[str] = self.xmd.split('\n')
+        for paragraph in paragraphs:
+            cleaned_paragraph = paragraph.strip()
+            if not cleaned_paragraph:
+                continue
+
+            if cleaned_paragraph.startswith('$'):
+                cleaned_paragraph = cleaned_paragraph[1:]
+
+            cleaned_paragraph = cleaned_paragraph.strip()
+            return cleaned_paragraph
+
+        return ''
 
     def build_xmd_blob(self, prepared_xmd: str) -> str:
         """Attaches CSS to XMD for remote CMS
