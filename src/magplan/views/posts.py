@@ -211,11 +211,9 @@ def _save_attachments(
 
         # This can be spoofed on client_side
         if featured_image_file and featured_image_file.content_type == IMAGE_MIME_TYPE_JPEG:
-            # Delete files with the same filename,
-            # uploaded for current post. Emulates overwrite without
-            # custom FileSystemStorage
+            # Delete any previously uploaded featured images
             Attachment.objects.filter(
-                post=post, original_filename=featured_image_file.name
+                post=post, type=Attachment.TYPE_FEATURED_IMAGE
             ).delete()
 
             attachment = Attachment(
