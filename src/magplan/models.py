@@ -24,7 +24,6 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.utils import timezone
-
 from magplan.conf import settings as  config
 from magplan.integrations.images import S3Client
 from magplan.integrations.posts import replace_images_paths, update_ext_db_xmd
@@ -331,7 +330,8 @@ class Post(AbstractSiteModel, AbstractBase):
         (POST_FEATURES_ADVERT, 'Advert'),
         (POST_FEATURES_TRANSLATED, 'Translated'),
     )
-    features = models.SmallIntegerField(choices=POST_FEATURES_CHOICES, default=POST_FEATURES_DEFAULT)
+    features = models.SmallIntegerField(choices=POST_FEATURES_CHOICES,
+                                        default=POST_FEATURES_DEFAULT)
 
     finished_at = models.DateTimeField(
         null=False,
@@ -417,6 +417,10 @@ class Post(AbstractSiteModel, AbstractBase):
         return list(
             filter(lambda a: a.type == Attachment.TYPE_FILE, self.attachment_set.all())
         )
+
+    @property
+    def featured_image(self) -> tp.Optional['Attachment']:
+        return self.attachment_set.filter(type=Attachment.TYPE_FEATURED_IMAGE).first()
 
     @property
     def assignee(self):
@@ -598,7 +602,13 @@ class Attachment(AbstractBase):
     TYPE_IMAGE = 0
     TYPE_PDF = 1
     TYPE_FILE = 2
-    TYPE_CHOICES = ((TYPE_IMAGE, 'Image'), (TYPE_PDF, 'PDF'), (TYPE_FILE, 'File'))
+    TYPE_FEATURED_IMAGE = 3
+    TYPE_CHOICES = (
+        (TYPE_IMAGE, 'Image'),
+        (TYPE_PDF, 'PDF'),
+        (TYPE_FILE, 'File'),
+        (TYPE_FEATURED_IMAGE, 'Featured image'),
+    )
     type = models.SmallIntegerField(choices=TYPE_CHOICES, default=TYPE_IMAGE)
 
     original_filename = models.CharField(null=False, blank=False, max_length=255)
