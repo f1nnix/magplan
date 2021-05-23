@@ -116,7 +116,7 @@
 
 
         <section id="attachments" style="margin-bottom: 1rem;">
-            {% with is_locked=post.is_locked images=post.images pdfs=post.pdfs files=post.files %}
+            {% with is_locked=post.is_locked images=post.images pdfs=post.pdfs files=post.files featured_image=post.featured_image %}
                 {% include 'magplan/posts/_attachments.html' %}
             {% endwith %}
 
