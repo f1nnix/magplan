@@ -104,8 +104,7 @@ class PostMetaForm(ModelForm):
 
     class Meta:
         model = Post
-        fields = ('issues', 'editor', 'finished_at', 'published_at', 'css')
-        # css = forms.CharField(widget=AceWidget)
+        fields = ('issues', 'editor', 'finished_at', 'published_at', 'css', 'slug')
 
         widgets = {
             'issues': forms.SelectMultiple(attrs={
@@ -117,6 +116,7 @@ class PostMetaForm(ModelForm):
             'css': AceWidget(
                 mode='css', theme='textmate', showinvisibles=True, toolbar=False
             ),
+            'slug': forms.TextInput(attrs={'class': 'form-control', }),
         }
 
     def __init__(self, *args, **kwargs):

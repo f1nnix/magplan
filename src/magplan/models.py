@@ -343,7 +343,7 @@ class Post(AbstractSiteModel, AbstractBase):
         null=True, blank=True, verbose_name='Дата публикации'
     )
     kicker = models.CharField(null=True, blank=True, max_length=255)
-    slug = models.SlugField(null=True, blank=True, max_length=255)
+    slug = models.SlugField(null=True, blank=True, max_length=255, verbose_name='Слаг для URL')
     title = models.CharField(
         null=True, blank=True, max_length=255, verbose_name='Заголовок статьи'
     )
