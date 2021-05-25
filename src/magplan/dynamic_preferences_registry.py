@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.sites.models import Site
 from dynamic_preferences.preferences import Section
 from dynamic_preferences.types import ChoicePreference
 from dynamic_preferences.users.registries import user_preferences_registry
@@ -69,3 +70,15 @@ class NewIdeaNotification(ChoicePreference):
     default = 'yes'
     widget = forms.Select(attrs={'class': 'form-control'})
     verbose_name = 'Присылать уведомелния о новых идеях?'
+
+@user_preferences_registry.register
+class PlanCurrentSite(ChoicePreference):
+    name = 'current_site'
+    section = plan
+    choices = [
+        (str(s.id), s.name)
+        for s in Site.objects.all()
+    ]
+    default = '1'
+    widget = forms.Select(attrs={'class': 'form-control'})
+    verbose_name = 'Текущий сайт'

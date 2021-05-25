@@ -15,14 +15,15 @@ from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import JSONField
+from django.contrib.sites.managers import CurrentSiteManager
+from django.contrib.sites.models import Site
 from django.core.mail import EmailMultiAlternatives
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.utils import timezone
-
 from magplan.conf import settings as  config
 from magplan.integrations.images import S3Client
 from magplan.integrations.posts import replace_images_paths, update_ext_db_xmd
@@ -50,6 +51,25 @@ class AbstractBase(models.Model):
 
     class Meta:
         abstract = True
+
+
+class AbstractSiteModel(models.Model):
+    """
+    Support for multisite managers
+    """
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
+    objects = models.Manager()
+    on_current_site = CurrentSiteManager()
+
+    class Meta:
+        abstract = True
+
+    @classmethod
+    def on_site(cls, site: tp.Optional[Site]) -> QuerySet:
+        if not site:
+            return cls.objects
+
+        return cls.objects.filter(site=site)
 
 
 class User(UserModel):
@@ -115,7 +135,7 @@ class Profile(AbstractBase):
     notes = models.TextField('Примечания', blank=True, null=True)
 
 
-class Section(AbstractBase):
+class Section(AbstractSiteModel, AbstractBase):
     def __str__(self):
         return self.title
 
@@ -159,7 +179,7 @@ class Issue(AbstractBase):
         )
 
 
-class Stage(AbstractBase):
+class Stage(AbstractSiteModel, AbstractBase):
     def __str__(self):
         return self.title
 
@@ -269,7 +289,7 @@ class Idea(AbstractBase):
         return render_md(self.description)
 
 
-class Post(AbstractBase):
+class Post(AbstractSiteModel, AbstractBase):
     # Used for external parser configuration
     PAYWALL_NOTICE_HEAD = '<div class="paywall-notice">'
     PAYWALL_NOTICE_BODY = 'Продолжение статьи доступно только продписчикам'
@@ -310,7 +330,8 @@ class Post(AbstractBase):
         (POST_FEATURES_ADVERT, 'Advert'),
         (POST_FEATURES_TRANSLATED, 'Translated'),
     )
-    features = models.SmallIntegerField(choices=POST_FEATURES_CHOICES, default=POST_FEATURES_DEFAULT)
+    features = models.SmallIntegerField(choices=POST_FEATURES_CHOICES,
+                                        default=POST_FEATURES_DEFAULT)
 
     finished_at = models.DateTimeField(
         null=False,
@@ -398,6 +419,10 @@ class Post(AbstractBase):
         )
 
     @property
+    def featured_image(self) -> tp.Optional['Attachment']:
+        return self.attachment_set.filter(type=Attachment.TYPE_FEATURED_IMAGE).first()
+
+    @property
     def assignee(self):
         if self.stage and self.stage.assignee:
             return self.stage.assignee
@@ -473,6 +498,25 @@ class Post(AbstractBase):
     @property
     def wp_id(self):
         return self.meta.get('wpid')
+    
+    @property
+    def lead(self) -> str:
+        if not self.xmd:
+            return ''
+
+        paragraphs: List[str] = self.xmd.split('\n')
+        for paragraph in paragraphs:
+            cleaned_paragraph = paragraph.strip()
+            if not cleaned_paragraph:
+                continue
+
+            if cleaned_paragraph.startswith('$'):
+                cleaned_paragraph = cleaned_paragraph[1:]
+
+            cleaned_paragraph = cleaned_paragraph.strip()
+            return cleaned_paragraph
+
+        return ''
 
     def build_xmd_blob(self, prepared_xmd: str) -> str:
         """Attaches CSS to XMD for remote CMS
@@ -577,7 +621,13 @@ class Attachment(AbstractBase):
     TYPE_IMAGE = 0
     TYPE_PDF = 1
     TYPE_FILE = 2
-    TYPE_CHOICES = ((TYPE_IMAGE, 'Image'), (TYPE_PDF, 'PDF'), (TYPE_FILE, 'File'))
+    TYPE_FEATURED_IMAGE = 3
+    TYPE_CHOICES = (
+        (TYPE_IMAGE, 'Image'),
+        (TYPE_PDF, 'PDF'),
+        (TYPE_FILE, 'File'),
+        (TYPE_FEATURED_IMAGE, 'Featured image'),
+    )
     type = models.SmallIntegerField(choices=TYPE_CHOICES, default=TYPE_IMAGE)
 
     original_filename = models.CharField(null=False, blank=False, max_length=255)

@@ -3,6 +3,7 @@ import typing as tp
 
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q, QuerySet
+from django.http import HttpRequest
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.utils.timezone import now
@@ -10,12 +11,17 @@ from django.utils.timezone import now
 from magplan.forms import WhitelistedPostExtendedModelForm, AdPostExtendedModelForm, DefaultPostModelForm, \
     ArchivedPostModelForm
 from magplan.models import Post, Stage, User
+from magplan.utils import get_current_site
 
 
-def _get_filtered_posts_queryset(filter_: tp.Optional[str], current_user: User) -> QuerySet:
-    """Returns articles QuerySet, based on user request filters.
+def _get_filtered_posts_queryset(filter_: tp.Optional[str], current_user: User, queryset: QuerySet = None) -> QuerySet:
     """
-    posts = Post.objects \
+    Returns articles QuerySet, based on user request filters.
+    """
+
+    if queryset is None:
+        queryset = Post.objects
+    posts = queryset \
         .prefetch_related('section', 'stage', 'issues__magazine', 'editor__profile') \
         .order_by('-updated_at')
 
@@ -54,7 +60,12 @@ def get_api_urls() -> tp.Dict[str, str]:
 @login_required
 def index(request):
     filter_ = request.GET.get('filter')
-    posts: QuerySet = _get_filtered_posts_queryset(filter_, request.user.user)
+
+    current_context_site = get_current_site(request)
+    queryset = Post.on_site(site=current_context_site)
+    posts: QuerySet = _get_filtered_posts_queryset(
+        filter_, request.user.user, queryset=queryset
+    )
 
     # If user has any permissions to create any type of articles
     has_create_articles_permissions = any((
@@ -72,16 +83,19 @@ def index(request):
 
 
 @login_required
-def default(request):
+def default(request: HttpRequest):
     form = DefaultPostModelForm()
 
     if request.method == 'POST':
-        form = DefaultPostModelForm(request.POST)
+        form: Post = DefaultPostModelForm(request.POST)
 
         if form.is_valid():
-            post = form.save(commit=False)
+            current_site = get_current_site(request)
+            post: Post = form.save(commit=False)
+
+            post.site = current_site
             post.editor = request.user.user
-            post.stage = Stage.objects.get(slug='waiting')
+            post.stage = Stage.on_current_site.get(slug='waiting')
 
             post.save()
             form.save_m2m()

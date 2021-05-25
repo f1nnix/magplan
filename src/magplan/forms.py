@@ -126,7 +126,7 @@ class PostMetaForm(ModelForm):
 
 class PostBaseModelForm(ModelForm):
     section = forms.ModelChoiceField(
-        queryset=Section.objects.filter(is_whitelisted=False, is_archived=False),
+        queryset=Section.on_current_site.filter(is_whitelisted=False, is_archived=False),
         label="Рубрика",
         empty_label=None,
         widget=forms.Select(attrs={'class': 'form-control', 'rows': 5})
