@@ -1,7 +1,7 @@
 import datetime
 import io
 import os
-from typing import List
+from typing import List, Optional
 from zipfile import ZIP_DEFLATED, ZipFile
 
 import html2text
@@ -35,9 +35,10 @@ from magplan.tasks.send_post_comment_notification import send_post_comment_notif
 from magplan.tasks.upload_post_to_wp import upload_post_to_wp
 from slugify import slugify
 
+IMAGE_MIME_TYPE_JPEG= 'image/jpeg'
 IMAGE_MIME_TYPES = {
     'image/gif',
-    'image/jpeg',
+    IMAGE_MIME_TYPE_JPEG,
     'image/png',
 }
 
@@ -171,7 +172,10 @@ def _authorize_stage_change(user: User, post: Post, new_stage_id: int) -> bool:
     return False
 
 
-def _save_attachments(files: List, post: Post, user: User) -> List[Attachment]:
+def _save_attachments(
+        files: List, post: Post, user: User,
+        featured_image_file: Optional = None
+) -> List[Attachment]:
     attachments = []
 
     with transaction.atomic():
@@ -205,6 +209,24 @@ def _save_attachments(files: List, post: Post, user: User) -> List[Attachment]:
             attachment.save()
             attachments.append(attachment)
 
+        # This can be spoofed on client_side
+        if featured_image_file and featured_image_file.content_type == IMAGE_MIME_TYPE_JPEG:
+            # Delete any previously uploaded featured images
+            Attachment.objects.filter(
+                post=post, type=Attachment.TYPE_FEATURED_IMAGE
+            ).delete()
+
+            attachment = Attachment(
+                post=post,
+                user=user,
+                original_filename=featured_image_file.name,
+                type=Attachment.TYPE_FEATURED_IMAGE,
+                file=featured_image_file,
+            )  # save original filename
+
+            attachment.save()
+
+
     return attachments
 
 
@@ -228,7 +250,7 @@ def show(request, post_id):
         "magplan/posts/show.html",
         {
             "post": post,
-            "stages": Stage.objects.order_by("sort").all(),
+            "stages": Stage.on_current_site.order_by("sort").all(),
             "instance_chunk": _get_arbitrary_chunk(post),
             "comment_form": CommentModelForm(),
             "meta_form": post_meta_form,
@@ -243,8 +265,9 @@ def show(request, post_id):
 @login_required
 def create(request):
     if request.method == "POST":
-        form = PostBaseModelForm(request.POST)
+        form: Post = PostBaseModelForm(request.POST)
 
+        # Set post site scope
         if form.is_valid():
             post = form.save(commit=False)
             post.editor = request.user.user
@@ -272,8 +295,14 @@ def edit(request, post_id):
     if request.method == "POST":
         form = PostExtendedModelForm(request.POST, request.FILES, instance=post)
 
-        files = request.FILES.getlist("attachments")
-        attachments = _save_attachments(files, post, request.user.user)
+        attachments_files = request.FILES.getlist("attachments")
+        featured_image_files = request.FILES.getlist('featured_image')
+        attachments = _save_attachments(
+            attachments_files, post, request.user.user,
+            featured_image_file=(
+                featured_image_files[0] if featured_image_files else None
+            )
+        )
 
         if form.is_valid():
             post.imprint_updater(request.user.user)

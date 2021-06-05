@@ -1,7 +1,6 @@
 {% load filters %}
 {% load i18n %}
 
-{#    <h2 style="display: inline-block;">{% trans "attachments" %}</h2>#}
 {% if hide_upload_form is not True %}
     <div class="row justify-content-end">
         <div class="col-lg-8 col-xs-12">
@@ -17,6 +16,24 @@
             </div>
         </div>
     </div>
+    <div class="row justify-content-end">
+        <div class="col-lg-8 col-xs-12">
+            <p>Если нужно, можно загрузить заходник. Разрешены только изображения в формате JPEG. Используете
+                подготовленные изображения нужного размера.</p>
+        </div>
+        <div class="col-lg-4 col-xs-12">
+            <div class="card bg-light mb-3">
+                <div class="card-body">
+                    <input
+                            type="file"
+                            name="featured_image"
+                            id="featuredImageFile"
+                            accept="image/jpeg"
+                    />
+                </div>
+            </div>
+        </div>
+    </div>
 {% endif %}
 
 {% if hide_images is not True %}
@@ -24,6 +41,29 @@
         <section id="images">
             <h4 style="display: inline-block;">{% trans "images" %}</h4>
             <div class="row">
+                {% if featured_image %}
+                    <div class="col-6 col-sm-3 col-md-2 col-lg-2 col-xl-2" style="margin-bottom: 1rem;">
+
+                        <div class="card border-primary">
+                            <div class="card-img-top"
+                                 style="height: 5rem; background: url({{ image.file.url }}) 100% 100% no-repeat; background-size: cover;"
+                                 alt="Card image cap"></div>
+                            <div class="card-body  bg-light" style="padding: 0.5rem;">
+                                <p class="card-text">
+                                    <a href="{{ featured_image.file.url }}"
+                                       class="attachment-link"
+                                       data-id="{{ featured_image.id }}"
+                                       data-filename="{{ featured_image.original_filename }}"
+                                    >{{ featured_image.original_filename|trim_filename }}</a>
+                                    {% if is_locked == False %}
+                                        <a href="#" class="attachment-delete-link">&#10060;</a>
+                                        <small style="display: block">{{ featured_image.created_at }}</small>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
                 {% for image in images %}
                     <div class="col-6 col-sm-3 col-md-2 col-lg-2 col-xl-2" style="margin-bottom: 1rem;">
                         <div class="card">
@@ -44,7 +84,6 @@
                                 </p>
                             </div>
                         </div>
-
                     </div>
                 {% endfor %}
             </div>
@@ -110,3 +149,5 @@
         <ul class="card-text" style="padding-left: 20px;"></ul>
     </div>
 </div>
+
+
