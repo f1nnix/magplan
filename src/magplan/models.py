@@ -123,6 +123,12 @@ class Profile(AbstractBase):
     m_name = models.CharField('Отчество', max_length=255, blank=True, null=True)
     l_name = models.CharField('Фамилия', max_length=255, blank=True, null=True)
     n_name = models.CharField('Ник', max_length=255, blank=True, null=True)
+    bio = models.TextField('Био', blank=True, null=True)
+
+    # Global fields
+    f_name_generic = models.CharField('Имя латинницей', max_length=255, blank=True, null=True)
+    l_name_generic = models.CharField('Фамилия латинницей', max_length=255, blank=True, null=True)
+    bio_generic = models.TextField('Био латинницей', blank=True, null=True)
 
     RUSSIA = 0
     UKRAINE = 1
