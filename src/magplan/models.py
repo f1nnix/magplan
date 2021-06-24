@@ -91,7 +91,7 @@ class User(UserModel):
     def display_name_default(self):
         p: Profile = self.profile
         if p.l_name and p.f_name:
-            return '%s %s' % (p.f_name_generic, p.l_name_generic)
+            return '%s %s' % (p.f_name, p.l_name)
         elif p.n_name:
             return p.n_name
         else:
