@@ -1,5 +1,5 @@
 <div class="row">
-    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-12">
+    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
         <div class="form-group">
             {{ user_form.email.label }}
             {% if user_form.email.errors %}
@@ -11,7 +11,7 @@
             {{ user_form.email }}
         </div>
     </div>
-    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-12">
+    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
         <div class="form-group">
             {{ profile_form.n_name.label }}
             {% if profile_form.n_name.errors %}
@@ -23,7 +23,10 @@
             {{ profile_form.n_name }}
         </div>
     </div>
-    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-12">
+</div>
+<h3>На русском</h3>
+<div class="row">
+    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
         <div class="form-group">
             {{ profile_form.f_name.label }}
             {% if profile_form.f_name.errors %}
@@ -35,7 +38,7 @@
             {{ profile_form.f_name }}
         </div>
     </div>
-    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-12">
+    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
         <div class="form-group">
             {{ profile_form.l_name.label }}
             {% if profile_form.l_name.errors %}
@@ -47,7 +50,59 @@
             {{ profile_form.l_name }}
         </div>
     </div>
+    <div class="col-12">
+        <div class="form-group">
+            {{ profile_form.bio.label }}
+            {% if profile_form.bio.errors %}
+                <ul class="errors">
+                    {% for error in form.bio.errors %}
+                        <li>{{ error }}</li>{% endfor %}
+                </ul>
+            {% endif %}
+            {{ profile_form.bio }}
+        </div>
+    </div>
 </div>
+<h3>Латиницей</h3>
+<div class="row">
+    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+        <div class="form-group">
+            {{ profile_form.f_name_generic.label }}
+            {% if profile_form.f_name_generic.errors %}
+                <ul class="errors">
+                    {% for error in form.f_name_generic.errors %}
+                        <li>{{ error }}</li>{% endfor %}
+                </ul>
+            {% endif %}
+            {{ profile_form.f_name_generic }}
+        </div>
+    </div>
+    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+        <div class="form-group">
+            {{ profile_form.l_name_generic.label }}
+            {% if profile_form.l_name_generic.errors %}
+                <ul class="errors">
+                    {% for error in form.l_name_generic.errors %}
+                        <li>{{ error }}</li>{% endfor %}
+                </ul>
+            {% endif %}
+            {{ profile_form.l_name_generic }}
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="form-group">
+            {{ profile_form.bio_generic.label }}
+            {% if profile_form.bio_generic.errors %}
+                <ul class="errors">
+                    {% for error in form.bio_generic.errors %}
+                        <li>{{ error }}</li>{% endfor %}
+                </ul>
+            {% endif %}
+            {{ profile_form.bio_generic }}
+        </div>
+    </div>
+</div>
+<h3>Остальное</h3>
 <div class="row">
     <div class="col-12">
         <div class="form-group">

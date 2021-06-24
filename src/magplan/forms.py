@@ -22,11 +22,19 @@ class UserModelForm(ModelForm):
 class ProfileModelForm(ModelForm):
     class Meta:
         model = Profile
-        fields = ('l_name', 'f_name', 'n_name', 'notes',)
+        fields = (
+            'l_name', 'f_name', 'n_name', 'bio', 'f_name_generic', 'l_name_generic', 'bio_generic', 'notes',
+        )
         widgets = {
             'l_name': forms.TextInput(attrs={'class': 'form-control', }),
             'f_name': forms.TextInput(attrs={'class': 'form-control', }),
             'n_name': forms.TextInput(attrs={'class': 'form-control', }),
+            'bio': forms.Textarea(attrs={'class': 'form-control', }),
+
+            'l_name_generic': forms.TextInput(attrs={'class': 'form-control', }),
+            'f_name_generic': forms.TextInput(attrs={'class': 'form-control', }),
+            'bio_generic': forms.Textarea(attrs={'class': 'form-control', }),
+
             'notes': forms.Textarea(attrs={'class': 'form-control', }),
         }
 
@@ -188,6 +196,7 @@ class PostDirectCreateModelForm(PostBaseModelForm):
 
 class DefaultPostModelForm(PostDirectCreateModelForm):
     pass
+
 
 class ArchivedPostModelForm(PostDirectCreateModelForm):
     section = forms.ModelChoiceField(
