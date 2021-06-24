@@ -11,6 +11,7 @@ import django
 import html2text
 import requests
 from botocore.exceptions import ClientError
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -24,6 +25,7 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.utils import timezone
+
 from magplan.conf import settings as  config
 from magplan.integrations.images import S3Client
 from magplan.integrations.posts import replace_images_paths, update_ext_db_xmd
@@ -53,11 +55,15 @@ class AbstractBase(models.Model):
         abstract = True
 
 
+def current_site_id() -> int:
+    return settings.SITE_ID
+
+
 class AbstractSiteModel(models.Model):
     """
     Support for multisite managers
     """
-    site = models.ForeignKey(Site, on_delete=models.CASCADE)
+    site = models.ForeignKey(Site, on_delete=models.CASCADE, default=current_site_id)
     objects = models.Manager()
     on_current_site = CurrentSiteManager()
 
@@ -157,7 +163,7 @@ class Magazine(AbstractBase):
         return self.title
 
 
-class Issue(AbstractBase):
+class Issue(AbstractSiteModel, AbstractBase):
     class Meta:
         ordering = ['-number']
 
@@ -198,7 +204,7 @@ class Stage(AbstractSiteModel, AbstractBase):
     meta = JSONField(default=dict)
 
 
-class Idea(AbstractBase):
+class Idea(AbstractSiteModel, AbstractBase):
     AUTHOR_TYPE_NO = 'NO'
     AUTHOR_TYPE_NEW = 'NW'
     AUTHOR_TYPE_EXISTING = 'EX'
@@ -498,7 +504,7 @@ class Post(AbstractSiteModel, AbstractBase):
     @property
     def wp_id(self):
         return self.meta.get('wpid')
-    
+
     @property
     def lead(self) -> str:
         if not self.xmd:
