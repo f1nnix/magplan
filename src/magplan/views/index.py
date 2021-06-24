@@ -54,7 +54,7 @@ def daterange(
 @login_required
 def index(request):
     self_posts = (
-        Post.objects.prefetch_related('stage')
+        Post.on_current_site.prefetch_related('stage')
         .filter(
             Q(stage__assignee__isnull=False, stage__assignee=request.user.user)
             | Q(stage__assignee__isnull=True, editor=request.user.user)
@@ -62,11 +62,11 @@ def index(request):
         .exclude(stage__slug__in=['vault', 'published'])
     )
 
-    need_to_vote = Idea.objects.filter(approved__isnull=True).exclude(
+    need_to_vote = Idea.on_current_site.filter(approved__isnull=True).exclude(
         votes__user=request.user.user
     )
 
-    opened_issues = Issue.objects.filter(
+    opened_issues = Issue.on_current_site.filter(
         posts__stage__slug__in=[
             'waiting',
             'proofreading_editor',
