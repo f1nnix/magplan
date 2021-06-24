@@ -85,9 +85,23 @@ class User(UserModel):
     meta = JSONField(default=dict)
 
     def __str__(self):
-        p = self.profile
+        return self.display_name_default
+
+    @property
+    def display_name_default(self):
+        p: Profile = self.profile
         if p.l_name and p.f_name:
-            return '%s %s' % (p.l_name, p.f_name)
+            return '%s %s' % (p.f_name_generic, p.l_name_generic)
+        elif p.n_name:
+            return p.n_name
+        else:
+            return self.email
+
+    @property
+    def display_name_generic(self):
+        p: Profile = self.profile
+        if p.l_name_generic and p.f_name_generic:
+            return '%s %s' % (p.f_name_generic, p.l_name_generic)
         elif p.n_name:
             return p.n_name
         else:
