@@ -1,6 +1,6 @@
 package:
 	rm dist/*
-	@python setup.py sdist
+	python3 setup.py sdist
 
 upload:
-	pipenv run twine upload dist/*
+	twine upload dist/*
