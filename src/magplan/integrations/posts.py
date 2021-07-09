@@ -132,11 +132,11 @@ def update_ext_db_xmd(
 
     with SSHTunnelForwarder(*ssh_conn_args, **ssh_conn_kwargs) as tunnel:
         mysql_conn_settings = {
-            'host': conf['EXT_DB_HOST'],
+            'host': tunnel.local_bind_host,
+            'port': tunnel.local_bind_port,
             'user': conf['EXT_DB_USER'],
             'passwd': conf['EXT_DB_PASS'],
             'db': conf['EXT_DB_NAME'],
-            'port': tunnel.local_bind_port
         }
         conn = pymysql.connect(**mysql_conn_settings)
 
@@ -151,4 +151,4 @@ def update_ext_db_xmd(
         if post_date_gmt:
             update_post_field(conn, post_id, 'post_date_gmt', post_date_gmt)
 
-    conn.close()
+        conn.close()
