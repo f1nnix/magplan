@@ -4,27 +4,21 @@ Project management system for publishers, magazines and content creators, writte
 
 ## Features
 
-* complete publications management: from article idea to publishing;
+* complete posts management: from article idea to publishing;
 * articles stages, assignees, roles;
 * posts metadata, editors, authors, attachments (images, PDF's, files);
-* extendable Markdown engine;
+* extendable Markdown engine with ability to use external one;
 * posts ideas with voting system;
 * discussions, email notifications;
 * team actions logs;
-* publising content to S3 and WordPress with async tasks;
-* fees and payments management*;
-* extensible [wiki](http://www.django-wiki.org)*.
-
-
-_* Removed from v2. See  v1 branch_
+* publish content to S3 and WordPress with async tasks.
 
 ![](docs/screenshot1.jpg)
 
-
 ## Install and run
 
-1. Install with your favourite package manager:
-
+1. Create new Django project and first app according to official Django [Writing your first Django app, part 1](https://docs.djangoproject.com/en/3.2/intro/tutorial01/) tutorial.
+2. Install `django-magplan` with your favourite package management tool: 
     ```
     pip install django-magplan
     ```
@@ -34,19 +28,24 @@ _* Removed from v2. See  v1 branch_
     ```
     pipenv install django-magplan
     ```
-2. Add Magplan to Django `INSTALLED_APPS` in your projects `settings.py`:
+   Don't forget to setup database, which is described in Django [Writing your first Django app, part 2](https://docs.djangoproject.com/en/3.2/intro/tutorial02/) tutorial, part 2.
+3. Add Magplan to Django `INSTALLED_APPS` in your projects Django `settings.py`. Magplan need some extra requirements, so you should add it too:
 
     ```
-    # Application definition
     INSTALLED_APPS = [
-        ...
-        'django.contrib.sessions',
-        'django.contrib.messages',
-        'django.contrib.staticfiles',
-        'magplan'
+      ...
+      # Theese apps will be installed with magplan, add it
+      'django_ace',
+      'django_admin_listfilter_dropdown',
+      'dynamic_preferences',
+      'dynamic_preferences.users.apps.UserPreferencesConfig',
+      'widget_tweaks',
+      
+      # Add magplan itself
+      'magplan',
     ]
     ```
-3. Add Magplan to Django in your project `urls.py`:
+4. Add Magplan to Django in your project `urls.py`:
     ```
     urlpatterns = [
         ...    
@@ -54,6 +53,42 @@ _* Removed from v2. See  v1 branch_
         
     ]
     ```
+5. Add magplan required middleware to handle multisite:
+   ```
+   MIDDLEWARE += [
+       ...
+       'magplan.middleware.SetLanguageMiddleware',
+   ]
+   ```
+
+6. Add several template context processors for proper rendering last issues, etc:
+   ```
+   TEMPLATES = [
+       {
+           'BACKEND': 'django.template.backends.django.DjangoTemplates',
+           'DIRS': [BASE_DIR / 'templates'],
+           'APP_DIRS': True,
+           'OPTIONS': {
+               'context_processors': [
+                   # ...Add theese lines to the end
+                   'dynamic_preferences.processors.global_preferences',
+                   'magplan.context_processors.inject_last_issues',
+                   'magplan.context_processors.inject_sites',
+               ],
+           },
+       },
+   ]
+   ```
+7. Run migrations:
+   ```
+   ./manage.ru migrate
+   ```
+   Please, refer to Django [Writing your first Django app, part 2](https://docs.djangoproject.com/en/3.2/intro/tutorial02/) tutorial, part 2.
+
+8. Run app:
+   ```
+   ./manage.py runserver 8080
+   ```
 4. Go to `http://localhost:8080/plan/`.
 
 
