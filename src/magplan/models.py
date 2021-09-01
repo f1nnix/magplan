@@ -5,6 +5,7 @@ import logging
 import mimetypes
 import os
 import typing as tp
+import urllib
 from typing import List
 
 import django
@@ -822,8 +823,14 @@ def _render_with_external_parser(
         request_headers: tp.Dict[str, str] = {  # unusued
             'content-type': 'application/x-www-form-urlencoded; charset=utf-8'
         }
+        request_query_params: tp.Dict[str, str] = {
+            'x': config.EXTERNAL_PARSER_TOKEN or ''
+        }
+
+        query_string = urllib.parse.urlencode(request_query_params)
+        prepared_url = f'{config.EXTERNAL_PARSER_URL}?{query_string}'
         response = requests.post(
-            config.EXTERNAL_PARSER_URL, data=request_payload
+            prepared_url, data=request_payload
         )
         return response.text
 
