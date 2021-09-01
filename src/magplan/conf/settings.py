@@ -3,6 +3,7 @@ from django.conf import settings as django_settings
 SYSTEM_USER_ID = getattr(django_settings, 'SYSTEM_USER_ID', 'foo@bar.baz')
 PLAN_EMAIL_FROM = getattr(django_settings, 'PLAN_EMAIL_FROM', 'foo@bar.baz')
 EXTERNAL_PARSER_URL = getattr(django_settings, 'EXTERNAL_PARSER_URL', None)
+EXTERNAL_PARSER_TOKEN = getattr(django_settings, 'EXTERNAL_PARSER_TOKEN', None)
 PLAN_POSTS_INSTANCE_CHUNK = getattr(django_settings, 'PLAN_POSTS_INSTANCE_CHUNK', None)
 PLAN_EMAIL_SUBJECT_PREFIX = getattr(django_settings, 'PLAN_EMAIL_SUBJECT_PREFIX', '[magplan]')
 
