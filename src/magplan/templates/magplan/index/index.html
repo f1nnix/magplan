@@ -43,12 +43,15 @@
         </div>
     {% endif %}
 
+    {% if self_posts|length > 0%}
     <h3>Материалы на мне</h3>
     {% with posts=self_posts %}
         {% include 'magplan/partials/posts_table.html' %}
     {% endwith %}
-
     <br>
+    {% endif %}
+
+    
     <h3>План публикаций</h3>
     <div class="table-responsive">
         <table id="schedule" class="table table-bordered table-stripped">

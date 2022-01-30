@@ -83,7 +83,7 @@ def index(request):
     # Count schedule
     schedule = {}
     time_start, time_end = get_schedule_starttime()
-    scheduled_posts = Post.objects.filter(
+    scheduled_posts = Post.on_current_site.filter(
         published_at__gte=time_start, published_at__lte=time_end
     )
 
