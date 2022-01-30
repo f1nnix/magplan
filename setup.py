@@ -28,7 +28,7 @@ prod_requirements = [
     "django-picklefield",
     "django-polymorphic",
     "django-widget-tweaks",
-    "django==3.2.7",
+    "django==3.2.11",
     "html2text",
     "mistune==0.8.4",
     "psycopg2",
