@@ -6,7 +6,7 @@ from magplan.models import Issue
 
 
 def inject_last_issues(request):
-    issues = Issue.objects.order_by('-number').all()[:5]
+    issues = Issue.on_current_site.order_by('-number').all()[:5]
     return {
         'navbar_issues': issues,
     }
