@@ -271,7 +271,7 @@ def create(request):
         if form.is_valid():
             post = form.save(commit=False)
             post.editor = request.user.user
-            post.stage = Stage.objects.get(slug="waiting")
+            post.stage = Stage.on_current_site.get(slug="waiting")
 
             post.save()
             form.save_m2m()
@@ -377,13 +377,18 @@ def set_stage(request, post_id, system=Comment.TYPE_SYSTEM):
         id=post_id
     )
 
-    if request.method == "POST" and request.POST.get("new_stage_id"):
-        if not _authorize_stage_change(
-                request.user.user, post, int(request.POST.get("new_stage_id"))
-        ):
+    raw_new_stage_id: Optional[str] = request.POST.get("new_stage_id")
+    if not raw_new_stage_id:
+        return HttpResponseForbidden()
+
+    new_stage_id: int =  int(raw_new_stage_id)
+        
+
+    if request.method == "POST":
+        if not _authorize_stage_change(request.user.user, post, new_stage_id):
             return HttpResponseForbidden()
 
-        stage = Stage.objects.get(id=request.POST.get("new_stage_id", None))
+        stage = Stage.objects.get(id=new_stage_id)
 
         # set deadline to current stage durtion. If no duration, append 1 day
         duration = stage.duration if stage.duration else 1
