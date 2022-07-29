@@ -30,7 +30,7 @@ prod_requirements = [
     "django-widget-tweaks",
     "django==3.2.7",
     "html2text",
-    "mistune==0.8.4",
+    "mistune==2.0.3",
     "psycopg2",
     "pymysql",
     "python-slugify",
