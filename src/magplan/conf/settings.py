@@ -22,6 +22,7 @@ EXT_DB_NAME = getattr(django_settings, 'EXT_DB_NAME', 'database')
 EXT_DB_USER = getattr(django_settings, 'EXT_DB_USER', 'db_user')
 EXT_DB_PASS = getattr(django_settings, 'EXT_DB_PASS', 'db_pass')
 
+S3_ENDPOINT = getattr(django_settings, 'S3_ENDPOINT', 's3_endpoint')
 S3_ACCESS_KEY = getattr(django_settings, 'S3_ACCESS_KEY', 's3_access_key')
 S3_SECRET_KEY = getattr(django_settings, 'S3_SECRET_KEY', 's3_secret_key')
 S3_BUCKET_NAME = getattr(django_settings, 'S3_BUCKET_NAME', 's3_bucket_name')
