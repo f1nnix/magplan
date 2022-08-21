@@ -36,6 +36,8 @@ from magplan.xmd.mappers import s3_public_mapper as s3_image_mapper
 NEW_IDEA_NOTIFICATION_PREFERENCE_NAME = 'magplan__new_idea_notification'
 WP_DATE_FORMAT_STRING = '%Y-%m-%d %H:%M:%S'
 
+S3_STATIC_BASE_PATH = os.environ.get('S3_STATIC_BASE_PATH')
+
 from .xmd.mappers import plan_internal_mapper as plan_image_mapper
 
 UserModel = get_user_model()
@@ -663,22 +665,18 @@ class Attachment(AbstractBase):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     meta = JSONField(default=dict)
 
-    S3_BUCKET_URL = 'https://{}.s3.eu-central-1.amazonaws.com'.format(
-        os.environ.get('S3_BUCKET_NAME', '')
-    )
-
     @property
     def s3_full_url(self):
-        return '{}/{}'.format(self.S3_BUCKET_URL, self._build_s3_path())
+        return '{}/{}'.format(S3_STATIC_BASE_PATH, self.build_s3_object_path())
 
-    def _build_s3_path(self) -> str:
-        """Returns S3 object key path for upload.
+    def build_s3_object_path(self) -> str:
+        """Returns S3 object key path for upload with trailing slash
         """
         dirname = os.path.dirname(self.file.name)
         basename = os.path.basename(self.file.name)
         hashed_dirname = hashlib.md5(dirname.encode()).hexdigest()
 
-        return '{}/{}/{}'.format(
+        return 'images/{}/{}/{}'.format(
             hashed_dirname,
             self.id,
             basename
@@ -692,9 +690,9 @@ class Attachment(AbstractBase):
 
     def _upload_to_s3(self):
         with S3Client() as (s3, S3_BUCKET_NAME):
-            object_name = self._build_s3_path()
+            object_path = self.build_s3_object_path()
             try:
-                s3_object = s3.Object(S3_BUCKET_NAME, object_name)
+                s3_object = s3.Object(S3_BUCKET_NAME, object_path)
                 s3_object.upload_file(
                     self.file.path,
                     ExtraArgs={
