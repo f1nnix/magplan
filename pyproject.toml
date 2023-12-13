@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "magplan"
+version = "3.0.0"
+description = ""
+authors = ["Ilya Rusanen <ilya@rusanen.co.uk>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+boto3 = "^1.34.0"
+celery = {extras = ["redis"], version = "^5.3.6"}
+django-ace = "^1.32.0"
+django-admin-list-filter-dropdown = "^1.0.3"
+django-dynamic-preferences = "^1.16.0"
+django-filter = "^23.5"
+django-picklefield = "^3.1"
+django-polymorphic = "^3.1.0"
+django-widget-tweaks = "^1.5.0"
+django = "^3.2.7"
+html2text = "^2020.1.16"
+mistune = "0.8.4"
+psycopg2 = "^2.9.9"
+pymysql = "^1.1.0"
+python-slugify = "^8.0.1"
+requests = "^2.31.0"
+sshtunnel = "^0.4.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
