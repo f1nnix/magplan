@@ -1,6 +1,5 @@
-package:
-	rm dist/*
-	python3 setup.py sdist
+PWD := $(shell pwd)
 
-upload:
-	twine upload dist/*
+compile-proto:
+	mkdir -p protogen
+	protoc --pyi_out=$(PWD)/protogen -I=$(PWD)/proto --python_out=$(PWD)/protogen $(PWD)/proto/*

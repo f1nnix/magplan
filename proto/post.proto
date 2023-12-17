@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+message Post {
+  optional int32 id = 1;
+  optional string title = 2;
+  optional string lead = 3;
+  optional string html_content = 4;
+  repeated string authors_emails = 5;
+  optional bool is_published = 6;
+  optional int32 issue_id = 7;
+  optional google.protobuf.Timestamp published_at = 8; 
+}
