@@ -9,6 +9,7 @@ import urllib
 from typing import List
 
 import django
+from django.db.models import JSONField
 import html2text
 import requests
 from botocore.exceptions import ClientError
@@ -19,7 +20,6 @@ from django.contrib.contenttypes.fields import (
     GenericForeignKey,
 )
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.postgres.fields import JSONField
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
 from django.core.mail import EmailMultiAlternatives
