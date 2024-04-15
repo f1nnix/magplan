@@ -128,7 +128,9 @@ def _get_suggestion_issues() -> Tuple[Optional[Issue], List[Issue]]:
         "publishing",
     )
     opened_issues = (
-        Issue.on_current_site.filter(posts__stage__slug__in=article_stages_for_opened_issues)
+        Issue.on_current_site.filter(
+            posts__stage__slug__in=article_stages_for_opened_issues
+        )
         .order_by("number")
         .distinct()
         .all()[:5]

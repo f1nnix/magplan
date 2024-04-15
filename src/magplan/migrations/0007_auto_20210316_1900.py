@@ -8,15 +8,15 @@ import django.db.models.manager
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('magplan', '0006_auto_20210316_1840'),
+        ("magplan", "0006_auto_20210316_1840"),
     ]
 
     operations = [
         migrations.AlterModelManagers(
-            name='post',
+            name="post",
             managers=[
-                ('objects', django.db.models.manager.Manager()),
-                ('on_current_site', django.contrib.sites.managers.CurrentSiteManager()),
+                ("objects", django.db.models.manager.Manager()),
+                ("on_current_site", django.contrib.sites.managers.CurrentSiteManager()),
             ],
         ),
     ]

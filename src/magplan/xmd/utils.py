@@ -13,6 +13,6 @@ def get_attachment_original_filename(filename: str, attachments: List) -> str:
         if attachment.original_filename == filename
     ]
     if not attachments_:
-        return ''
+        return ""
 
     return attachments_[0].file.url

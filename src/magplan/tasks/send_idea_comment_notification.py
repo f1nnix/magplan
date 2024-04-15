@@ -15,8 +15,8 @@ from celery import shared_task
 from magplan.models import Comment, User
 from magplan.tasks.utils import _can_recieve_notification, _get_whitelisted_recipients
 
-RECIEVE_NOTIFICATIONS_PERMISSION = 'main.recieve_idea_email_updates'
-NOTIFICATION_LEVEL_PREFERENCE = 'idea_comment_notification_level'
+RECIEVE_NOTIFICATIONS_PERMISSION = "main.recieve_idea_email_updates"
+NOTIFICATION_LEVEL_PREFERENCE = "idea_comment_notification_level"
 
 
 def _get_involved_users(comment: Comment) -> set:
@@ -77,7 +77,10 @@ def _get_recipients(comment: Comment) -> Set[User]:
         recipient
         for recipient in recipients
         if _can_recieve_notification(
-            recipient, comment, RECIEVE_NOTIFICATIONS_PERMISSION, NOTIFICATION_LEVEL_PREFERENCE
+            recipient,
+            comment,
+            RECIEVE_NOTIFICATIONS_PERMISSION,
+            NOTIFICATION_LEVEL_PREFERENCE,
         )
     }
 
@@ -88,11 +91,17 @@ def _send_email(comment, recipients):
     subject = f"Комментарий к идее «{comment.commentable}» от {comment.user}"
     html_content = render_to_string(
         "email/new_comment.html",
-        {"comment": comment, "commentable_type": 'idea', "APP_URL": os.environ.get('APP_URL', None)},
+        {
+            "comment": comment,
+            "commentable_type": "idea",
+            "APP_URL": os.environ.get("APP_URL", None),
+        },
     )
     text_content = html2text.html2text(html_content)
-    msg = EmailMultiAlternatives(subject, text_content, config.PLAN_EMAIL_FROM, recipients)
-    msg.attach_alternative(html_content, 'text/html')
+    msg = EmailMultiAlternatives(
+        subject, text_content, config.PLAN_EMAIL_FROM, recipients
+    )
+    msg.attach_alternative(html_content, "text/html")
     msg.send()
 
 
@@ -109,7 +118,7 @@ def send_idea_comment_notification(comment_id: int) -> None:
     permission and not comment author.
     """
     logger = logging.getLogger()
-    logger.info('Sending notifications for comment #%s', comment_id)
+    logger.info("Sending notifications for comment #%s", comment_id)
 
     # Task will fail if comment is not found
     comment = Comment.objects.get(id=comment_id)

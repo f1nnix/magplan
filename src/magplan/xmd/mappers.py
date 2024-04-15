@@ -19,9 +19,7 @@ def plan_internal_mapper(filename: str, attachments: List) -> str:
 
 
 def s3_public_mapper(filename: str, attachments: List) -> str:
-    """Get public S3 filename for requested attachment
-
-    """
+    """Get public S3 filename for requested attachment"""
     # Find requested attachment from post attachments
     attachments_ = [
         attachment

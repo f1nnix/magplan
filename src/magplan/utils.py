@@ -6,7 +6,7 @@ from django.http import HttpRequest
 
 
 def safe_cast(value: Any, to: Callable, on_error: Any = None) -> Any:
-    """"Safe casts value to type with provided casting constructor.
+    """ "Safe casts value to type with provided casting constructor.
 
     If cast falls for some reason, default on_error value is returned.*
 
@@ -27,7 +27,7 @@ def get_current_site(request: HttpRequest, safe: bool = True) -> Site:
     """
     Returns selected on plan site from user settings
     """
-    current_site_id = request.user.preferences['magplan__current_site']  # noqa
+    current_site_id = request.user.preferences["magplan__current_site"]  # noqa
     if current_site_id:
         try:
             Site.objects.get(id=current_site_id)

@@ -12,161 +12,292 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('magplan', '0001_initial'),
-        ('contenttypes', '0002_remove_content_type_name'),
+        ("magplan", "0001_initial"),
+        ("contenttypes", "0002_remove_content_type_name"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='User',
+            name="User",
             fields=[
-                ('user_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to=settings.AUTH_USER_MODEL)),
-                ('meta', django.contrib.postgres.fields.jsonb.JSONField(default=dict)),
+                (
+                    "user_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                ("meta", django.contrib.postgres.fields.jsonb.JSONField(default=dict)),
             ],
             options={
-                'permissions': (('access_magplan', 'Can access magplan'), ('manage_authors', 'Can manage authors')),
+                "permissions": (
+                    ("access_magplan", "Can access magplan"),
+                    ("manage_authors", "Can manage authors"),
+                ),
             },
-            bases=('main.user',),
+            bases=("main.user",),
             managers=[
-                ('objects', django.contrib.auth.models.UserManager()),
+                ("objects", django.contrib.auth.models.UserManager()),
             ],
         ),
         migrations.CreateModel(
-            name='Widget',
+            name="Widget",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('_old_id', models.PositiveIntegerField(blank=True, null=True)),
-                ('content', models.TextField()),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("_old_id", models.PositiveIntegerField(blank=True, null=True)),
+                ("content", models.TextField()),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='Widgetype',
+            name="Widgetype",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('_old_id', models.PositiveIntegerField(blank=True, null=True)),
-                ('slug', models.SlugField(max_length=255)),
-                ('title', models.CharField(max_length=255)),
-                ('meta', django.contrib.postgres.fields.jsonb.JSONField(default=dict)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("_old_id", models.PositiveIntegerField(blank=True, null=True)),
+                ("slug", models.SlugField(max_length=255)),
+                ("title", models.CharField(max_length=255)),
+                ("meta", django.contrib.postgres.fields.jsonb.JSONField(default=dict)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='Vote',
+            name="Vote",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('_old_id', models.PositiveIntegerField(blank=True, null=True)),
-                ('score', models.SmallIntegerField(choices=[(0, 'Против таких статей в «Хакере»'), (25, 'Не верю, что выйдет хорошо'), (50, 'Тема нормальная, но не для меня'), (75, 'Почитал бы, встретив в журнале'), (100, 'Ради таких статей мог бы подписаться')], default=50)),
-                ('idea', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='votes', to='magplan.idea')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='magplan.user')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("_old_id", models.PositiveIntegerField(blank=True, null=True)),
+                (
+                    "score",
+                    models.SmallIntegerField(
+                        choices=[
+                            (0, "Против таких статей в «Хакере»"),
+                            (25, "Не верю, что выйдет хорошо"),
+                            (50, "Тема нормальная, но не для меня"),
+                            (75, "Почитал бы, встретив в журнале"),
+                            (100, "Ради таких статей мог бы подписаться"),
+                        ],
+                        default=50,
+                    ),
+                ),
+                (
+                    "idea",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="votes",
+                        to="magplan.idea",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="magplan.user"
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.AddField(
-            model_name='stage',
-            name='assignee',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='magplan.user'),
+            model_name="stage",
+            name="assignee",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="magplan.user",
+            ),
         ),
         migrations.AddField(
-            model_name='stage',
-            name='next_stage',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='p_stage', to='magplan.stage'),
+            model_name="stage",
+            name="next_stage",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="p_stage",
+                to="magplan.stage",
+            ),
         ),
         migrations.AddField(
-            model_name='stage',
-            name='prev_stage',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='n_stage', to='magplan.stage'),
+            model_name="stage",
+            name="prev_stage",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="n_stage",
+                to="magplan.stage",
+            ),
         ),
         migrations.AddField(
-            model_name='profile',
-            name='user',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='profile', to='magplan.user'),
+            model_name="profile",
+            name="user",
+            field=models.OneToOneField(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="profile",
+                to="magplan.user",
+            ),
         ),
         migrations.AddField(
-            model_name='post',
-            name='authors',
-            field=models.ManyToManyField(to='magplan.User', verbose_name='Авторы'),
+            model_name="post",
+            name="authors",
+            field=models.ManyToManyField(to="magplan.User", verbose_name="Авторы"),
         ),
         migrations.AddField(
-            model_name='post',
-            name='editor',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='edited', to='magplan.user', verbose_name='Редактор'),
+            model_name="post",
+            name="editor",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="edited",
+                to="magplan.user",
+                verbose_name="Редактор",
+            ),
         ),
         migrations.AddField(
-            model_name='post',
-            name='issues',
-            field=models.ManyToManyField(related_name='posts', to='magplan.Issue', verbose_name='Выпуски'),
+            model_name="post",
+            name="issues",
+            field=models.ManyToManyField(
+                related_name="posts", to="magplan.Issue", verbose_name="Выпуски"
+            ),
         ),
         migrations.AddField(
-            model_name='post',
-            name='last_updater',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='posts_updated', to='magplan.user', verbose_name='Кто последний обновлял'),
+            model_name="post",
+            name="last_updater",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="posts_updated",
+                to="magplan.user",
+                verbose_name="Кто последний обновлял",
+            ),
         ),
         migrations.AddField(
-            model_name='post',
-            name='postype',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='magplan.postype'),
+            model_name="post",
+            name="postype",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="magplan.postype"
+            ),
         ),
         migrations.AddField(
-            model_name='post',
-            name='section',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='magplan.section', verbose_name='Раздел'),
+            model_name="post",
+            name="section",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to="magplan.section",
+                verbose_name="Раздел",
+            ),
         ),
         migrations.AddField(
-            model_name='post',
-            name='stage',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='magplan.stage', verbose_name='Этап'),
+            model_name="post",
+            name="stage",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to="magplan.stage",
+                verbose_name="Этап",
+            ),
         ),
         migrations.AddField(
-            model_name='issue',
-            name='magazine',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='magplan.magazine'),
+            model_name="issue",
+            name="magazine",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="magplan.magazine"
+            ),
         ),
         migrations.AddField(
-            model_name='idea',
-            name='authors',
-            field=models.ManyToManyField(blank=True, related_name='authors', to='magplan.User', verbose_name='Авторы'),
+            model_name="idea",
+            name="authors",
+            field=models.ManyToManyField(
+                blank=True,
+                related_name="authors",
+                to="magplan.User",
+                verbose_name="Авторы",
+            ),
         ),
         migrations.AddField(
-            model_name='idea',
-            name='editor',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='editor', to='magplan.user'),
+            model_name="idea",
+            name="editor",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="editor",
+                to="magplan.user",
+            ),
         ),
         migrations.AddField(
-            model_name='idea',
-            name='post',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='magplan.post'),
+            model_name="idea",
+            name="post",
+            field=models.OneToOneField(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="magplan.post",
+            ),
         ),
         migrations.AddField(
-            model_name='comment',
-            name='content_type',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='contenttypes.contenttype'),
+            model_name="comment",
+            name="content_type",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to="contenttypes.contenttype",
+            ),
         ),
         migrations.AddField(
-            model_name='comment',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='magplan.user'),
+            model_name="comment",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="magplan.user"
+            ),
         ),
         migrations.AddField(
-            model_name='attachment',
-            name='post',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='magplan.post'),
+            model_name="attachment",
+            name="post",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="magplan.post"
+            ),
         ),
         migrations.AddField(
-            model_name='attachment',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='magplan.user'),
+            model_name="attachment",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="magplan.user"
+            ),
         ),
     ]

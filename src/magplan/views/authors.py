@@ -9,18 +9,16 @@ from magplan.forms import UserModelForm, ProfileModelForm
 
 
 @login_required
-@permission_required('magplan.manage_authors')
+@permission_required("magplan.manage_authors")
 def index(request):
-    users = User.objects.prefetch_related('profile').order_by('profile__l_name').all()
-    return render(request, 'magplan/authors/index.html', {
-        'users': users
-    })
+    users = User.objects.prefetch_related("profile").order_by("profile__l_name").all()
+    return render(request, "magplan/authors/index.html", {"users": users})
 
 
 @login_required
-@permission_required('magplan.manage_authors')
+@permission_required("magplan.manage_authors")
 def new(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         user_form = UserModelForm(request.POST)
         profile_form = ProfileModelForm(request.POST)
 
@@ -33,40 +31,52 @@ def new(request):
             profile_form = ProfileModelForm(request.POST, instance=user.profile)
             profile_form.save()
 
-            messages.add_message(request, messages.INFO, f'Автор «{user}» успешно создан')
+            messages.add_message(
+                request, messages.INFO, f"Автор «{user}» успешно создан"
+            )
 
-            return redirect('authors_edit', user.id)
+            return redirect("authors_edit", user.id)
 
     else:
         user_form = UserModelForm()
         profile_form = ProfileModelForm()
 
-    return render(request, 'magplan/authors/new.html', {
-        'user_form': user_form,
-        'profile_form': profile_form,
-    })
+    return render(
+        request,
+        "magplan/authors/new.html",
+        {
+            "user_form": user_form,
+            "profile_form": profile_form,
+        },
+    )
 
 
 @login_required
-@permission_required('magplan.manage_authors')
+@permission_required("magplan.manage_authors")
 def show(request, user_id):
     user = User.objects.get(id=user_id)
-    posts = (Post.objects.filter(Q(authors=user) | Q(editor=user))
-             .prefetch_related('authors', 'editor', 'stage', 'section')
-             .exclude(stage__slug='vault')
-             .order_by('created_at'))
-    return render(request, 'magplan/authors/show.html', {
-        'user': user,
-        'posts': posts,
-    })
+    posts = (
+        Post.objects.filter(Q(authors=user) | Q(editor=user))
+        .prefetch_related("authors", "editor", "stage", "section")
+        .exclude(stage__slug="vault")
+        .order_by("created_at")
+    )
+    return render(
+        request,
+        "magplan/authors/show.html",
+        {
+            "user": user,
+            "posts": posts,
+        },
+    )
 
 
 @login_required
-@permission_required('magplan.manage_authors')
+@permission_required("magplan.manage_authors")
 def edit(request, user_id):
     user = User.objects.get(id=user_id)
 
-    if request.method == 'POST':
+    if request.method == "POST":
         user_form = UserModelForm(request.POST, instance=user)
         profile_form = ProfileModelForm(request.POST, instance=user.profile)
 
@@ -74,14 +84,20 @@ def edit(request, user_id):
             user_form.save()
             profile_form.save()
 
-            messages.add_message(request, messages.INFO, f'Автор «{user}» успешно отредактирован')
+            messages.add_message(
+                request, messages.INFO, f"Автор «{user}» успешно отредактирован"
+            )
 
     else:
         user_form = UserModelForm(instance=user)
         profile_form = ProfileModelForm(instance=user.profile)
 
-    return render(request, 'magplan/authors/edit.html', {
-        'user_form': user_form,
-        'profile_form': profile_form,
-        'user': user,
-    })
+    return render(
+        request,
+        "magplan/authors/edit.html",
+        {
+            "user_form": user_form,
+            "profile_form": profile_form,
+            "user": user,
+        },
+    )

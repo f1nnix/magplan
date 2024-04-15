@@ -4,9 +4,9 @@ from tqdm import tqdm
 
 
 class Command(BaseCommand):
-    help = 'Re-renders all posts content'
+    help = "Re-renders all posts content"
 
     def handle(self, *args, **options):
-        posts = Post.objects.filter(xmd__isnull=False).exclude(xmd__exact='')
+        posts = Post.objects.filter(xmd__isnull=False).exclude(xmd__exact="")
         for post in tqdm(posts):
             post.save()

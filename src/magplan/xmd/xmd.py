@@ -7,11 +7,12 @@ from magplan.xmd.renderer import XMDRenderer
 
 
 def render_md(
-        md_text: str,
-        image_mapper: tp.Callable = default_image_mapper,
-        attachments: tp.List = None,
-        render_lead=True,
-        *args, **kwargs
+    md_text: str,
+    image_mapper: tp.Callable = default_image_mapper,
+    attachments: tp.List = None,
+    render_lead=True,
+    *args,
+    **kwargs
 ) -> str:
     """Render markdown chunk with optional assets preprocessing.
 

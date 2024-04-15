@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class PlanConfig(AppConfig):
-    name = 'magplan'
+    name = "magplan"

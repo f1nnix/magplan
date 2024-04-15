@@ -17,28 +17,28 @@ MAX_VOTE_OPTIONS_NUMBER = len(Vote.SCORE_CHOICES)
 VOTE_SCORE_STEP = 100 // (MAX_VOTE_OPTIONS_NUMBER - 1)
 FAILBACK_VOTE_INDEX = 2
 CSS_COLORS = (
-    'danger',
-    'warning',
-    'light',
-    'info',
-    'success',
+    "danger",
+    "warning",
+    "light",
+    "info",
+    "success",
 )
 
 EMOJI_SCORES = (
-    '🤮',
-    '🤨',
-    '😐',
-    '😏',
-    '😍',
+    "🤮",
+    "🤨",
+    "😐",
+    "😏",
+    "😍",
 )
 
 
-@register.filter(name='voted')
+@register.filter(name="voted")
 def voted(value, user):
     return value.voted(user)
 
 
-@register.filter(name='humanize_score_index')
+@register.filter(name="humanize_score_index")
 def humanize_score_index(index) -> str:
     if not isinstance(index, int):
         index = safe_cast(index, int, -1)
@@ -53,7 +53,7 @@ def humanize_score_index(index) -> str:
     return humanize_score(score)
 
 
-@register.filter(name='humanize_score')
+@register.filter(name="humanize_score")
 def humanize_score(value) -> str:
     if not isinstance(value, int):
         value = safe_cast(value, int, -1)
@@ -72,18 +72,15 @@ def humanize_score(value) -> str:
     return Vote.SCORE_CHOICES[choice_index][1]
 
 
-@register.filter(name='times')
+@register.filter(name="times")
 def times(number):
     return range(number)
 
 
-@register.filter(name='trim_filename')
+@register.filter(name="trim_filename")
 def trim_filename(filename):
     if len(filename) > 30:
-        return '%s...%s' % (
-            filename[:10],
-            filename[-20:]
-        )
+        return "%s...%s" % (filename[:10], filename[-20:])
     return filename
 
 
@@ -108,10 +105,10 @@ class SetVarNode(template.Node):
             value = ""
         context[self.var_name] = value
 
-        return u""
+        return ""
 
 
-@register.tag(name='set')
+@register.tag(name="set")
 def set_var(parser, token):
     """
     {% set some_var = '123' %}
@@ -119,15 +116,17 @@ def set_var(parser, token):
     parts = token.split_contents()
     if len(parts) < 4:
         raise template.TemplateSyntaxError(
-            "'set' tag must be of the form: {% set <var_name> = <var_value> %}")
+            "'set' tag must be of the form: {% set <var_name> = <var_value> %}"
+        )
 
     return SetVarNode(parts[1], parts[3])
 
 
 @register.filter
 def can_be_moved_to_stage_by(post, user: SimpleLazyObject):
-    return (post.stage.assignee and post.stage.assignee == user.user) or \
-           (not post.stage.assignee and post.editor == user.user)
+    return (post.stage.assignee and post.stage.assignee == user.user) or (
+        not post.stage.assignee and post.editor == user.user
+    )
 
 
 @register.filter
@@ -137,16 +136,22 @@ def sub(value, arg):
 
 @register.filter
 def url_for_post_comments(post):
-    return reverse(posts.comments, kwargs={
-        'post_id': post.id,
-    })
+    return reverse(
+        posts.comments,
+        kwargs={
+            "post_id": post.id,
+        },
+    )
 
 
 @register.filter
 def url_for_idea_comments(idea):
-    return reverse(ideas.comments, kwargs={
-        'idea_id': idea.id,
-    })
+    return reverse(
+        ideas.comments,
+        kwargs={
+            "idea_id": idea.id,
+        },
+    )
 
 
 @register.filter
@@ -191,11 +196,11 @@ def date_class(datetime_obj: datetime.datetime) -> str:
     today = datetime.datetime.now().date()
 
     if date < today:
-        return 'past'
+        return "past"
     elif date == today:
-        return 'today'
+        return "today"
     else:
-        return ''
+        return ""
 
 
 @register.filter
@@ -206,13 +211,13 @@ def get_item(dictionary, key):
 numeric_test = re.compile("^\d+$")
 
 
-@register.filter(name='get_attr')
+@register.filter(name="get_attr")
 def get_attr(value, arg):
     """Gets an attribute of an object dynamically from a string name"""
 
     if hasattr(value, str(arg)):
         return getattr(value, arg)
-    elif hasattr(value, 'has_key') and value.has_key(arg):
+    elif hasattr(value, "has_key") and value.has_key(arg):
         return value[arg]
     elif numeric_test.match(str(arg)) and len(value) > int(arg):
         return value[int(arg)]
@@ -220,7 +225,7 @@ def get_attr(value, arg):
         return settings.TEMPLATE_STRING_IF_INVALID
 
 
-@register.filter(name='score_css_color_by_index')
+@register.filter(name="score_css_color_by_index")
 def score_css_color_by_index(index):
     if not isinstance(index, int):
         index = safe_cast(index, int, -1)
@@ -234,7 +239,7 @@ def score_css_color_by_index(index):
     return CSS_COLORS[index]
 
 
-@register.filter(name='emoji_sign_by_index')
+@register.filter(name="emoji_sign_by_index")
 def emoji_sign_by_index(index):
     if not isinstance(index, int):
         index = safe_cast(index, int, -1)

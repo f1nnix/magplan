@@ -54,12 +54,12 @@ def daterange(
 @login_required
 def index(request):
     self_posts = (
-        Post.on_current_site.prefetch_related('stage')
+        Post.on_current_site.prefetch_related("stage")
         .filter(
             Q(stage__assignee__isnull=False, stage__assignee=request.user.user)
             | Q(stage__assignee__isnull=True, editor=request.user.user)
         )
-        .exclude(stage__slug__in=['vault', 'published'])
+        .exclude(stage__slug__in=["vault", "published"])
     )
 
     need_to_vote = Idea.on_current_site.filter(approved__isnull=True).exclude(
@@ -68,15 +68,15 @@ def index(request):
 
     opened_issues = Issue.on_current_site.filter(
         posts__stage__slug__in=[
-            'waiting',
-            'proofreading_editor',
-            'precheck',
-            'spellcheck',
-            'markup',
-            'proofreading_spell',
-            'proofreading_chief_dpt',
-            'proofreading_chief',
-            'publishing',
+            "waiting",
+            "proofreading_editor",
+            "precheck",
+            "spellcheck",
+            "markup",
+            "proofreading_spell",
+            "proofreading_chief_dpt",
+            "proofreading_chief",
+            "publishing",
         ]
     ).distinct()
 
@@ -99,12 +99,12 @@ def index(request):
 
     return render(
         request,
-        'magplan/index/index.html',
+        "magplan/index/index.html",
         {
-            'self_posts': self_posts,
-            'need_to_vote': need_to_vote,
-            'opened_issues': opened_issues,
-            'schedule': schedule,
-            'today': datetime.datetime.today().replace(hour=0, minute=0, second=0),
+            "self_posts": self_posts,
+            "need_to_vote": need_to_vote,
+            "opened_issues": opened_issues,
+            "schedule": schedule,
+            "today": datetime.datetime.today().replace(hour=0, minute=0, second=0),
         },
     )

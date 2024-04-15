@@ -9,35 +9,39 @@ import django.db.models.manager
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('sites', '0002_alter_domain_unique'),
-        ('magplan', '0007_auto_20210316_1900'),
+        ("sites", "0002_alter_domain_unique"),
+        ("magplan", "0007_auto_20210316_1900"),
     ]
 
     operations = [
         migrations.AlterModelManagers(
-            name='section',
+            name="section",
             managers=[
-                ('objects', django.db.models.manager.Manager()),
-                ('on_current_site', django.contrib.sites.managers.CurrentSiteManager()),
+                ("objects", django.db.models.manager.Manager()),
+                ("on_current_site", django.contrib.sites.managers.CurrentSiteManager()),
             ],
         ),
         migrations.AlterModelManagers(
-            name='stage',
+            name="stage",
             managers=[
-                ('objects', django.db.models.manager.Manager()),
-                ('on_current_site', django.contrib.sites.managers.CurrentSiteManager()),
+                ("objects", django.db.models.manager.Manager()),
+                ("on_current_site", django.contrib.sites.managers.CurrentSiteManager()),
             ],
         ),
         migrations.AddField(
-            model_name='section',
-            name='site',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='sites.site'),
+            model_name="section",
+            name="site",
+            field=models.ForeignKey(
+                default=1, on_delete=django.db.models.deletion.CASCADE, to="sites.site"
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='stage',
-            name='site',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='sites.site'),
+            model_name="stage",
+            name="site",
+            field=models.ForeignKey(
+                default=1, on_delete=django.db.models.deletion.CASCADE, to="sites.site"
+            ),
             preserve_default=False,
         ),
     ]

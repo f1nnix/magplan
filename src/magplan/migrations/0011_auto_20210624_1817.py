@@ -6,28 +6,34 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('magplan', '0010_auto_20210624_1041'),
+        ("magplan", "0010_auto_20210624_1041"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='profile',
-            name='bio',
-            field=models.TextField(blank=True, null=True, verbose_name='Био'),
+            model_name="profile",
+            name="bio",
+            field=models.TextField(blank=True, null=True, verbose_name="Био"),
         ),
         migrations.AddField(
-            model_name='profile',
-            name='bio_generic',
-            field=models.TextField(blank=True, null=True, verbose_name='Био латинницей'),
+            model_name="profile",
+            name="bio_generic",
+            field=models.TextField(
+                blank=True, null=True, verbose_name="Био латинницей"
+            ),
         ),
         migrations.AddField(
-            model_name='profile',
-            name='f_name_generic',
-            field=models.CharField(blank=True, max_length=255, null=True, verbose_name='Имя латинницей'),
+            model_name="profile",
+            name="f_name_generic",
+            field=models.CharField(
+                blank=True, max_length=255, null=True, verbose_name="Имя латинницей"
+            ),
         ),
         migrations.AddField(
-            model_name='profile',
-            name='l_name_generic',
-            field=models.CharField(blank=True, max_length=255, null=True, verbose_name='Фамилия латинницей'),
+            model_name="profile",
+            name="l_name_generic",
+            field=models.CharField(
+                blank=True, max_length=255, null=True, verbose_name="Фамилия латинницей"
+            ),
         ),
     ]

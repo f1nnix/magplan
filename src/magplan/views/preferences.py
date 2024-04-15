@@ -8,7 +8,7 @@ from dynamic_preferences.users.forms import user_preference_form_builder
 @login_required
 def index(request):
     PreferencesForm = user_preference_form_builder(instance=request.user.user)
-    if request.method == 'POST':
+    if request.method == "POST":
         form = PreferencesForm(request.POST)
         if form.is_valid():
             form.update_preferences()
@@ -16,15 +16,14 @@ def index(request):
                 request, messages.SUCCESS, "Настройи успешно обновлены"
             )
 
-            return redirect('preferences_index')
+            return redirect("preferences_index")
         else:
             # TODO: check, if form reflects invalid
             #       payload for PreferencesForm
             PreferencesForm = user_preference_form_builder(instance=request.user.user)
 
-    return render(request, 'magplan/preferences/index.html', {'form': PreferencesForm})
+    return render(request, "magplan/preferences/index.html", {"form": PreferencesForm})
 
 
 @login_required
-def set_current_site(request: HttpRequest) -> HttpResponse:
-    ...
+def set_current_site(request: HttpRequest) -> HttpResponse: ...

@@ -27,16 +27,16 @@ from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.utils import timezone
 
-from magplan.conf import settings as  config
+from magplan.conf import settings as config
 from magplan.integrations.images import S3Client
 from magplan.integrations.posts import replace_images_paths, update_ext_db_xmd
 from magplan.xmd import render_md
 from magplan.xmd.mappers import s3_public_mapper as s3_image_mapper
 
-NEW_IDEA_NOTIFICATION_PREFERENCE_NAME = 'magplan__new_idea_notification'
-WP_DATE_FORMAT_STRING = '%Y-%m-%d %H:%M:%S'
+NEW_IDEA_NOTIFICATION_PREFERENCE_NAME = "magplan__new_idea_notification"
+WP_DATE_FORMAT_STRING = "%Y-%m-%d %H:%M:%S"
 
-S3_STATIC_BASE_PATH = os.environ.get('S3_STATIC_BASE_PATH')
+S3_STATIC_BASE_PATH = os.environ.get("S3_STATIC_BASE_PATH")
 
 from .xmd.mappers import plan_internal_mapper as plan_image_mapper
 
@@ -66,6 +66,7 @@ class AbstractSiteModel(models.Model):
     """
     Support for multisite managers
     """
+
     site = models.ForeignKey(Site, on_delete=models.CASCADE, default=current_site_id)
     objects = models.Manager()
     on_current_site = CurrentSiteManager()
@@ -94,7 +95,7 @@ class User(UserModel):
     def display_name_default(self):
         p: Profile = self.profile
         if p.l_name and p.f_name:
-            return '%s %s' % (p.f_name, p.l_name)
+            return "%s %s" % (p.f_name, p.l_name)
         elif p.n_name:
             return p.n_name
         else:
@@ -104,7 +105,7 @@ class User(UserModel):
     def display_name_generic(self):
         p: Profile = self.profile
         if p.l_name_generic and p.f_name_generic:
-            return '%s %s' % (p.f_name_generic, p.l_name_generic)
+            return "%s %s" % (p.f_name_generic, p.l_name_generic)
         elif p.n_name:
             return p.n_name
         else:
@@ -135,33 +136,37 @@ class User(UserModel):
 
 class Profile(AbstractBase):
     is_public = models.BooleanField(null=False, blank=False, default=False)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    f_name = models.CharField('Имя', max_length=255, blank=True, null=True)
-    m_name = models.CharField('Отчество', max_length=255, blank=True, null=True)
-    l_name = models.CharField('Фамилия', max_length=255, blank=True, null=True)
-    n_name = models.CharField('Ник', max_length=255, blank=True, null=True)
-    bio = models.TextField('Био', blank=True, null=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
+    f_name = models.CharField("Имя", max_length=255, blank=True, null=True)
+    m_name = models.CharField("Отчество", max_length=255, blank=True, null=True)
+    l_name = models.CharField("Фамилия", max_length=255, blank=True, null=True)
+    n_name = models.CharField("Ник", max_length=255, blank=True, null=True)
+    bio = models.TextField("Био", blank=True, null=True)
 
     # Global fields
-    f_name_generic = models.CharField('Имя латинницей', max_length=255, blank=True, null=True)
-    l_name_generic = models.CharField('Фамилия латинницей', max_length=255, blank=True, null=True)
-    bio_generic = models.TextField('Био латинницей', blank=True, null=True)
+    f_name_generic = models.CharField(
+        "Имя латинницей", max_length=255, blank=True, null=True
+    )
+    l_name_generic = models.CharField(
+        "Фамилия латинницей", max_length=255, blank=True, null=True
+    )
+    bio_generic = models.TextField("Био латинницей", blank=True, null=True)
 
     RUSSIA = 0
     UKRAINE = 1
     BELARUS = 2
     KAZAKHSTAN = 3
     COUNTRY_CHOICES = (
-        (RUSSIA, 'Россия'),
-        (UKRAINE, 'Украина'),
-        (BELARUS, 'Беларусь'),
-        (KAZAKHSTAN, 'Казахстан'),
+        (RUSSIA, "Россия"),
+        (UKRAINE, "Украина"),
+        (BELARUS, "Беларусь"),
+        (KAZAKHSTAN, "Казахстан"),
     )
     country = models.SmallIntegerField(
-        'Страна', choices=COUNTRY_CHOICES, default=RUSSIA
+        "Страна", choices=COUNTRY_CHOICES, default=RUSSIA
     )
-    city = models.CharField('Город или поселок', max_length=255, blank=True, null=True)
-    notes = models.TextField('Примечания', blank=True, null=True)
+    city = models.CharField("Город или поселок", max_length=255, blank=True, null=True)
+    notes = models.TextField("Примечания", blank=True, null=True)
 
 
 class Section(AbstractSiteModel, AbstractBase):
@@ -172,7 +177,7 @@ class Section(AbstractSiteModel, AbstractBase):
     title = models.CharField(null=False, blank=False, max_length=255)
     description = models.TextField(null=True, blank=False)
     sort = models.SmallIntegerField(null=False, blank=False, default=0)
-    color = models.CharField(null=False, blank=False, default='000000', max_length=6)
+    color = models.CharField(null=False, blank=False, default="000000", max_length=6)
     is_archived = models.BooleanField(null=False, blank=False, default=False)
     is_whitelisted = models.BooleanField(null=False, blank=False, default=False)
 
@@ -188,10 +193,10 @@ class Magazine(AbstractBase):
 
 class Issue(AbstractSiteModel, AbstractBase):
     class Meta:
-        ordering = ['-number']
+        ordering = ["-number"]
 
     def __str__(self):
-        return '%s #%s' % (self.magazine, self.number)
+        return "%s #%s" % (self.magazine, self.number)
 
     number = models.SmallIntegerField(null=False, blank=False, default=0)
     title = models.CharField(null=True, blank=False, max_length=255)
@@ -203,9 +208,7 @@ class Issue(AbstractSiteModel, AbstractBase):
 
     @property
     def full_title(self) -> str:
-        return '{} #{} {}'.format(
-            'Хакер', self.number, self.title or ''
-        )
+        return "{} #{} {}".format("Хакер", self.number, self.title or "")
 
 
 class Stage(AbstractSiteModel, AbstractBase):
@@ -218,45 +221,45 @@ class Stage(AbstractSiteModel, AbstractBase):
     duration = models.SmallIntegerField(null=True, blank=True, default=1)
     assignee = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
     prev_stage = models.ForeignKey(
-        'self', related_name='n_stage', null=True, blank=True, on_delete=models.CASCADE
+        "self", related_name="n_stage", null=True, blank=True, on_delete=models.CASCADE
     )
     next_stage = models.ForeignKey(
-        'self', related_name='p_stage', null=True, blank=True, on_delete=models.CASCADE
+        "self", related_name="p_stage", null=True, blank=True, on_delete=models.CASCADE
     )
     skip_notification = models.BooleanField(null=False, blank=False, default=False)
     meta = JSONField(default=dict)
 
 
 class Idea(AbstractSiteModel, AbstractBase):
-    AUTHOR_TYPE_NO = 'NO'
-    AUTHOR_TYPE_NEW = 'NW'
-    AUTHOR_TYPE_EXISTING = 'EX'
+    AUTHOR_TYPE_NO = "NO"
+    AUTHOR_TYPE_NEW = "NW"
+    AUTHOR_TYPE_EXISTING = "EX"
     AUTHOR_TYPE_CHOICES = [
-        (AUTHOR_TYPE_NO, 'Нет автора'),
-        (AUTHOR_TYPE_NEW, 'Новый автор'),
-        (AUTHOR_TYPE_EXISTING, 'Существующий автор(ы)'),
+        (AUTHOR_TYPE_NO, "Нет автора"),
+        (AUTHOR_TYPE_NEW, "Новый автор"),
+        (AUTHOR_TYPE_EXISTING, "Существующий автор(ы)"),
     ]
     title = models.CharField(
-        null=False, blank=False, max_length=255, verbose_name='Заголовок'
+        null=False, blank=False, max_length=255, verbose_name="Заголовок"
     )
-    description = models.TextField(verbose_name='Описание')
+    description = models.TextField(verbose_name="Описание")
     approved = models.BooleanField(null=True)
-    editor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='editor')
+    editor = models.ForeignKey(User, on_delete=models.CASCADE, related_name="editor")
     post = models.OneToOneField(
-        'Post', on_delete=models.SET_NULL, null=True, blank=True
+        "Post", on_delete=models.SET_NULL, null=True, blank=True
     )
-    comments = GenericRelation('Comment')
+    comments = GenericRelation("Comment")
     author_type = models.CharField(
         max_length=2,
         choices=AUTHOR_TYPE_CHOICES,
         default=AUTHOR_TYPE_NO,
-        verbose_name='Автор',
+        verbose_name="Автор",
     )
     authors_new = models.CharField(
-        max_length=255, null=True, blank=True, verbose_name='Новые автор'
+        max_length=255, null=True, blank=True, verbose_name="Новые автор"
     )
     authors = models.ManyToManyField(
-        User, verbose_name='Авторы', related_name='authors', blank=True
+        User, verbose_name="Авторы", related_name="authors", blank=True
     )
 
     def voted(self, user):
@@ -267,24 +270,25 @@ class Idea(AbstractSiteModel, AbstractBase):
         return False
 
     def _send_vote_notification(self, recipient: User) -> None:
-        subject = f'Новая идея «{self.title}». Голосуйте!'
+        subject = f"Новая идея «{self.title}». Голосуйте!"
 
-        context = {
-            'idea': self,
-            'APP_URL': os.environ.get('APP_URL')
-        }
-        message_html_content: str = render_to_string('email/new_idea.html', context)
+        context = {"idea": self, "APP_URL": os.environ.get("APP_URL")}
+        message_html_content: str = render_to_string("email/new_idea.html", context)
         message_text_content: str = html2text.html2text(message_html_content)
 
-        msg = EmailMultiAlternatives(subject, message_text_content, config.PLAN_EMAIL_FROM,
-                                     [recipient.email])
-        msg.attach_alternative(message_html_content, 'text/html')
+        msg = EmailMultiAlternatives(
+            subject, message_text_content, config.PLAN_EMAIL_FROM, [recipient.email]
+        )
+        msg.attach_alternative(message_html_content, "text/html")
         msg.send()
 
     def send_vote_notifications(self) -> None:
-        active_users: tp.List[User] = User.objects.filter(is_active=True).exclude(id=self.editor_id)
+        active_users: tp.List[User] = User.objects.filter(is_active=True).exclude(
+            id=self.editor_id
+        )
         recipients: tp.List[User] = [
-            user for user in active_users
+            user
+            for user in active_users
             if user.preferences[NEW_IDEA_NOTIFICATION_PREFERENCE_NAME]
         ]
 
@@ -296,13 +300,13 @@ class Idea(AbstractSiteModel, AbstractBase):
 
     class Meta:
         permissions = (
-            ('edit_extended_idea_attrs', 'Edit extended Idea attributes'),
-            ('recieve_idea_email_updates', 'Recieve email updates for Idea'),
+            ("edit_extended_idea_attrs", "Edit extended Idea attributes"),
+            ("recieve_idea_email_updates", "Recieve email updates for Idea"),
         )
 
     @property
     def comments_(self):
-        return self.comments.order_by('created_at').all
+        return self.comments.order_by("created_at").all
 
     @property
     def score(self):
@@ -321,9 +325,9 @@ class Idea(AbstractSiteModel, AbstractBase):
 class Post(AbstractSiteModel, AbstractBase):
     # Used for external parser configuration
     PAYWALL_NOTICE_HEAD = '<div class="paywall-notice">'
-    PAYWALL_NOTICE_BODY = 'Продолжение статьи доступно только продписчикам'
-    PAYWALL_NOTICE_TAIL = '</div>'
-    PAYWALL_NOTICE_RENDERED = '{}{}{}'.format(
+    PAYWALL_NOTICE_BODY = "Продолжение статьи доступно только продписчикам"
+    PAYWALL_NOTICE_TAIL = "</div>"
+    PAYWALL_NOTICE_RENDERED = "{}{}{}".format(
         PAYWALL_NOTICE_HEAD, PAYWALL_NOTICE_BODY, PAYWALL_NOTICE_TAIL
     )
 
@@ -332,8 +336,8 @@ class Post(AbstractSiteModel, AbstractBase):
         if self.kicker is None:
             return self.title
 
-        separator = ' ' if self.kicker.endswith(('!', ':', '?')) else '. '
-        return f'{self.kicker}{separator}{self.title}'
+        separator = " " if self.kicker.endswith(("!", ":", "?")) else ". "
+        return f"{self.kicker}{separator}{self.title}"
 
     def __str__(self) -> str:
         return self.full_title
@@ -341,8 +345,8 @@ class Post(AbstractSiteModel, AbstractBase):
     POST_FORMAT_DEFAULT = 0
     POST_FORMAT_FEATURED = 1
     POST_FORMAT_CHOICES = (
-        (POST_FORMAT_DEFAULT, 'Default'),
-        (POST_FORMAT_FEATURED, 'Featured'),
+        (POST_FORMAT_DEFAULT, "Default"),
+        (POST_FORMAT_FEATURED, "Featured"),
     )
 
     format = models.SmallIntegerField(
@@ -354,30 +358,33 @@ class Post(AbstractSiteModel, AbstractBase):
     POST_FEATURES_ADVERT = 2
     POST_FEATURES_TRANSLATED = 2
     POST_FEATURES_CHOICES = (
-        (POST_FEATURES_DEFAULT, 'Default'),
-        (POST_FEATURES_ARCHIVE, 'Archive'),
-        (POST_FEATURES_ADVERT, 'Advert'),
-        (POST_FEATURES_TRANSLATED, 'Translated'),
+        (POST_FEATURES_DEFAULT, "Default"),
+        (POST_FEATURES_ARCHIVE, "Archive"),
+        (POST_FEATURES_ADVERT, "Advert"),
+        (POST_FEATURES_TRANSLATED, "Translated"),
     )
-    features = models.SmallIntegerField(choices=POST_FEATURES_CHOICES,
-                                        default=POST_FEATURES_DEFAULT)
+    features = models.SmallIntegerField(
+        choices=POST_FEATURES_CHOICES, default=POST_FEATURES_DEFAULT
+    )
 
     finished_at = models.DateTimeField(
         null=False,
         blank=False,
         default=django.utils.timezone.now,
-        verbose_name='Дедлайн',
+        verbose_name="Дедлайн",
     )
     published_at = models.DateTimeField(
-        null=True, blank=True, verbose_name='Дата публикации'
+        null=True, blank=True, verbose_name="Дата публикации"
     )
     kicker = models.CharField(null=True, blank=True, max_length=255)
-    slug = models.SlugField(null=True, blank=True, max_length=255, verbose_name='Слаг для URL')
+    slug = models.SlugField(
+        null=True, blank=True, max_length=255, verbose_name="Слаг для URL"
+    )
     title = models.CharField(
-        null=True, blank=True, max_length=255, verbose_name='Заголовок статьи'
+        null=True, blank=True, max_length=255, verbose_name="Заголовок статьи"
     )
     description = models.TextField(
-        null=False, blank=True, verbose_name='Описание статьи'
+        null=False, blank=True, verbose_name="Описание статьи"
     )
     views = models.IntegerField(default=0)
     is_paywalled = models.BooleanField(default=False)
@@ -389,35 +396,35 @@ class Post(AbstractSiteModel, AbstractBase):
         null=True,
         on_delete=models.CASCADE,
         related_name="edited",
-        verbose_name='Редактор',
+        verbose_name="Редактор",
     )
-    authors = models.ManyToManyField(User, verbose_name='Авторы')
-    stage = models.ForeignKey(Stage, on_delete=models.CASCADE, verbose_name='Этап')
-    issues = models.ManyToManyField(Issue, related_name='posts', verbose_name='Выпуски')
+    authors = models.ManyToManyField(User, verbose_name="Авторы")
+    stage = models.ForeignKey(Stage, on_delete=models.CASCADE, verbose_name="Этап")
+    issues = models.ManyToManyField(Issue, related_name="posts", verbose_name="Выпуски")
     section = models.ForeignKey(
         Section,
         on_delete=models.CASCADE,
         null=False,
         blank=False,
-        verbose_name='Раздел',
+        verbose_name="Раздел",
     )
     last_updater = models.ForeignKey(
         User,
-        related_name='posts_updated',
-        verbose_name='Кто последний обновлял',
+        related_name="posts_updated",
+        verbose_name="Кто последний обновлял",
         null=True,
         on_delete=models.SET_NULL,
     )
 
     meta = JSONField(default=dict)
 
-    comments = GenericRelation('Comment')
+    comments = GenericRelation("Comment")
     is_locked = models.BooleanField(default=False)
     css = models.TextField(
-        null=True, blank=True, verbose_name='CSS-стили для статьи',
-        help_text=(
-            'CSS, который будет применяться к превью статьи'
-        )
+        null=True,
+        blank=True,
+        verbose_name="CSS-стили для статьи",
+        help_text=("CSS, который будет применяться к превью статьи"),
     )
 
     def imprint_updater(self, user: User) -> None:
@@ -448,7 +455,7 @@ class Post(AbstractSiteModel, AbstractBase):
         )
 
     @property
-    def featured_image(self) -> tp.Optional['Attachment']:
+    def featured_image(self) -> tp.Optional["Attachment"]:
         return self.attachment_set.filter(type=Attachment.TYPE_FEATURED_IMAGE).first()
 
     @property
@@ -476,11 +483,11 @@ class Post(AbstractSiteModel, AbstractBase):
 
     @property
     def comments_(self):
-        return self.comments.order_by('created_at').all
+        return self.comments.order_by("created_at").all
 
     @property
     def has_text(self):
-        return self.xmd is not None and self.xmd != ''
+        return self.xmd is not None and self.xmd != ""
 
     @property
     def is_default(self):
@@ -504,19 +511,19 @@ class Post(AbstractSiteModel, AbstractBase):
 
     class Meta:
         permissions = (
-            ('recieve_post_email_updates', 'Recieve email updates for Post'),
-            ('edit_extended_post_attrs', 'Edit extended Post attributes'),
+            ("recieve_post_email_updates", "Recieve email updates for Post"),
+            ("edit_extended_post_attrs", "Edit extended Post attributes"),
             # Direct article creation
-            ('create_generic_post', 'Create generic post'),
-            ('create_archive_post', 'Create archive post'),
-            ('create_advert_post', 'Create advert post'),
-            ('create_regular_post', 'Create regular post'),
-            ('create_translated_post', 'Create translated post'),
+            ("create_generic_post", "Create generic post"),
+            ("create_archive_post", "Create archive post"),
+            ("create_advert_post", "Create advert post"),
+            ("create_regular_post", "Create regular post"),
+            ("create_translated_post", "Create translated post"),
         )
 
     @property
     def is_overdue(self):
-        if self.stage.slug in ('vault', 'published'):
+        if self.stage.slug in ("vault", "published"):
             return False
         return timezone.now() > self.finished_at
 
@@ -526,44 +533,44 @@ class Post(AbstractSiteModel, AbstractBase):
 
     @property
     def wp_id(self):
-        return self.meta.get('wpid')
+        return self.meta.get("wpid")
 
     @property
     def lead(self) -> str:
         if not self.xmd:
-            return ''
+            return ""
 
-        paragraphs: List[str] = self.xmd.split('\n')
+        paragraphs: List[str] = self.xmd.split("\n")
         for paragraph in paragraphs:
             cleaned_paragraph = paragraph.strip()
             if not cleaned_paragraph:
                 continue
 
-            if cleaned_paragraph.startswith('$'):
+            if cleaned_paragraph.startswith("$"):
                 cleaned_paragraph = cleaned_paragraph[1:]
 
             cleaned_paragraph = cleaned_paragraph.strip()
             return cleaned_paragraph
 
-        return ''
+        return ""
 
     def build_xmd_blob(self, prepared_xmd: str) -> str:
         """Attaches CSS to XMD for remote CMS
 
-            >>> self.css ='foo'
-            'foo'
+        >>> self.css ='foo'
+        'foo'
 
-            >>> xmd = 'bar'
-            'bar'
+        >>> xmd = 'bar'
+        'bar'
 
-            >>> self.build_xmd_blob(self.xmd)
-            %style type=text/css
-            foo
-            %style
-            bar
+        >>> self.build_xmd_blob(self.xmd)
+        %style type=text/css
+        foo
+        %style
+        bar
         """
-        OPENING_STYLE_TAG = '%style type=text/css'
-        CLOSING_STYLE_TAG = '%style'
+        OPENING_STYLE_TAG = "%style type=text/css"
+        CLOSING_STYLE_TAG = "%style"
 
         if not prepared_xmd:
             return prepared_xmd
@@ -571,11 +578,8 @@ class Post(AbstractSiteModel, AbstractBase):
         if not self.css:
             return prepared_xmd
 
-        return '{}\n{}\n{}\n{}'.format(
-            OPENING_STYLE_TAG,
-            self.css,
-            CLOSING_STYLE_TAG,
-            prepared_xmd
+        return "{}\n{}\n{}\n{}".format(
+            OPENING_STYLE_TAG, self.css, CLOSING_STYLE_TAG, prepared_xmd
         )
 
     def upload(self):
@@ -590,14 +594,14 @@ class Post(AbstractSiteModel, AbstractBase):
             with Lock():
                 post.upload()
         """
-        logger.debug('Staring Post.upload')
+        logger.debug("Staring Post.upload")
         if not self.wp_id:
-            logger.warning('No wp_id, exiting')
+            logger.warning("No wp_id, exiting")
             return
 
         for image in self.images:
             image.upload_to_storage()
-        logger.debug('Uploaded images')
+        logger.debug("Uploaded images")
 
         # Upload to external DB
         prepared_xmd = replace_images_paths(
@@ -605,25 +609,29 @@ class Post(AbstractSiteModel, AbstractBase):
             attachments=self.images,
             mapper=s3_image_mapper,
         )
-        logger.debug('Replaced images paths')
+        logger.debug("Replaced images paths")
 
         upload_kwargs: tp.Dict[str, str] = {
-            'xmd': prepared_xmd,
-            'title': str(self),
-            'css': self.css,
+            "xmd": prepared_xmd,
+            "title": str(self),
+            "css": self.css,
         }
-        logger.debug('Prepared upload kwargs')
+        logger.debug("Prepared upload kwargs")
 
         if self.published_at and self.features == self.POST_FEATURES_ARCHIVE:
-            logger.debug('Running on archived post. Adding issues datetimes as publication dates')
+            logger.debug(
+                "Running on archived post. Adding issues datetimes as publication dates"
+            )
             post_date_gmt: str = self.published_at.strftime(WP_DATE_FORMAT_STRING)
-            post_date: str = self.published_at.astimezone().strftime(WP_DATE_FORMAT_STRING)
+            post_date: str = self.published_at.astimezone().strftime(
+                WP_DATE_FORMAT_STRING
+            )
 
-            upload_kwargs['post_date_gmt'] = post_date_gmt
-            upload_kwargs['post_date'] = post_date
-            logger.debug('Added publication dates')
+            upload_kwargs["post_date_gmt"] = post_date_gmt
+            upload_kwargs["post_date"] = post_date
+            logger.debug("Added publication dates")
 
-        logger.debug('Ready to run upload to WP')
+        logger.debug("Ready to run upload to WP")
         update_ext_db_xmd(self.wp_id, **upload_kwargs)
 
     def render_xmd(self):
@@ -652,35 +660,30 @@ class Attachment(AbstractBase):
     TYPE_FILE = 2
     TYPE_FEATURED_IMAGE = 3
     TYPE_CHOICES = (
-        (TYPE_IMAGE, 'Image'),
-        (TYPE_PDF, 'PDF'),
-        (TYPE_FILE, 'File'),
-        (TYPE_FEATURED_IMAGE, 'Featured image'),
+        (TYPE_IMAGE, "Image"),
+        (TYPE_PDF, "PDF"),
+        (TYPE_FILE, "File"),
+        (TYPE_FEATURED_IMAGE, "Featured image"),
     )
     type = models.SmallIntegerField(choices=TYPE_CHOICES, default=TYPE_IMAGE)
 
     original_filename = models.CharField(null=False, blank=False, max_length=255)
-    file = models.FileField(upload_to='attachments/%Y/%m/%d/', max_length=2048)
+    file = models.FileField(upload_to="attachments/%Y/%m/%d/", max_length=2048)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     meta = JSONField(default=dict)
 
     @property
     def s3_full_url(self):
-        return '{}/{}'.format(S3_STATIC_BASE_PATH, self.build_s3_object_path())
+        return "{}/{}".format(S3_STATIC_BASE_PATH, self.build_s3_object_path())
 
     def build_s3_object_path(self) -> str:
-        """Returns S3 object key path for upload with trailing slash
-        """
+        """Returns S3 object key path for upload with trailing slash"""
         dirname = os.path.dirname(self.file.name)
         basename = os.path.basename(self.file.name)
         hashed_dirname = hashlib.md5(dirname.encode()).hexdigest()
 
-        return 'images/{}/{}/{}'.format(
-            hashed_dirname,
-            self.id,
-            basename
-        )
+        return "images/{}/{}/{}".format(hashed_dirname, self.id, basename)
 
     def _guess_self_mimetype(self) -> tp.Optional[str]:
         try:
@@ -696,9 +699,10 @@ class Attachment(AbstractBase):
                 s3_object.upload_file(
                     self.file.path,
                     ExtraArgs={
-                        'ACL': 'public-read',
-                        'ContentType': self._guess_self_mimetype()
-                    })
+                        "ACL": "public-read",
+                        "ContentType": self._guess_self_mimetype(),
+                    },
+                )
             except ClientError as e:
                 logging.error(e)
                 return False
@@ -714,18 +718,18 @@ class Comment(AbstractBase):
     SYSTEM_ACTION_UPDATE = 10
     SYSTEM_ACTION_CHANGE_META = 15
     SYSTEM_ACTION_CHOICES = (
-        (SYSTEM_ACTION_SET_STAGE, 'Set stage'),
-        (SYSTEM_ACTION_UPDATE, 'Update'),
-        (SYSTEM_ACTION_CHANGE_META, 'Change meta'),
+        (SYSTEM_ACTION_SET_STAGE, "Set stage"),
+        (SYSTEM_ACTION_UPDATE, "Update"),
+        (SYSTEM_ACTION_CHANGE_META, "Change meta"),
     )
 
     TYPE_SYSTEM = 5
     TYPE_PRIVATE = 10
     TYPE_PUBLIC = 15
     TYPE_CHOICES = (
-        (TYPE_SYSTEM, 'system'),
-        (TYPE_PRIVATE, 'private'),
-        (TYPE_PUBLIC, 'public'),
+        (TYPE_SYSTEM, "system"),
+        (TYPE_PRIVATE, "private"),
+        (TYPE_PUBLIC, "public"),
     )
     text = models.TextField(blank=True)
     type = models.SmallIntegerField(choices=TYPE_CHOICES, default=TYPE_PRIVATE)
@@ -733,11 +737,11 @@ class Comment(AbstractBase):
 
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
-    commentable = GenericForeignKey('content_type', 'object_id')
+    commentable = GenericForeignKey("content_type", "object_id")
     meta = JSONField(default=dict)
 
     def __str__(self):
-        return '%s, %s:%s...' % (self.user_id, self.type, self.text[0:50])
+        return "%s, %s:%s..." % (self.user_id, self.type, self.text[0:50])
 
     @property
     def html(self):
@@ -746,9 +750,9 @@ class Comment(AbstractBase):
     @property
     def changelog(self):
         try:
-            md = '\n'.join(self.meta['comment']['changelog'])
+            md = "\n".join(self.meta["comment"]["changelog"])
         except Exception:
-            md = ''
+            md = ""
 
         return render_md(md, render_lead=False)
 
@@ -760,15 +764,15 @@ class Vote(AbstractBase):
     SCORE_75 = 75
     SCORE_100 = 100
     SCORE_CHOICES = (
-        (SCORE_0, 'Против таких статей в «Хакере»'),
-        (SCORE_25, 'Не верю, что выйдет хорошо'),
-        (SCORE_50, 'Тема нормальная, но не для меня'),
-        (SCORE_75, 'Почитал бы, встретив в журнале'),
-        (SCORE_100, 'Ради таких статей мог бы подписаться'),
+        (SCORE_0, "Против таких статей в «Хакере»"),
+        (SCORE_25, "Не верю, что выйдет хорошо"),
+        (SCORE_50, "Тема нормальная, но не для меня"),
+        (SCORE_75, "Почитал бы, встретив в журнале"),
+        (SCORE_100, "Ради таких статей мог бы подписаться"),
     )
     score = models.SmallIntegerField(choices=SCORE_CHOICES, default=SCORE_50)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    idea = models.ForeignKey(Idea, on_delete=models.CASCADE, related_name='votes')
+    idea = models.ForeignKey(Idea, on_delete=models.CASCADE, related_name="votes")
 
     @property
     def score_humanized(self):
@@ -801,9 +805,9 @@ def save_user_profile(sender, instance, **kwargs):
 
 
 def _render_with_external_parser(
-        id: int, xmd: str, paywall_tag_html: str = Post.PAYWALL_NOTICE_RENDERED
+    id: int, xmd: str, paywall_tag_html: str = Post.PAYWALL_NOTICE_RENDERED
 ) -> tp.Optional[str]:
-    FAILBACK_SYNTAX_LANG = 'cpp'
+    FAILBACK_SYNTAX_LANG = "cpp"
 
     if not xmd:
         return None
@@ -813,23 +817,21 @@ def _render_with_external_parser(
 
     try:
         request_payload: tp.Dict[str, str] = {
-            'id': id,
-            'md': xmd,
-            'lang': FAILBACK_SYNTAX_LANG,
-            'xakepcut': paywall_tag_html,
+            "id": id,
+            "md": xmd,
+            "lang": FAILBACK_SYNTAX_LANG,
+            "xakepcut": paywall_tag_html,
         }
         request_headers: tp.Dict[str, str] = {  # unusued
-            'content-type': 'application/x-www-form-urlencoded; charset=utf-8'
+            "content-type": "application/x-www-form-urlencoded; charset=utf-8"
         }
         request_query_params: tp.Dict[str, str] = {
-            'x': config.EXTERNAL_PARSER_TOKEN or ''
+            "x": config.EXTERNAL_PARSER_TOKEN or ""
         }
 
         query_string = urllib.parse.urlencode(request_query_params)
-        prepared_url = f'{config.EXTERNAL_PARSER_URL}?{query_string}'
-        response = requests.post(
-            prepared_url, data=request_payload
-        )
+        prepared_url = f"{config.EXTERNAL_PARSER_URL}?{query_string}"
+        response = requests.post(prepared_url, data=request_payload)
         return response.text
 
     except Exception as exc:

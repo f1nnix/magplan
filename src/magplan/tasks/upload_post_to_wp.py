@@ -11,14 +11,15 @@ from magplan.integrations.posts import Lock
 
 logger = logging.getLogger()
 
+
 @shared_task
 def upload_post_to_wp(post_id: int) -> None:
-    logger.info('Starting task upload_post_to_wp...')
+    logger.info("Starting task upload_post_to_wp...")
 
     post = Post.objects.filter(id=post_id).first()
     if post is None:
         return
 
     with Lock(post):
-        logger.info('Lock for post %s acquired' % post.id)
+        logger.info("Lock for post %s acquired" % post.id)
         post.upload()

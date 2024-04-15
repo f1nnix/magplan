@@ -6,13 +6,21 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('magplan', '0003_auto_20201121_1750'),
+        ("magplan", "0003_auto_20201121_1750"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='post',
-            name='features',
-            field=models.SmallIntegerField(choices=[(0, 'Default'), (1, 'Archive'), (2, 'Advert'), (2, 'Translation')], default=0),
+            model_name="post",
+            name="features",
+            field=models.SmallIntegerField(
+                choices=[
+                    (0, "Default"),
+                    (1, "Archive"),
+                    (2, "Advert"),
+                    (2, "Translation"),
+                ],
+                default=0,
+            ),
         ),
     ]

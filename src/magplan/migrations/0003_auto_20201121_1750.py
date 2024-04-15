@@ -6,21 +6,21 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('magplan', '0002_auto_20201115_1140'),
+        ("magplan", "0002_auto_20201115_1140"),
     ]
 
     operations = [
         migrations.DeleteModel(
-            name='Widget',
+            name="Widget",
         ),
         migrations.DeleteModel(
-            name='Widgetype',
+            name="Widgetype",
         ),
         migrations.RemoveField(
-            model_name='post',
-            name='postype',
+            model_name="post",
+            name="postype",
         ),
         migrations.DeleteModel(
-            name='Postype',
+            name="Postype",
         ),
     ]

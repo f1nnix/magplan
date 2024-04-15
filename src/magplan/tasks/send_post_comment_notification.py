@@ -16,8 +16,8 @@ from magplan.conf import settings as config
 from magplan.models import Comment
 from magplan.tasks.utils import _can_recieve_notification, _get_whitelisted_recipients
 
-RECIEVE_NOTIFICATIONS_PERMISSION = 'main.recieve_post_email_updates'
-NOTIFICATION_LEVEL_PREFERENCE = 'post_comment_notification_level'
+RECIEVE_NOTIFICATIONS_PERMISSION = "main.recieve_post_email_updates"
+NOTIFICATION_LEVEL_PREFERENCE = "post_comment_notification_level"
 
 
 def _get_involved_users(comment: Comment) -> set:
@@ -43,7 +43,9 @@ def _get_involved_users(comment: Comment) -> set:
 
     # Add all previous commenters in the tread
     previous_comments = Comment.objects.filter(
-        content_type=ContentType.objects.get_for_model(post), object_id=post.id, type=Comment.TYPE_PRIVATE
+        content_type=ContentType.objects.get_for_model(post),
+        object_id=post.id,
+        type=Comment.TYPE_PRIVATE,
     ).exclude(id=comment.id)
 
     users.update([pc.user for pc in previous_comments])
@@ -81,7 +83,10 @@ def _get_recipients(comment: Comment) -> Set[User]:
         recipient
         for recipient in recipients
         if _can_recieve_notification(
-            recipient, comment, RECIEVE_NOTIFICATIONS_PERMISSION, NOTIFICATION_LEVEL_PREFERENCE
+            recipient,
+            comment,
+            RECIEVE_NOTIFICATIONS_PERMISSION,
+            NOTIFICATION_LEVEL_PREFERENCE,
         )
     }
 
@@ -90,13 +95,21 @@ def _get_recipients(comment: Comment) -> Set[User]:
 
 def _send_email(comment, recipients):
     subject = f"Комментарий к посту «{comment.commentable}» от {comment.user}"
-    commentable_type = "post" if comment.commentable.__class__.__name__ == "Post" else "idea"
+    commentable_type = (
+        "post" if comment.commentable.__class__.__name__ == "Post" else "idea"
+    )
     html_content = render_to_string(
         "email/new_comment.html",
-        {"comment": comment, "commentable_type": commentable_type, "APP_URL": os.environ.get("APP_URL", None)},
+        {
+            "comment": comment,
+            "commentable_type": commentable_type,
+            "APP_URL": os.environ.get("APP_URL", None),
+        },
     )
     text_content = html2text.html2text(html_content)
-    msg = EmailMultiAlternatives(subject, text_content, config.PLAN_EMAIL_FROM, recipients)
+    msg = EmailMultiAlternatives(
+        subject, text_content, config.PLAN_EMAIL_FROM, recipients
+    )
     msg.attach_alternative(html_content, "text/html")
     msg.send()
 
@@ -115,7 +128,7 @@ def send_post_comment_notification(comment_id: int) -> None:
     permission and not comment author.
     """
     logger = logging.getLogger()
-    logger.info('Sending notifications for comment #%s', comment_id)
+    logger.info("Sending notifications for comment #%s", comment_id)
 
     # Task will fail if comment is not found
     comment = Comment.objects.get(id=comment_id)

@@ -35,11 +35,11 @@ from magplan.tasks.send_post_comment_notification import send_post_comment_notif
 from magplan.tasks.upload_post_to_wp import upload_post_to_wp
 from slugify import slugify
 
-IMAGE_MIME_TYPE_JPEG= 'image/jpeg'
+IMAGE_MIME_TYPE_JPEG = "image/jpeg"
 IMAGE_MIME_TYPES = {
-    'image/gif',
+    "image/gif",
     IMAGE_MIME_TYPE_JPEG,
-    'image/png',
+    "image/png",
 }
 
 
@@ -59,10 +59,10 @@ def _get_arbitrary_chunk(post: Post) -> str:
 
 
 def _create_system_comment(
-        action_type, user, post, changelog=None, attachments=None, stage=None
+    action_type, user, post, changelog=None, attachments=None, stage=None
 ) -> Comment:
     """Create auto-generated system comment with post changes logs
-    
+
     :param action_type:
     :param user:
     :param post:
@@ -173,8 +173,7 @@ def _authorize_stage_change(user: User, post: Post, new_stage_id: int) -> bool:
 
 
 def _save_attachments(
-        files: List, post: Post, user: User,
-        featured_image_file: Optional = None
+    files: List, post: Post, user: User, featured_image_file: Optional = None
 ) -> List[Attachment]:
     attachments = []
 
@@ -183,9 +182,7 @@ def _save_attachments(
             # Delete files with the same filename,
             # uploaded for current post. Emulates overwrite without
             # custom FileSystemStorage
-            Attachment.objects.filter(
-                post=post, original_filename=file.name
-            ).delete()
+            Attachment.objects.filter(post=post, original_filename=file.name).delete()
 
             attachment = Attachment(
                 post=post, user=user, original_filename=file.name
@@ -210,7 +207,10 @@ def _save_attachments(
             attachments.append(attachment)
 
         # This can be spoofed on client_side
-        if featured_image_file and featured_image_file.content_type == IMAGE_MIME_TYPE_JPEG:
+        if (
+            featured_image_file
+            and featured_image_file.content_type == IMAGE_MIME_TYPE_JPEG
+        ):
             # Delete any previously uploaded featured images
             Attachment.objects.filter(
                 post=post, type=Attachment.TYPE_FEATURED_IMAGE
@@ -226,7 +226,6 @@ def _save_attachments(
 
             attachment.save()
 
-
     return attachments
 
 
@@ -237,13 +236,10 @@ def show(request, post_id):
     ).get(id=post_id)
 
     post_meta_form = PostMetaForm(
-        initial={
-            'wp_id': post.meta.get('wpid')
-        },
-        instance=post
+        initial={"wp_id": post.meta.get("wpid")}, instance=post
     )
 
-    api_issues_search_url = reverse('api_issues_search')
+    api_issues_search_url = reverse("api_issues_search")
 
     return render(
         request,
@@ -256,8 +252,7 @@ def show(request, post_id):
             "meta_form": post_meta_form,
             "TYPE_CHOICES": Comment.TYPE_CHOICES,
             "SYSTEM_ACTION_CHOICES": Comment.SYSTEM_ACTION_CHOICES,
-            'api_issues_search_url': api_issues_search_url,
-
+            "api_issues_search_url": api_issues_search_url,
         },
     )
 
@@ -296,12 +291,14 @@ def edit(request, post_id):
         form = PostExtendedModelForm(request.POST, request.FILES, instance=post)
 
         attachments_files = request.FILES.getlist("attachments")
-        featured_image_files = request.FILES.getlist('featured_image')
+        featured_image_files = request.FILES.getlist("featured_image")
         attachments = _save_attachments(
-            attachments_files, post, request.user.user,
+            attachments_files,
+            post,
+            request.user.user,
             featured_image_file=(
                 featured_image_files[0] if featured_image_files else None
-            )
+            ),
         )
 
         if form.is_valid():
@@ -328,13 +325,13 @@ def edit(request, post_id):
     else:
         form = PostExtendedModelForm(instance=post)
 
-    api_authors_search_url = reverse('api_authors_search')
+    api_authors_search_url = reverse("api_authors_search")
 
-    return render(request, "magplan/posts/edit.html", {
-        "post": post,
-        "form": form,
-        'api_authors_search_url': api_authors_search_url
-    })
+    return render(
+        request,
+        "magplan/posts/edit.html",
+        {"post": post, "form": form, "api_authors_search_url": api_authors_search_url},
+    )
 
 
 @login_required
@@ -381,8 +378,7 @@ def set_stage(request, post_id, system=Comment.TYPE_SYSTEM):
     if not raw_new_stage_id:
         return HttpResponseForbidden()
 
-    new_stage_id: int =  int(raw_new_stage_id)
-        
+    new_stage_id: int = int(raw_new_stage_id)
 
     if request.method == "POST":
         if not _authorize_stage_change(request.user.user, post, new_stage_id):
