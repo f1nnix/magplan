@@ -14,7 +14,12 @@ class Migration(migrations.Migration):
             model_name="attachment",
             name="type",
             field=models.SmallIntegerField(
-                choices=[(0, "Image"), (1, "PDF"), (2, "File"), (3, "Featured image")],
+                choices=[
+                    (0, "Image"),
+                    (1, "PDF"),
+                    (2, "File"),
+                    (3, "Featured image"),
+                ],
                 default=0,
             ),
         ),

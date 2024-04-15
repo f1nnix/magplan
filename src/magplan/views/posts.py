@@ -31,7 +31,9 @@ from magplan.models import (
     Stage,
     User,
 )
-from magplan.tasks.send_post_comment_notification import send_post_comment_notification
+from magplan.tasks.send_post_comment_notification import (
+    send_post_comment_notification,
+)
 from magplan.tasks.upload_post_to_wp import upload_post_to_wp
 from slugify import slugify
 
@@ -124,7 +126,10 @@ def _generate_changelog_for_form(form: PostMetaForm) -> List[str]:
         ", ".join([str(i) for i in form.initial.get(field)]),
         ", ".join([str(i) for i in form.cleaned_data.get(field)]),
     )
-    _ = lambda form, field: (form.initial.get(field), form.cleaned_data.get(field))
+    _ = lambda form, field: (
+        form.initial.get(field),
+        form.cleaned_data.get(field),
+    )
     for changed_field in changed_fields:
         log = None
 
@@ -182,7 +187,9 @@ def _save_attachments(
             # Delete files with the same filename,
             # uploaded for current post. Emulates overwrite without
             # custom FileSystemStorage
-            Attachment.objects.filter(post=post, original_filename=file.name).delete()
+            Attachment.objects.filter(
+                post=post, original_filename=file.name
+            ).delete()
 
             attachment = Attachment(
                 post=post, user=user, original_filename=file.name
@@ -288,7 +295,9 @@ def edit(request, post_id):
     ).get(id=post_id)
 
     if request.method == "POST":
-        form = PostExtendedModelForm(request.POST, request.FILES, instance=post)
+        form = PostExtendedModelForm(
+            request.POST, request.FILES, instance=post
+        )
 
         attachments_files = request.FILES.getlist("attachments")
         featured_image_files = request.FILES.getlist("featured_image")
@@ -312,14 +321,18 @@ def edit(request, post_id):
                 attachments=attachments,
             )
             messages.add_message(
-                request, messages.SUCCESS, "Пост «%s» успешно отредактирован" % post
+                request,
+                messages.SUCCESS,
+                "Пост «%s» успешно отредактирован" % post,
             )
 
             return redirect("posts_edit", post_id)
 
         else:
             messages.add_message(
-                request, messages.ERROR, "При обновлении поста произошла ошибка ввода"
+                request,
+                messages.ERROR,
+                "При обновлении поста произошла ошибка ввода",
             )
 
     else:
@@ -330,7 +343,11 @@ def edit(request, post_id):
     return render(
         request,
         "magplan/posts/edit.html",
-        {"post": post, "form": form, "api_authors_search_url": api_authors_search_url},
+        {
+            "post": post,
+            "form": form,
+            "api_authors_search_url": api_authors_search_url,
+        },
     )
 
 
@@ -360,19 +377,24 @@ def edit_meta(request, post_id):
         changelog = _generate_changelog_for_form(form)
         if len(changelog) > 0:
             _create_system_comment(
-                Comment.SYSTEM_ACTION_CHANGE_META, request.user.user, post, changelog
+                Comment.SYSTEM_ACTION_CHANGE_META,
+                request.user.user,
+                post,
+                changelog,
             )
 
-        messages.add_message(request, messages.INFO, f"Пост {post} успешно обновлен!")
+        messages.add_message(
+            request, messages.INFO, f"Пост {post} успешно обновлен!"
+        )
 
     return redirect("posts_show", post_id)
 
 
 @login_required
 def set_stage(request, post_id, system=Comment.TYPE_SYSTEM):
-    post = Post.objects.prefetch_related("stage__n_stage", "stage__p_stage").get(
-        id=post_id
-    )
+    post = Post.objects.prefetch_related(
+        "stage__n_stage", "stage__p_stage"
+    ).get(id=post_id)
 
     raw_new_stage_id: Optional[str] = request.POST.get("new_stage_id")
     if not raw_new_stage_id:
@@ -388,7 +410,9 @@ def set_stage(request, post_id, system=Comment.TYPE_SYSTEM):
 
         # set deadline to current stage durtion. If no duration, append 1 day
         duration = stage.duration if stage.duration else 1
-        post.finished_at = post.finished_at + +datetime.timedelta(days=duration)
+        post.finished_at = post.finished_at + +datetime.timedelta(
+            days=duration
+        )
         post.stage = stage
         post.imprint_updater(request.user.user)
         post.save()
@@ -398,12 +422,18 @@ def set_stage(request, post_id, system=Comment.TYPE_SYSTEM):
 
         # Create system comment
         _create_system_comment(
-            Comment.SYSTEM_ACTION_SET_STAGE, request.user.user, post, stage=post.stage
+            Comment.SYSTEM_ACTION_SET_STAGE,
+            request.user.user,
+            post,
+            stage=post.stage,
         )
 
         # TODO: extract method
         # Send email if stage allows it
-        if post.assignee != request.user.user and stage.skip_notification is False:
+        if (
+            post.assignee != request.user.user
+            and stage.skip_notification is False
+        ):
             subject = f"На вас назначена статья «{post}»"
             html_content = render_to_string(
                 "email/assigned_to_you.html",
@@ -411,7 +441,10 @@ def set_stage(request, post_id, system=Comment.TYPE_SYSTEM):
             )
             text_content = html2text.html2text(html_content)
             msg = EmailMultiAlternatives(
-                subject, text_content, config.PLAN_EMAIL_FROM, [post.assignee.email]
+                subject,
+                text_content,
+                config.PLAN_EMAIL_FROM,
+                [post.assignee.email],
             )
             msg.attach_alternative(html_content, "text/html")
             msg.send()
@@ -493,8 +526,12 @@ def download_content(request: HttpRequest, post_id: int) -> HttpResponse:
                 pass
         zipfile.close()
 
-        resp = HttpResponse(s.getvalue(), content_type="application/x-zip-compressed")
-        resp["Content-Disposition"] = f"attachment; filename=content_{post_id}.zip"
+        resp = HttpResponse(
+            s.getvalue(), content_type="application/x-zip-compressed"
+        )
+        resp["Content-Disposition"] = (
+            f"attachment; filename=content_{post_id}.zip"
+        )
         return resp
 
 

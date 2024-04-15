@@ -31,7 +31,12 @@ class Migration(migrations.Migration):
                         to=settings.AUTH_USER_MODEL,
                     ),
                 ),
-                ("meta", django.contrib.postgres.fields.jsonb.JSONField(default=dict)),
+                (
+                    "meta",
+                    django.contrib.postgres.fields.jsonb.JSONField(
+                        default=dict
+                    ),
+                ),
             ],
             options={
                 "permissions": (
@@ -58,7 +63,10 @@ class Migration(migrations.Migration):
                 ),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 ("updated_at", models.DateTimeField(auto_now=True)),
-                ("_old_id", models.PositiveIntegerField(blank=True, null=True)),
+                (
+                    "_old_id",
+                    models.PositiveIntegerField(blank=True, null=True),
+                ),
                 ("content", models.TextField()),
             ],
             options={
@@ -79,10 +87,18 @@ class Migration(migrations.Migration):
                 ),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 ("updated_at", models.DateTimeField(auto_now=True)),
-                ("_old_id", models.PositiveIntegerField(blank=True, null=True)),
+                (
+                    "_old_id",
+                    models.PositiveIntegerField(blank=True, null=True),
+                ),
                 ("slug", models.SlugField(max_length=255)),
                 ("title", models.CharField(max_length=255)),
-                ("meta", django.contrib.postgres.fields.jsonb.JSONField(default=dict)),
+                (
+                    "meta",
+                    django.contrib.postgres.fields.jsonb.JSONField(
+                        default=dict
+                    ),
+                ),
             ],
             options={
                 "abstract": False,
@@ -102,7 +118,10 @@ class Migration(migrations.Migration):
                 ),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 ("updated_at", models.DateTimeField(auto_now=True)),
-                ("_old_id", models.PositiveIntegerField(blank=True, null=True)),
+                (
+                    "_old_id",
+                    models.PositiveIntegerField(blank=True, null=True),
+                ),
                 (
                     "score",
                     models.SmallIntegerField(
@@ -127,7 +146,8 @@ class Migration(migrations.Migration):
                 (
                     "user",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="magplan.user"
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="magplan.user",
                     ),
                 ),
             ],
@@ -179,7 +199,9 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="post",
             name="authors",
-            field=models.ManyToManyField(to="magplan.User", verbose_name="Авторы"),
+            field=models.ManyToManyField(
+                to="magplan.User", verbose_name="Авторы"
+            ),
         ),
         migrations.AddField(
             model_name="post",
@@ -196,7 +218,9 @@ class Migration(migrations.Migration):
             model_name="post",
             name="issues",
             field=models.ManyToManyField(
-                related_name="posts", to="magplan.Issue", verbose_name="Выпуски"
+                related_name="posts",
+                to="magplan.Issue",
+                verbose_name="Выпуски",
             ),
         ),
         migrations.AddField(
@@ -214,7 +238,8 @@ class Migration(migrations.Migration):
             model_name="post",
             name="postype",
             field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to="magplan.postype"
+                on_delete=django.db.models.deletion.CASCADE,
+                to="magplan.postype",
             ),
         ),
         migrations.AddField(
@@ -239,7 +264,8 @@ class Migration(migrations.Migration):
             model_name="issue",
             name="magazine",
             field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to="magplan.magazine"
+                on_delete=django.db.models.deletion.CASCADE,
+                to="magplan.magazine",
             ),
         ),
         migrations.AddField(

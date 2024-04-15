@@ -11,7 +11,11 @@ from magplan.forms import UserModelForm, ProfileModelForm
 @login_required
 @permission_required("magplan.manage_authors")
 def index(request):
-    users = User.objects.prefetch_related("profile").order_by("profile__l_name").all()
+    users = (
+        User.objects.prefetch_related("profile")
+        .order_by("profile__l_name")
+        .all()
+    )
     return render(request, "magplan/authors/index.html", {"users": users})
 
 
@@ -28,7 +32,9 @@ def new(request):
             user.is_active = False
             user.save()
 
-            profile_form = ProfileModelForm(request.POST, instance=user.profile)
+            profile_form = ProfileModelForm(
+                request.POST, instance=user.profile
+            )
             profile_form.save()
 
             messages.add_message(
@@ -85,7 +91,9 @@ def edit(request, user_id):
             profile_form.save()
 
             messages.add_message(
-                request, messages.INFO, f"Автор «{user}» успешно отредактирован"
+                request,
+                messages.INFO,
+                f"Автор «{user}» успешно отредактирован",
             )
 
     else:

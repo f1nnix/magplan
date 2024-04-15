@@ -9,7 +9,9 @@ from django.shortcuts import render, HttpResponse, redirect
 @login_required
 def index(request):
     issues = (
-        Issue.on_current_site.all().order_by("-number").prefetch_related("magazine")
+        Issue.on_current_site.all()
+        .order_by("-number")
+        .prefetch_related("magazine")
     )
 
     return render(
@@ -59,7 +61,12 @@ def show(request, issue_id):
             "posts": posts,
             "stats": {
                 "has_text": len(
-                    list(filter(lambda p: (p.xmd is not None) and (p.xmd != ""), posts))
+                    list(
+                        filter(
+                            lambda p: (p.xmd is not None) and (p.xmd != ""),
+                            posts,
+                        )
+                    )
                 ),
                 "incomplete": len(
                     list(filter(lambda p: p.stage.slug != "published", posts))

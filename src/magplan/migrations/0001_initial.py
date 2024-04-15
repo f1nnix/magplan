@@ -27,11 +27,15 @@ class Migration(migrations.Migration):
                 ),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 ("updated_at", models.DateTimeField(auto_now=True)),
-                ("_old_id", models.PositiveIntegerField(blank=True, null=True)),
+                (
+                    "_old_id",
+                    models.PositiveIntegerField(blank=True, null=True),
+                ),
                 (
                     "type",
                     models.SmallIntegerField(
-                        choices=[(0, "Image"), (1, "PDF"), (2, "File")], default=0
+                        choices=[(0, "Image"), (1, "PDF"), (2, "File")],
+                        default=0,
                     ),
                 ),
                 ("original_filename", models.CharField(max_length=255)),
@@ -41,7 +45,12 @@ class Migration(migrations.Migration):
                         max_length=2048, upload_to="attachments/%Y/%m/%d/"
                     ),
                 ),
-                ("meta", django.contrib.postgres.fields.jsonb.JSONField(default=dict)),
+                (
+                    "meta",
+                    django.contrib.postgres.fields.jsonb.JSONField(
+                        default=dict
+                    ),
+                ),
             ],
             options={
                 "abstract": False,
@@ -61,17 +70,29 @@ class Migration(migrations.Migration):
                 ),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 ("updated_at", models.DateTimeField(auto_now=True)),
-                ("_old_id", models.PositiveIntegerField(blank=True, null=True)),
+                (
+                    "_old_id",
+                    models.PositiveIntegerField(blank=True, null=True),
+                ),
                 ("text", models.TextField(blank=True)),
                 (
                     "type",
                     models.SmallIntegerField(
-                        choices=[(5, "system"), (10, "private"), (15, "public")],
+                        choices=[
+                            (5, "system"),
+                            (10, "private"),
+                            (15, "public"),
+                        ],
                         default=10,
                     ),
                 ),
                 ("object_id", models.PositiveIntegerField()),
-                ("meta", django.contrib.postgres.fields.jsonb.JSONField(default=dict)),
+                (
+                    "meta",
+                    django.contrib.postgres.fields.jsonb.JSONField(
+                        default=dict
+                    ),
+                ),
             ],
             options={
                 "abstract": False,
@@ -91,8 +112,14 @@ class Migration(migrations.Migration):
                 ),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 ("updated_at", models.DateTimeField(auto_now=True)),
-                ("_old_id", models.PositiveIntegerField(blank=True, null=True)),
-                ("title", models.CharField(max_length=255, verbose_name="Заголовок")),
+                (
+                    "_old_id",
+                    models.PositiveIntegerField(blank=True, null=True),
+                ),
+                (
+                    "title",
+                    models.CharField(max_length=255, verbose_name="Заголовок"),
+                ),
                 ("description", models.TextField(verbose_name="Описание")),
                 ("approved", models.BooleanField(null=True)),
                 (
@@ -120,8 +147,14 @@ class Migration(migrations.Migration):
             ],
             options={
                 "permissions": (
-                    ("edit_extended_idea_attrs", "Edit extended Idea attributes"),
-                    ("recieve_idea_email_updates", "Recieve email updates for Idea"),
+                    (
+                        "edit_extended_idea_attrs",
+                        "Edit extended Idea attributes",
+                    ),
+                    (
+                        "recieve_idea_email_updates",
+                        "Recieve email updates for Idea",
+                    ),
                 ),
             },
         ),
@@ -139,11 +172,17 @@ class Migration(migrations.Migration):
                 ),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 ("updated_at", models.DateTimeField(auto_now=True)),
-                ("_old_id", models.PositiveIntegerField(blank=True, null=True)),
+                (
+                    "_old_id",
+                    models.PositiveIntegerField(blank=True, null=True),
+                ),
                 ("number", models.SmallIntegerField(default=0)),
                 ("title", models.CharField(max_length=255, null=True)),
                 ("description", models.TextField(null=True)),
-                ("published_at", models.DateField(default=datetime.date.today)),
+                (
+                    "published_at",
+                    models.DateField(default=datetime.date.today),
+                ),
             ],
             options={
                 "ordering": ["-number"],
@@ -163,7 +202,10 @@ class Migration(migrations.Migration):
                 ),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 ("updated_at", models.DateTimeField(auto_now=True)),
-                ("_old_id", models.PositiveIntegerField(blank=True, null=True)),
+                (
+                    "_old_id",
+                    models.PositiveIntegerField(blank=True, null=True),
+                ),
                 ("slug", models.SlugField(max_length=255)),
                 ("title", models.CharField(max_length=255)),
                 ("description", models.TextField(blank=True)),
@@ -186,7 +228,10 @@ class Migration(migrations.Migration):
                 ),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 ("updated_at", models.DateTimeField(auto_now=True)),
-                ("_old_id", models.PositiveIntegerField(blank=True, null=True)),
+                (
+                    "_old_id",
+                    models.PositiveIntegerField(blank=True, null=True),
+                ),
                 (
                     "format",
                     models.SmallIntegerField(
@@ -196,7 +241,8 @@ class Migration(migrations.Migration):
                 (
                     "finished_at",
                     models.DateTimeField(
-                        default=django.utils.timezone.now, verbose_name="Дедлайн"
+                        default=django.utils.timezone.now,
+                        verbose_name="Дедлайн",
                     ),
                 ),
                 (
@@ -205,8 +251,14 @@ class Migration(migrations.Migration):
                         blank=True, null=True, verbose_name="Дата публикации"
                     ),
                 ),
-                ("kicker", models.CharField(blank=True, max_length=255, null=True)),
-                ("slug", models.SlugField(blank=True, max_length=255, null=True)),
+                (
+                    "kicker",
+                    models.CharField(blank=True, max_length=255, null=True),
+                ),
+                (
+                    "slug",
+                    models.SlugField(blank=True, max_length=255, null=True),
+                ),
                 (
                     "title",
                     models.CharField(
@@ -218,13 +270,20 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "description",
-                    models.TextField(blank=True, verbose_name="Описание статьи"),
+                    models.TextField(
+                        blank=True, verbose_name="Описание статьи"
+                    ),
                 ),
                 ("views", models.IntegerField(default=0)),
                 ("is_paywalled", models.BooleanField(default=False)),
                 ("xmd", models.TextField(null=True)),
                 ("html", models.TextField(null=True)),
-                ("meta", django.contrib.postgres.fields.jsonb.JSONField(default=dict)),
+                (
+                    "meta",
+                    django.contrib.postgres.fields.jsonb.JSONField(
+                        default=dict
+                    ),
+                ),
                 ("is_locked", models.BooleanField(default=False)),
                 (
                     "css",
@@ -238,8 +297,14 @@ class Migration(migrations.Migration):
             ],
             options={
                 "permissions": (
-                    ("recieve_post_email_updates", "Recieve email updates for Post"),
-                    ("edit_extended_post_attrs", "Edit extended Post attributes"),
+                    (
+                        "recieve_post_email_updates",
+                        "Recieve email updates for Post",
+                    ),
+                    (
+                        "edit_extended_post_attrs",
+                        "Edit extended Post attributes",
+                    ),
                 ),
             },
         ),
@@ -257,10 +322,18 @@ class Migration(migrations.Migration):
                 ),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 ("updated_at", models.DateTimeField(auto_now=True)),
-                ("_old_id", models.PositiveIntegerField(blank=True, null=True)),
+                (
+                    "_old_id",
+                    models.PositiveIntegerField(blank=True, null=True),
+                ),
                 ("slug", models.SlugField(max_length=255)),
                 ("title", models.CharField(max_length=255)),
-                ("meta", django.contrib.postgres.fields.jsonb.JSONField(default=dict)),
+                (
+                    "meta",
+                    django.contrib.postgres.fields.jsonb.JSONField(
+                        default=dict
+                    ),
+                ),
             ],
             options={
                 "abstract": False,
@@ -280,30 +353,45 @@ class Migration(migrations.Migration):
                 ),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 ("updated_at", models.DateTimeField(auto_now=True)),
-                ("_old_id", models.PositiveIntegerField(blank=True, null=True)),
+                (
+                    "_old_id",
+                    models.PositiveIntegerField(blank=True, null=True),
+                ),
                 ("is_public", models.BooleanField(default=False)),
                 (
                     "f_name",
                     models.CharField(
-                        blank=True, max_length=255, null=True, verbose_name="Имя"
+                        blank=True,
+                        max_length=255,
+                        null=True,
+                        verbose_name="Имя",
                     ),
                 ),
                 (
                     "m_name",
                     models.CharField(
-                        blank=True, max_length=255, null=True, verbose_name="Отчество"
+                        blank=True,
+                        max_length=255,
+                        null=True,
+                        verbose_name="Отчество",
                     ),
                 ),
                 (
                     "l_name",
                     models.CharField(
-                        blank=True, max_length=255, null=True, verbose_name="Фамилия"
+                        blank=True,
+                        max_length=255,
+                        null=True,
+                        verbose_name="Фамилия",
                     ),
                 ),
                 (
                     "n_name",
                     models.CharField(
-                        blank=True, max_length=255, null=True, verbose_name="Ник"
+                        blank=True,
+                        max_length=255,
+                        null=True,
+                        verbose_name="Ник",
                     ),
                 ),
                 (
@@ -330,7 +418,9 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "notes",
-                    models.TextField(blank=True, null=True, verbose_name="Примечания"),
+                    models.TextField(
+                        blank=True, null=True, verbose_name="Примечания"
+                    ),
                 ),
             ],
             options={
@@ -351,7 +441,10 @@ class Migration(migrations.Migration):
                 ),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 ("updated_at", models.DateTimeField(auto_now=True)),
-                ("_old_id", models.PositiveIntegerField(blank=True, null=True)),
+                (
+                    "_old_id",
+                    models.PositiveIntegerField(blank=True, null=True),
+                ),
                 ("slug", models.SlugField(max_length=255)),
                 ("title", models.CharField(max_length=255)),
                 ("description", models.TextField(null=True)),
@@ -378,7 +471,10 @@ class Migration(migrations.Migration):
                 ),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 ("updated_at", models.DateTimeField(auto_now=True)),
-                ("_old_id", models.PositiveIntegerField(blank=True, null=True)),
+                (
+                    "_old_id",
+                    models.PositiveIntegerField(blank=True, null=True),
+                ),
                 ("slug", models.SlugField(max_length=255)),
                 ("title", models.CharField(max_length=255)),
                 ("sort", models.SmallIntegerField(default=0)),
@@ -387,7 +483,12 @@ class Migration(migrations.Migration):
                     models.SmallIntegerField(blank=True, default=1, null=True),
                 ),
                 ("skip_notification", models.BooleanField(default=False)),
-                ("meta", django.contrib.postgres.fields.jsonb.JSONField(default=dict)),
+                (
+                    "meta",
+                    django.contrib.postgres.fields.jsonb.JSONField(
+                        default=dict
+                    ),
+                ),
             ],
             options={
                 "abstract": False,

@@ -19,14 +19,20 @@ class Migration(migrations.Migration):
             name="idea",
             managers=[
                 ("objects", django.db.models.manager.Manager()),
-                ("on_current_site", django.contrib.sites.managers.CurrentSiteManager()),
+                (
+                    "on_current_site",
+                    django.contrib.sites.managers.CurrentSiteManager(),
+                ),
             ],
         ),
         migrations.AlterModelManagers(
             name="issue",
             managers=[
                 ("objects", django.db.models.manager.Manager()),
-                ("on_current_site", django.contrib.sites.managers.CurrentSiteManager()),
+                (
+                    "on_current_site",
+                    django.contrib.sites.managers.CurrentSiteManager(),
+                ),
             ],
         ),
         migrations.AddField(
@@ -60,7 +66,10 @@ class Migration(migrations.Migration):
             model_name="post",
             name="slug",
             field=models.SlugField(
-                blank=True, max_length=255, null=True, verbose_name="Слаг для URL"
+                blank=True,
+                max_length=255,
+                null=True,
+                verbose_name="Слаг для URL",
             ),
         ),
         migrations.AlterField(

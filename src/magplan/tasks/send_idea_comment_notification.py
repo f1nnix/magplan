@@ -13,7 +13,10 @@ from django.template.loader import render_to_string
 
 from celery import shared_task
 from magplan.models import Comment, User
-from magplan.tasks.utils import _can_recieve_notification, _get_whitelisted_recipients
+from magplan.tasks.utils import (
+    _can_recieve_notification,
+    _get_whitelisted_recipients,
+)
 
 RECIEVE_NOTIFICATIONS_PERMISSION = "main.recieve_idea_email_updates"
 NOTIFICATION_LEVEL_PREFERENCE = "idea_comment_notification_level"
@@ -68,7 +71,9 @@ def _get_recipients(comment: Comment) -> Set[User]:
     involved_users = _get_involved_users(comment)
     recipients.update(involved_users)
 
-    whitelisted_recipients = _get_whitelisted_recipients(NOTIFICATION_LEVEL_PREFERENCE)
+    whitelisted_recipients = _get_whitelisted_recipients(
+        NOTIFICATION_LEVEL_PREFERENCE
+    )
     recipients.update(whitelisted_recipients)
 
     # Remove users, who cannot receive notifications

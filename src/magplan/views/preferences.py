@@ -20,9 +20,13 @@ def index(request):
         else:
             # TODO: check, if form reflects invalid
             #       payload for PreferencesForm
-            PreferencesForm = user_preference_form_builder(instance=request.user.user)
+            PreferencesForm = user_preference_form_builder(
+                instance=request.user.user
+            )
 
-    return render(request, "magplan/preferences/index.html", {"form": PreferencesForm})
+    return render(
+        request, "magplan/preferences/index.html", {"form": PreferencesForm}
+    )
 
 
 @login_required

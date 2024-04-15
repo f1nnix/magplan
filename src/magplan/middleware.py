@@ -9,7 +9,9 @@ class SetLanguageMiddleware:
     def __call__(self, request):
         # Set user language from settings
         try:
-            user_language = request.user.user.preferences.get("magplan__ui_language")
+            user_language = request.user.user.preferences.get(
+                "magplan__ui_language"
+            )
             translation.activate(user_language)
             request.session[translation.LANGUAGE_SESSION_KEY] = user_language
         except:

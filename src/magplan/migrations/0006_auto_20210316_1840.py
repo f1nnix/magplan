@@ -18,14 +18,19 @@ class Migration(migrations.Migration):
             name="post",
             managers=[
                 ("objects", django.db.models.manager.Manager()),
-                ("on_site", django.contrib.sites.managers.CurrentSiteManager()),
+                (
+                    "on_site",
+                    django.contrib.sites.managers.CurrentSiteManager(),
+                ),
             ],
         ),
         migrations.AddField(
             model_name="post",
             name="site",
             field=models.ForeignKey(
-                default=1, on_delete=django.db.models.deletion.CASCADE, to="sites.site"
+                default=1,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="sites.site",
             ),
             preserve_default=False,
         ),

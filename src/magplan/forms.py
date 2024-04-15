@@ -117,14 +117,22 @@ class IdeaModelForm(ModelForm):
 
     class Meta:
         model = Idea
-        fields = ["title", "description", "author_type", "authors_new", "authors"]
+        fields = [
+            "title",
+            "description",
+            "author_type",
+            "authors_new",
+            "authors",
+        ]
         widgets = {
             "title": forms.TextInput(
                 attrs={
                     "class": "form-control",
                 }
             ),
-            "description": forms.Textarea(attrs={"class": "form-control", "rows": 5}),
+            "description": forms.Textarea(
+                attrs={"class": "form-control", "rows": 5}
+            ),
             "authors_new": forms.TextInput(attrs={"class": "form-control"}),
             "authors": forms.SelectMultiple(
                 attrs={
@@ -161,7 +169,9 @@ class IssueModelForm(ModelForm):
                     "class": "form-control",
                 }
             ),
-            "description": forms.Textarea(attrs={"class": "form-control", "rows": 5}),
+            "description": forms.Textarea(
+                attrs={"class": "form-control", "rows": 5}
+            ),
             "published_at": forms.DateInput(
                 attrs={
                     "class": "form-control date_picker",
@@ -192,7 +202,14 @@ class PostMetaForm(ModelForm):
 
     class Meta:
         model = Post
-        fields = ("issues", "editor", "finished_at", "published_at", "css", "slug")
+        fields = (
+            "issues",
+            "editor",
+            "finished_at",
+            "published_at",
+            "css",
+            "slug",
+        )
 
         widgets = {
             "issues": forms.SelectMultiple(
@@ -216,7 +233,10 @@ class PostMetaForm(ModelForm):
                 }
             ),
             "css": AceWidget(
-                mode="css", theme="textmate", showinvisibles=True, toolbar=False
+                mode="css",
+                theme="textmate",
+                showinvisibles=True,
+                toolbar=False,
             ),
             "slug": forms.TextInput(
                 attrs={
@@ -294,7 +314,14 @@ class PostExtendedModelForm(ModelForm):
     class Meta(PostBaseModelForm.Meta):
         model = Post
 
-        fields = ("title", "description", "authors", "kicker", "xmd", "section")
+        fields = (
+            "title",
+            "description",
+            "authors",
+            "kicker",
+            "xmd",
+            "section",
+        )
         widgets = {
             "title": forms.TextInput(
                 attrs={
@@ -353,7 +380,9 @@ class ArchivedPostModelForm(PostDirectCreateModelForm):
 
 class WhitelistedPostExtendedModelForm(PostDirectCreateModelForm):
     section = forms.ModelChoiceField(
-        queryset=Section.objects.filter(is_archived=False, is_whitelisted=True),
+        queryset=Section.objects.filter(
+            is_archived=False, is_whitelisted=True
+        ),
         label="Рубрика",
         empty_label=None,
         widget=forms.Select(attrs={"class": "form-control", "rows": 5}),

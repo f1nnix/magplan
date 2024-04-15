@@ -27,7 +27,9 @@ class TestImage(TestCase):
     def setUp(self):
         file1 = File(name="file1.jpg", file=BytesIO(b"abcdef"))
         attachment1 = G(
-            Attachment, original_filename="user_friendly_filename1.jpg", file=file1
+            Attachment,
+            original_filename="user_friendly_filename1.jpg",
+            file=file1,
         )
 
         self.mock_image_mapper = Mock()
@@ -45,7 +47,9 @@ class TestImage(TestCase):
     def test_render_image(self):
         self.mock_image_mapper.return_value = self.MOCK_SRC
 
-        html = self.renderer.image(self.MOCK_SRC, self.MOCK_TITLE, self.MOCK_ALT_TEXT)
+        html = self.renderer.image(
+            self.MOCK_SRC, self.MOCK_TITLE, self.MOCK_ALT_TEXT
+        )
 
         self.mock_image_mapper.assert_called_with(
             self.MOCK_SRC, self.renderer.attachments

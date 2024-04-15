@@ -5,7 +5,11 @@ from mistune import Renderer
 
 class XMDRenderer(Renderer):
     def __init__(
-        self, image_mapper: tp.Callable, attachments: tp.List = None, *args, **kwargs
+        self,
+        image_mapper: tp.Callable,
+        attachments: tp.List = None,
+        *args,
+        **kwargs
     ):
         self.attachments = attachments or []
         self.image_mapper = image_mapper
@@ -26,11 +30,17 @@ class XMDRenderer(Renderer):
         return html % (urlencoded_filename, alt_text, alt_text)
 
     def panel_block_www_start(self):
-        html = '<div class="panel www">' '<div class="www-inner">' "<h3>www</h3>"
+        html = (
+            '<div class="panel www">' '<div class="www-inner">' "<h3>www</h3>"
+        )
         return html
 
     def panel_block_info_start(self):
-        html = '<div class="panel info">' '<div class="info-inner">' "<h3>info</h3>"
+        html = (
+            '<div class="panel info">'
+            '<div class="info-inner">'
+            "<h3>info</h3>"
+        )
         return html
 
     def panel_block_warning_start(self):
@@ -58,7 +68,11 @@ class XMDRenderer(Renderer):
         return html
 
     def panel_block_default_start(self, text):
-        html = '<div class="panel default">' '<div class="default-inner">' "<h3>%s</h3>"
+        html = (
+            '<div class="panel default">'
+            '<div class="default-inner">'
+            "<h3>%s</h3>"
+        )
         return html % text
 
     def panel_block_term_code(self, content):

@@ -105,6 +105,8 @@ def index(request):
             "need_to_vote": need_to_vote,
             "opened_issues": opened_issues,
             "schedule": schedule,
-            "today": datetime.datetime.today().replace(hour=0, minute=0, second=0),
+            "today": datetime.datetime.today().replace(
+                hour=0, minute=0, second=0
+            ),
         },
     )

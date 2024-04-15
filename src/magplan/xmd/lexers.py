@@ -42,13 +42,17 @@ class PanelBlockLexer(BlockLexer):
         elif title == "TERM":
             self.tokens.append({"type": "panel_block_term_start"})
         else:
-            self.tokens.append({"type": "panel_block_default_start", "content": title})
+            self.tokens.append(
+                {"type": "panel_block_default_start", "content": title}
+            )
 
         # Add nested tokens
         if title == "TERM":
             # We treat term content as single
             # code block without nested elements
-            self.tokens.append({"type": "panel_block_term_code", "content": content})
+            self.tokens.append(
+                {"type": "panel_block_term_code", "content": content}
+            )
 
         else:
             self.parse(content)

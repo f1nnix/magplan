@@ -18,21 +18,29 @@ class Migration(migrations.Migration):
             name="section",
             managers=[
                 ("objects", django.db.models.manager.Manager()),
-                ("on_current_site", django.contrib.sites.managers.CurrentSiteManager()),
+                (
+                    "on_current_site",
+                    django.contrib.sites.managers.CurrentSiteManager(),
+                ),
             ],
         ),
         migrations.AlterModelManagers(
             name="stage",
             managers=[
                 ("objects", django.db.models.manager.Manager()),
-                ("on_current_site", django.contrib.sites.managers.CurrentSiteManager()),
+                (
+                    "on_current_site",
+                    django.contrib.sites.managers.CurrentSiteManager(),
+                ),
             ],
         ),
         migrations.AddField(
             model_name="section",
             name="site",
             field=models.ForeignKey(
-                default=1, on_delete=django.db.models.deletion.CASCADE, to="sites.site"
+                default=1,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="sites.site",
             ),
             preserve_default=False,
         ),
@@ -40,7 +48,9 @@ class Migration(migrations.Migration):
             model_name="stage",
             name="site",
             field=models.ForeignKey(
-                default=1, on_delete=django.db.models.deletion.CASCADE, to="sites.site"
+                default=1,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="sites.site",
             ),
             preserve_default=False,
         ),

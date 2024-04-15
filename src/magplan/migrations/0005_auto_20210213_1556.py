@@ -14,8 +14,14 @@ class Migration(migrations.Migration):
             name="post",
             options={
                 "permissions": (
-                    ("recieve_post_email_updates", "Recieve email updates for Post"),
-                    ("edit_extended_post_attrs", "Edit extended Post attributes"),
+                    (
+                        "recieve_post_email_updates",
+                        "Recieve email updates for Post",
+                    ),
+                    (
+                        "edit_extended_post_attrs",
+                        "Edit extended Post attributes",
+                    ),
                     ("create_generic_post", "Create generic post"),
                     ("create_archive_post", "Create archive post"),
                     ("create_advert_post", "Create advert post"),

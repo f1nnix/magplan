@@ -19,7 +19,9 @@ from magplan.forms import (
     IDEA_AUTHOR_SELF_CHOICE,
 )
 from magplan.models import Idea, Issue, Vote
-from magplan.tasks.send_idea_comment_notification import send_idea_comment_notification
+from magplan.tasks.send_idea_comment_notification import (
+    send_idea_comment_notification,
+)
 from magplan.tasks.send_idea_notification import send_idea_notification
 from magplan.utils import safe_cast
 
@@ -55,7 +57,10 @@ def index(request):
                 # Handle virtual SELF choice (which is actual AUTHOR_TYPE_EXISTING)
                 # We did it after actual m2m save as form.save_m2m()will overwrite any
                 # model assignments usgin empty Form authors field. So saving one more time
-                if request.POST.get("author_type") == IDEA_AUTHOR_SELF_CHOICE.slug:
+                if (
+                    request.POST.get("author_type")
+                    == IDEA_AUTHOR_SELF_CHOICE.slug
+                ):
                     idea.authors.add(request.user.user)
                     idea.save()
 
@@ -154,7 +159,8 @@ def show(request, idea_id):
     form = PostBaseModelForm(
         initial={
             "issues": initial_issues_suggesion,
-            "finished_at": datetime.datetime.now() + datetime.timedelta(days=3),
+            "finished_at": datetime.datetime.now()
+            + datetime.timedelta(days=3),
         },
         instance=idea,
     )
@@ -192,7 +198,9 @@ def vote(request, idea_id):
 
     score = safe_cast(score, to=int, on_error=DEFAULT_VOTE_SCORE)
 
-    allowed_scored: List[int] = [score_choice[0] for score_choice in Vote.SCORE_CHOICES]
+    allowed_scored: List[int] = [
+        score_choice[0] for score_choice in Vote.SCORE_CHOICES
+    ]
 
     if score not in allowed_scored:
         score = Vote.SCORE_50
@@ -200,7 +208,9 @@ def vote(request, idea_id):
     vote.score = score
     vote.save()
 
-    messages.add_message(request, messages.SUCCESS, "Ваш голос учтен. Спасибо!")
+    messages.add_message(
+        request, messages.SUCCESS, "Ваш голос учтен. Спасибо!"
+    )
 
     return redirect("ideas_show", idea_id=idea.id)
 
@@ -210,7 +220,9 @@ def approve(request, idea_id):
     idea = Idea.objects.prefetch_related("votes__user").get(id=idea_id)
 
     if request.method == "POST":
-        idea.approved = True if request.POST.get("approve", False) == "1" else False
+        idea.approved = (
+            True if request.POST.get("approve", False) == "1" else False
+        )
         idea.save()
         messages.add_message(request, messages.INFO, "Статус идеи изменен.")
 
@@ -226,7 +238,10 @@ def approve(request, idea_id):
             )
             text_content = html2text.html2text(html_content)
             msg = EmailMultiAlternatives(
-                subject, text_content, config.PLAN_EMAIL_FROM, [idea.editor.email]
+                subject,
+                text_content,
+                config.PLAN_EMAIL_FROM,
+                [idea.editor.email],
             )
             msg.attach_alternative(html_content, "text/html")
             msg.send()

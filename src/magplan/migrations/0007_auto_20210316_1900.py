@@ -16,7 +16,10 @@ class Migration(migrations.Migration):
             name="post",
             managers=[
                 ("objects", django.db.models.manager.Manager()),
-                ("on_current_site", django.contrib.sites.managers.CurrentSiteManager()),
+                (
+                    "on_current_site",
+                    django.contrib.sites.managers.CurrentSiteManager(),
+                ),
             ],
         ),
     ]

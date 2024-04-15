@@ -58,7 +58,13 @@ class TestPanelBlockLexer(TestCase):
 
     def test_nested_paragraphs(self):
         markdown = (
-            "[ Panel title\n" "\n" "Panel content 1\n" "\n" "Panel content 2\n" "\n" "]"
+            "[ Panel title\n"
+            "\n"
+            "Panel content 1\n"
+            "\n"
+            "Panel content 2\n"
+            "\n"
+            "]"
         )
         tokens = self.lexer.parse(markdown)
 
@@ -67,7 +73,9 @@ class TestPanelBlockLexer(TestCase):
         assert token_panel_start
         assert token_panel_end
 
-        paragraph_tokens = [token for token in tokens if token["type"] == "paragraph"]
+        paragraph_tokens = [
+            token for token in tokens if token["type"] == "paragraph"
+        ]
         assert len(paragraph_tokens) == 2
 
 

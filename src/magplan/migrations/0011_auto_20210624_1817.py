@@ -26,14 +26,20 @@ class Migration(migrations.Migration):
             model_name="profile",
             name="f_name_generic",
             field=models.CharField(
-                blank=True, max_length=255, null=True, verbose_name="Имя латинницей"
+                blank=True,
+                max_length=255,
+                null=True,
+                verbose_name="Имя латинницей",
             ),
         ),
         migrations.AddField(
             model_name="profile",
             name="l_name_generic",
             field=models.CharField(
-                blank=True, max_length=255, null=True, verbose_name="Фамилия латинницей"
+                blank=True,
+                max_length=255,
+                null=True,
+                verbose_name="Фамилия латинницей",
             ),
         ),
     ]

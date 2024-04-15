@@ -10,7 +10,8 @@ def issues_search(request):
     q = request.GET.get("q", None)
     issues = Issue.on_current_site.filter(number__exact=q)
     return JsonResponse(
-        [{"id": issue.id, "text": issue.__str__()} for issue in issues], safe=False
+        [{"id": issue.id, "text": issue.__str__()} for issue in issues],
+        safe=False,
     )
 
 

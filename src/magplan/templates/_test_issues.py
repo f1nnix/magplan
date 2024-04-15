@@ -1,5 +1,13 @@
 from django.test import Client, TestCase
-from plan.tests import _User, _Sections, _Section, _Stages, _Post, _Postype, _Issue
+from plan.tests import (
+    _User,
+    _Sections,
+    _Section,
+    _Stages,
+    _Post,
+    _Postype,
+    _Issue,
+)
 from django.urls import reverse
 from datetime import datetime
 from main.models import Issue
@@ -16,7 +24,9 @@ class TestCreate(TestCase):
 
     def test_redirect_to_login_if_not_authenticated(self):
         response = self.client.get(reverse(self.ROUTE_NAME))
-        self.assertRedirects(response, "%s?next=/admin/issues/new/" % reverse("login"))
+        self.assertRedirects(
+            response, "%s?next=/admin/issues/new/" % reverse("login")
+        )
 
     def test_should_render_issue_form(self):
         self.client.force_login(user=self.user)

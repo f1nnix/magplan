@@ -14,7 +14,10 @@ import requests
 from botocore.exceptions import ClientError
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
+from django.contrib.contenttypes.fields import (
+    GenericRelation,
+    GenericForeignKey,
+)
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import JSONField
 from django.contrib.sites.managers import CurrentSiteManager
@@ -67,7 +70,9 @@ class AbstractSiteModel(models.Model):
     Support for multisite managers
     """
 
-    site = models.ForeignKey(Site, on_delete=models.CASCADE, default=current_site_id)
+    site = models.ForeignKey(
+        Site, on_delete=models.CASCADE, default=current_site_id
+    )
     objects = models.Manager()
     on_current_site = CurrentSiteManager()
 
@@ -136,9 +141,13 @@ class User(UserModel):
 
 class Profile(AbstractBase):
     is_public = models.BooleanField(null=False, blank=False, default=False)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name="profile"
+    )
     f_name = models.CharField("Имя", max_length=255, blank=True, null=True)
-    m_name = models.CharField("Отчество", max_length=255, blank=True, null=True)
+    m_name = models.CharField(
+        "Отчество", max_length=255, blank=True, null=True
+    )
     l_name = models.CharField("Фамилия", max_length=255, blank=True, null=True)
     n_name = models.CharField("Ник", max_length=255, blank=True, null=True)
     bio = models.TextField("Био", blank=True, null=True)
@@ -165,7 +174,9 @@ class Profile(AbstractBase):
     country = models.SmallIntegerField(
         "Страна", choices=COUNTRY_CHOICES, default=RUSSIA
     )
-    city = models.CharField("Город или поселок", max_length=255, blank=True, null=True)
+    city = models.CharField(
+        "Город или поселок", max_length=255, blank=True, null=True
+    )
     notes = models.TextField("Примечания", blank=True, null=True)
 
 
@@ -177,9 +188,13 @@ class Section(AbstractSiteModel, AbstractBase):
     title = models.CharField(null=False, blank=False, max_length=255)
     description = models.TextField(null=True, blank=False)
     sort = models.SmallIntegerField(null=False, blank=False, default=0)
-    color = models.CharField(null=False, blank=False, default="000000", max_length=6)
+    color = models.CharField(
+        null=False, blank=False, default="000000", max_length=6
+    )
     is_archived = models.BooleanField(null=False, blank=False, default=False)
-    is_whitelisted = models.BooleanField(null=False, blank=False, default=False)
+    is_whitelisted = models.BooleanField(
+        null=False, blank=False, default=False
+    )
 
 
 class Magazine(AbstractBase):
@@ -219,14 +234,26 @@ class Stage(AbstractSiteModel, AbstractBase):
     title = models.CharField(null=False, blank=False, max_length=255)
     sort = models.SmallIntegerField(null=False, blank=False, default=0)
     duration = models.SmallIntegerField(null=True, blank=True, default=1)
-    assignee = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
+    assignee = models.ForeignKey(
+        User, null=True, blank=True, on_delete=models.CASCADE
+    )
     prev_stage = models.ForeignKey(
-        "self", related_name="n_stage", null=True, blank=True, on_delete=models.CASCADE
+        "self",
+        related_name="n_stage",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
     )
     next_stage = models.ForeignKey(
-        "self", related_name="p_stage", null=True, blank=True, on_delete=models.CASCADE
+        "self",
+        related_name="p_stage",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
     )
-    skip_notification = models.BooleanField(null=False, blank=False, default=False)
+    skip_notification = models.BooleanField(
+        null=False, blank=False, default=False
+    )
     meta = JSONField(default=dict)
 
 
@@ -244,7 +271,9 @@ class Idea(AbstractSiteModel, AbstractBase):
     )
     description = models.TextField(verbose_name="Описание")
     approved = models.BooleanField(null=True)
-    editor = models.ForeignKey(User, on_delete=models.CASCADE, related_name="editor")
+    editor = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="editor"
+    )
     post = models.OneToOneField(
         "Post", on_delete=models.SET_NULL, null=True, blank=True
     )
@@ -263,7 +292,9 @@ class Idea(AbstractSiteModel, AbstractBase):
     )
 
     def voted(self, user):
-        vote = next((v for v in self.votes.all() if v.user_id == user.id), None)
+        vote = next(
+            (v for v in self.votes.all() if v.user_id == user.id), None
+        )
 
         if vote:
             return True
@@ -273,19 +304,24 @@ class Idea(AbstractSiteModel, AbstractBase):
         subject = f"Новая идея «{self.title}». Голосуйте!"
 
         context = {"idea": self, "APP_URL": os.environ.get("APP_URL")}
-        message_html_content: str = render_to_string("email/new_idea.html", context)
+        message_html_content: str = render_to_string(
+            "email/new_idea.html", context
+        )
         message_text_content: str = html2text.html2text(message_html_content)
 
         msg = EmailMultiAlternatives(
-            subject, message_text_content, config.PLAN_EMAIL_FROM, [recipient.email]
+            subject,
+            message_text_content,
+            config.PLAN_EMAIL_FROM,
+            [recipient.email],
         )
         msg.attach_alternative(message_html_content, "text/html")
         msg.send()
 
     def send_vote_notifications(self) -> None:
-        active_users: tp.List[User] = User.objects.filter(is_active=True).exclude(
-            id=self.editor_id
-        )
+        active_users: tp.List[User] = User.objects.filter(
+            is_active=True
+        ).exclude(id=self.editor_id)
         recipients: tp.List[User] = [
             user
             for user in active_users
@@ -399,8 +435,12 @@ class Post(AbstractSiteModel, AbstractBase):
         verbose_name="Редактор",
     )
     authors = models.ManyToManyField(User, verbose_name="Авторы")
-    stage = models.ForeignKey(Stage, on_delete=models.CASCADE, verbose_name="Этап")
-    issues = models.ManyToManyField(Issue, related_name="posts", verbose_name="Выпуски")
+    stage = models.ForeignKey(
+        Stage, on_delete=models.CASCADE, verbose_name="Этап"
+    )
+    issues = models.ManyToManyField(
+        Issue, related_name="posts", verbose_name="Выпуски"
+    )
     section = models.ForeignKey(
         Section,
         on_delete=models.CASCADE,
@@ -439,24 +479,35 @@ class Post(AbstractSiteModel, AbstractBase):
     @property
     def images(self):
         return list(
-            filter(lambda a: a.type == Attachment.TYPE_IMAGE, self.attachment_set.all())
+            filter(
+                lambda a: a.type == Attachment.TYPE_IMAGE,
+                self.attachment_set.all(),
+            )
         )
 
     @property
     def pdfs(self):
         return list(
-            filter(lambda a: a.type == Attachment.TYPE_PDF, self.attachment_set.all())
+            filter(
+                lambda a: a.type == Attachment.TYPE_PDF,
+                self.attachment_set.all(),
+            )
         )
 
     @property
     def files(self):
         return list(
-            filter(lambda a: a.type == Attachment.TYPE_FILE, self.attachment_set.all())
+            filter(
+                lambda a: a.type == Attachment.TYPE_FILE,
+                self.attachment_set.all(),
+            )
         )
 
     @property
     def featured_image(self) -> tp.Optional["Attachment"]:
-        return self.attachment_set.filter(type=Attachment.TYPE_FEATURED_IMAGE).first()
+        return self.attachment_set.filter(
+            type=Attachment.TYPE_FEATURED_IMAGE
+        ).first()
 
     @property
     def assignee(self):
@@ -622,7 +673,9 @@ class Post(AbstractSiteModel, AbstractBase):
             logger.debug(
                 "Running on archived post. Adding issues datetimes as publication dates"
             )
-            post_date_gmt: str = self.published_at.strftime(WP_DATE_FORMAT_STRING)
+            post_date_gmt: str = self.published_at.strftime(
+                WP_DATE_FORMAT_STRING
+            )
             post_date: str = self.published_at.astimezone().strftime(
                 WP_DATE_FORMAT_STRING
             )
@@ -642,7 +695,9 @@ class Post(AbstractSiteModel, AbstractBase):
             self.xmd, self.images, mapper=plan_image_mapper
         )
         self.html = _render_with_external_parser(
-            self.id, prepared_xmd, paywall_tag_html=Post.PAYWALL_NOTICE_RENDERED
+            self.id,
+            prepared_xmd,
+            paywall_tag_html=Post.PAYWALL_NOTICE_RENDERED,
         )
 
         if not self.html:
@@ -667,7 +722,9 @@ class Attachment(AbstractBase):
     )
     type = models.SmallIntegerField(choices=TYPE_CHOICES, default=TYPE_IMAGE)
 
-    original_filename = models.CharField(null=False, blank=False, max_length=255)
+    original_filename = models.CharField(
+        null=False, blank=False, max_length=255
+    )
     file = models.FileField(upload_to="attachments/%Y/%m/%d/", max_length=2048)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
@@ -708,7 +765,9 @@ class Attachment(AbstractBase):
                 return False
             return True
 
-    def upload_to_storage(self, storage_type: StorageType = StorageType.S3) -> None:
+    def upload_to_storage(
+        self, storage_type: StorageType = StorageType.S3
+    ) -> None:
         if storage_type == StorageType.S3:
             self._upload_to_s3()
 
@@ -772,14 +831,18 @@ class Vote(AbstractBase):
     )
     score = models.SmallIntegerField(choices=SCORE_CHOICES, default=SCORE_50)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    idea = models.ForeignKey(Idea, on_delete=models.CASCADE, related_name="votes")
+    idea = models.ForeignKey(
+        Idea, on_delete=models.CASCADE, related_name="votes"
+    )
 
     @property
     def score_humanized(self):
         return self.__class__.SCORE_CHOICES
 
 
-def users_with_perm(perm_name: str, include_superuser: bool = True) -> List[User]:
+def users_with_perm(
+    perm_name: str, include_superuser: bool = True
+) -> List[User]:
     """Get all users by full permission name
 
     :param perm_name: permission name without app name
@@ -851,7 +914,9 @@ def on_post_pre_save(sender, instance: Post, **kwargs):
 
                 # Convert date to datetime
                 published_date: datetime.date = target_issue.published_at
-                published_datetime: datetime.datetime = datetime.datetime.combine(
-                    published_date, datetime.datetime.min.time()
+                published_datetime: datetime.datetime = (
+                    datetime.datetime.combine(
+                        published_date, datetime.datetime.min.time()
+                    )
                 )
                 instance.published_at = published_datetime
