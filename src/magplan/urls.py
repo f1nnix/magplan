@@ -2,16 +2,16 @@
 from django.urls import path
 
 from magplan.views import (
-    sections,
-    stages,
+    api,
     articles,
-    ideas,
     authors,
+    ideas,
     index,
     issues,
     posts,
-    api,
     preferences,
+    sections,
+    stages,
 )
 
 urlpatterns = [

@@ -6,12 +6,12 @@ import os
 from typing import Set
 
 import html2text
-from magplan.conf import settings as config
+from celery import shared_task
 from django.contrib.contenttypes.models import ContentType
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 
-from celery import shared_task
+from magplan.conf import settings as config
 from magplan.models import Comment, User
 from magplan.tasks.utils import (
     _can_recieve_notification,

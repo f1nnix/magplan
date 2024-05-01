@@ -1,6 +1,6 @@
 import datetime
 import os
-from typing import List, Tuple, Optional
+from typing import List, Optional, Tuple
 
 import django_filters
 import html2text
@@ -11,12 +11,13 @@ from django.db.models import Count
 from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
 from django.urls import reverse
+
 from magplan.conf import settings as config
 from magplan.forms import (
+    IDEA_AUTHOR_SELF_CHOICE,
     CommentModelForm,
     IdeaModelForm,
     PostBaseModelForm,
-    IDEA_AUTHOR_SELF_CHOICE,
 )
 from magplan.models import Idea, Issue, Vote
 from magplan.tasks.send_idea_comment_notification import (
@@ -159,8 +160,7 @@ def show(request, idea_id):
     form = PostBaseModelForm(
         initial={
             "issues": initial_issues_suggesion,
-            "finished_at": datetime.datetime.now()
-            + datetime.timedelta(days=3),
+            "finished_at": datetime.datetime.now() + datetime.timedelta(days=3),
         },
         instance=idea,
     )
@@ -208,9 +208,7 @@ def vote(request, idea_id):
     vote.score = score
     vote.save()
 
-    messages.add_message(
-        request, messages.SUCCESS, "Ваш голос учтен. Спасибо!"
-    )
+    messages.add_message(request, messages.SUCCESS, "Ваш голос учтен. Спасибо!")
 
     return redirect("ideas_show", idea_id=idea.id)
 

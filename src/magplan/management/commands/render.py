@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
-from magplan.models import *
 from tqdm import tqdm
+
+from magplan.models import *
 
 
 class Command(BaseCommand):

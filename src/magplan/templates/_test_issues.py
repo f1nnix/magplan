@@ -1,16 +1,17 @@
+from datetime import datetime
+
 from django.test import Client, TestCase
+from django.urls import reverse
+from main.models import Issue
 from plan.tests import (
-    _User,
-    _Sections,
-    _Section,
-    _Stages,
+    _Issue,
     _Post,
     _Postype,
-    _Issue,
+    _Section,
+    _Sections,
+    _Stages,
+    _User,
 )
-from django.urls import reverse
-from datetime import datetime
-from main.models import Issue
 
 
 class TestCreate(TestCase):

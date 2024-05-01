@@ -4,15 +4,15 @@ import typing as tp
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q, QuerySet
 from django.http import HttpRequest
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils.timezone import now
 
 from magplan.forms import (
-    WhitelistedPostExtendedModelForm,
     AdPostExtendedModelForm,
-    DefaultPostModelForm,
     ArchivedPostModelForm,
+    DefaultPostModelForm,
+    WhitelistedPostExtendedModelForm,
 )
 from magplan.models import Post, Stage, User
 from magplan.utils import get_current_site

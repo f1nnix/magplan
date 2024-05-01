@@ -4,7 +4,7 @@ from django import forms
 from django.forms import ModelForm
 from django_ace import AceWidget
 
-from magplan.models import Idea, Post, Comment, Section, Issue, User, Profile
+from magplan.models import Comment, Idea, Issue, Post, Profile, Section, User
 
 SelectChoice = namedtuple("SelectChoice", ["slug", "title"])
 IDEA_AUTHOR_SELF_CHOICE = SelectChoice("SELF", "Напишу сам")
@@ -380,9 +380,7 @@ class ArchivedPostModelForm(PostDirectCreateModelForm):
 
 class WhitelistedPostExtendedModelForm(PostDirectCreateModelForm):
     section = forms.ModelChoiceField(
-        queryset=Section.objects.filter(
-            is_archived=False, is_whitelisted=True
-        ),
+        queryset=Section.objects.filter(is_archived=False, is_whitelisted=True),
         label="Рубрика",
         empty_label=None,
         widget=forms.Select(attrs={"class": "form-control", "rows": 5}),

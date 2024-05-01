@@ -36,7 +36,5 @@ class Test_get_attachment_original_filename(TestCase):
         assert "file1" in filename
 
     def test_non_existing_filename(self):
-        filename = get_attachment_original_filename(
-            "404.jpg", self.attachments
-        )
+        filename = get_attachment_original_filename("404.jpg", self.attachments)
         assert not filename

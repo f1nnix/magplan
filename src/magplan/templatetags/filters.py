@@ -7,9 +7,9 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils.functional import SimpleLazyObject
 
-from magplan.models import Vote, Comment
+from magplan.models import Comment, Vote
 from magplan.utils import safe_cast
-from magplan.views import posts, ideas
+from magplan.views import ideas, posts
 
 register = template.Library()
 

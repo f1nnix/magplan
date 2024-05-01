@@ -5,9 +5,8 @@ import logging
 
 from celery import shared_task
 
-from magplan.models import Post
 from magplan.integrations.posts import Lock
-
+from magplan.models import Post
 
 logger = logging.getLogger()
 
