@@ -8,14 +8,16 @@ import html2text
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.sites.models import Site
 from django.core.mail import EmailMultiAlternatives
 from django.db import transaction
 from django.http import HttpRequest, HttpResponseForbidden
-from django.shortcuts import HttpResponse, redirect, render
-from django.shortcuts import get_object_or_404
+from django.shortcuts import HttpResponse, get_object_or_404, redirect, render
 from django.template import Context, Template
 from django.template.loader import render_to_string
 from django.urls import reverse
+from slugify import slugify
+
 from magplan.conf import settings as config
 from magplan.forms import (
     CommentModelForm,
@@ -30,12 +32,12 @@ from magplan.models import (
     Post,
     Stage,
     User,
+    current_site_id,
 )
 from magplan.tasks.send_post_comment_notification import (
     send_post_comment_notification,
 )
 from magplan.tasks.upload_post_to_wp import upload_post_to_wp
-from slugify import slugify
 
 IMAGE_MIME_TYPE_JPEG = "image/jpeg"
 IMAGE_MIME_TYPES = {
@@ -55,7 +57,15 @@ def _get_arbitrary_chunk(post: Post) -> str:
     :param post: Post instance to use in template
     :return: Rendered template string
     """
-    instance_template = Template(config.PLAN_POSTS_INSTANCE_CHUNK)
+
+    site = Site.objects.get(id=current_site_id())
+    chunk: Optional[str] = site.preferences[
+        "general__pre_post_content_chunk_template"
+    ]
+    if not chunk:
+        return ""
+
+    instance_template = Template(chunk)
     instance_chunk = instance_template.render(Context({"post": post}))
     return instance_chunk
 
@@ -295,9 +305,7 @@ def edit(request, post_id):
     ).get(id=post_id)
 
     if request.method == "POST":
-        form = PostExtendedModelForm(
-            request.POST, request.FILES, instance=post
-        )
+        form = PostExtendedModelForm(request.POST, request.FILES, instance=post)
 
         attachments_files = request.FILES.getlist("attachments")
         featured_image_files = request.FILES.getlist("featured_image")
@@ -410,9 +418,7 @@ def set_stage(request, post_id, system=Comment.TYPE_SYSTEM):
 
         # set deadline to current stage durtion. If no duration, append 1 day
         duration = stage.duration if stage.duration else 1
-        post.finished_at = post.finished_at + +datetime.timedelta(
-            days=duration
-        )
+        post.finished_at = post.finished_at + +datetime.timedelta(days=duration)
         post.stage = stage
         post.imprint_updater(request.user.user)
         post.save()
