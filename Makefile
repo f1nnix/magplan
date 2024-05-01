@@ -13,9 +13,8 @@ black:
 mypy:
 	mypy $(SRC_DIR)
 
-package:
-	rm dist/*
-	python3 setup.py sdist
+build:
+	poetry build
 
-upload:
-	twine upload dist/*
+publish:
+	poetry publish

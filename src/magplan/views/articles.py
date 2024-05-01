@@ -67,11 +67,8 @@ def get_api_urls() -> tp.Dict[str, str]:
 @login_required
 def index(request):
     filter_ = request.GET.get("filter")
-
-    current_context_site = get_current_site(request)
-    queryset = Post.on_site(site=current_context_site)
     posts: QuerySet = _get_filtered_posts_queryset(
-        filter_, request.user.user, queryset=queryset
+        filter_, request.user.user, queryset=Post.on_current_site
     )
 
     # If user has any permissions to create any type of articles
