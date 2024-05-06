@@ -5,6 +5,7 @@ from django.db import migrations, models
 import django.db.models.deletion
 import django.db.models.manager
 import magplan.models
+import magplan.models.abc
 
 
 class Migration(migrations.Migration):
@@ -39,7 +40,7 @@ class Migration(migrations.Migration):
             model_name="idea",
             name="site",
             field=models.ForeignKey(
-                default=magplan.models.current_site_id,
+                default=magplan.models.abc.current_site_id,
                 on_delete=django.db.models.deletion.CASCADE,
                 to="sites.site",
             ),
@@ -48,7 +49,7 @@ class Migration(migrations.Migration):
             model_name="issue",
             name="site",
             field=models.ForeignKey(
-                default=magplan.models.current_site_id,
+                default=magplan.models.abc.current_site_id,
                 on_delete=django.db.models.deletion.CASCADE,
                 to="sites.site",
             ),
@@ -57,7 +58,7 @@ class Migration(migrations.Migration):
             model_name="post",
             name="site",
             field=models.ForeignKey(
-                default=magplan.models.current_site_id,
+                default=magplan.models.abc.current_site_id,
                 on_delete=django.db.models.deletion.CASCADE,
                 to="sites.site",
             ),
@@ -76,7 +77,7 @@ class Migration(migrations.Migration):
             model_name="section",
             name="site",
             field=models.ForeignKey(
-                default=magplan.models.current_site_id,
+                default=magplan.models.abc.current_site_id,
                 on_delete=django.db.models.deletion.CASCADE,
                 to="sites.site",
             ),
@@ -85,7 +86,7 @@ class Migration(migrations.Migration):
             model_name="stage",
             name="site",
             field=models.ForeignKey(
-                default=magplan.models.current_site_id,
+                default=magplan.models.abc.current_site_id,
                 on_delete=django.db.models.deletion.CASCADE,
                 to="sites.site",
             ),

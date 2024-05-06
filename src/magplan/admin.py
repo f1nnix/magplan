@@ -3,17 +3,14 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django_admin_listfilter_dropdown.filters import RelatedDropdownFilter
 
-from magplan.models import (
-    User,
-    Post,
-    Comment,
-    Issue,
-    Stage,
-    Magazine,
-    Section,
-    Idea,
-    Attachment,
-)
+from magplan.models.comment import Comment
+from magplan.models.idea import Idea
+from magplan.models.issue import Issue
+from magplan.models.magazine import Magazine
+from magplan.models.post import Post, Attachment
+from magplan.models.section import Section
+from magplan.models.stage import Stage
+from magplan.models.user import User
 
 
 class UserAdmin(BaseUserAdmin):
