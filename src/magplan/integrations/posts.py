@@ -1,7 +1,6 @@
 import logging
 import re
 import typing as tp
-from contextlib import contextmanager
 
 import pymysql
 from django.conf import settings
@@ -17,25 +16,9 @@ img_pattern = re.compile(
     "$"  # Capture urls only from last section
 )
 
-url_replace_pattern = re.compile(
-    "\]\((.+)\)$"
-)  # FIXME: match real last () group
+url_replace_pattern = re.compile("\]\((.+)\)$")  # FIXME: match real last () group
 
 logger = logging.getLogger()
-
-
-@contextmanager
-def Lock(post):
-    post.is_locked = True
-    post.save()
-
-    try:
-        yield
-    except Exception as e:
-        raise e
-    finally:
-        post.is_locked = False
-        post.save()
 
 
 def replace_images_paths(
@@ -68,13 +51,9 @@ def replace_images_paths(
         # Parse all images for galleries one
         filenames = [
             filename.strip()
-            for filename in url_chunk[0].split(
-                ","
-            )  # First and only match group
+            for filename in url_chunk[0].split(",")  # First and only match group
         ]
-        absolute_url_chunks = [
-            mapper(filename, attachments) for filename in filenames
-        ]
+        absolute_url_chunks = [mapper(filename, attachments) for filename in filenames]
 
         # Build result line with new images
         absolute_urs = "]({})".format(",".join(absolute_url_chunks))
@@ -96,7 +75,9 @@ def update_post_meta_field(
         # Update existing if found
         existing_rows = cursor.fetchone()
         if existing_rows:
-            update_query = "UPDATE wp_postmeta SET meta_value=%s WHERE post_id=%s and meta_key=%s;"
+            update_query = (
+                "UPDATE wp_postmeta SET meta_value=%s WHERE post_id=%s and meta_key=%s;"
+            )
         else:
             update_query = "INSERT INTO wp_postmeta (meta_value, post_id, meta_key) VALUES (%s, %s, %s);"
         cursor.execute(
@@ -111,9 +92,7 @@ def update_post_meta_field(
     conn.commit()
 
 
-def update_post_field(
-    conn: pymysql.Connection, object_id: int, key: str, value: str
-):
+def update_post_field(conn: pymysql.Connection, object_id: int, key: str, value: str):
     with conn.cursor() as cursor:
         update_query = f"UPDATE wp_posts SET {key}=%s WHERE ID=%s;"  # Injection-safe as key is trusted
         cursor.execute(

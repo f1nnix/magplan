@@ -3,7 +3,6 @@ import logging
 from celery import shared_task
 
 from magplan.models import Post
-from magplan.integrations.posts import Lock
 from pymysql.err import OperationalError
 
 
@@ -22,6 +21,4 @@ def upload_post_to_wp(self, post_id: int) -> None:
     if post is None:
         return
 
-    with Lock(post):
-        logger.info("Lock for post %s acquired", post.id)
-        post.upload()
+    post.upload()
