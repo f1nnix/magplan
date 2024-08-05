@@ -3,7 +3,7 @@ name: Publish Python Package
 on:
   push:
     tags:
-      - '*.*.*'
+      - "*.*.*"
   workflow_dispatch:
 
 jobs:
@@ -17,7 +17,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.9
+          python-version: 3.11
 
       - name: Install Poetry
         run: |
@@ -41,4 +41,4 @@ jobs:
           PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
         run: |
           export PATH="$HOME/.local/bin:$PATH"
-          poetry publish --username $PYPI_USERNAME --password $PYPI_PASSWORD --no-interaction --build
+          poetry publish -vvv --username $PYPI_USERNAME --password $PYPI_PASSWORD --no-interaction --build
