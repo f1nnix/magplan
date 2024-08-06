@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "magplan"
-version = "3.3.7"
+version = "3.3.8"
 description = ""
 authors = ["Ilya Rusanen <ilya@rusanen.co.uk>"]
 readme = "README.md"
