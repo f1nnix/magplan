@@ -1,6 +1,7 @@
-from django.shortcuts import render
-from magplan.models import Stage
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+
+from magplan.models import Stage
 
 
 # Create your views here.

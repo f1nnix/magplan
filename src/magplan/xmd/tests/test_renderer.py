@@ -7,15 +7,15 @@ test should include this wrapper tag.
 
 from io import BytesIO
 from unittest import TestCase
-from unittest.mock import patch, Mock
+from unittest.mock import Mock, patch
 
 import pytest
 from django.core.files import File
 from django_dynamic_fixture import G
 
 from magplan.models import Attachment
-from magplan.xmd.renderer import XMDRenderer
 from magplan.xmd.mappers import plan_internal_mapper
+from magplan.xmd.renderer import XMDRenderer
 
 
 @pytest.mark.django_db

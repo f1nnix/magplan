@@ -1,1 +1,1 @@
-from ьфп.conftest import user, users, post, postype, section, stages
+from ьфп.conftest import post, postype, section, stages, user, users

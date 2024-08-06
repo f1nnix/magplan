@@ -1,11 +1,10 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Q
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect, render
 
-from magplan.models import User, Post
-from magplan.forms import UserModelForm, ProfileModelForm
+from magplan.forms import ProfileModelForm, UserModelForm
+from magplan.models import Post, User
 
 
 @login_required
@@ -32,9 +31,7 @@ def new(request):
             user.is_active = False
             user.save()
 
-            profile_form = ProfileModelForm(
-                request.POST, instance=user.profile
-            )
+            profile_form = ProfileModelForm(request.POST, instance=user.profile)
             profile_form.save()
 
             messages.add_message(

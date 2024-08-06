@@ -4,15 +4,16 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django_admin_listfilter_dropdown.filters import RelatedDropdownFilter
 
 from magplan.models import (
-    User,
-    Post,
-    Comment,
-    Issue,
-    Stage,
-    Magazine,
-    Section,
-    Idea,
     Attachment,
+    Comment,
+    Idea,
+    Issue,
+    Magazine,
+    Post,
+    Section,
+    SitePreferenceModel,
+    Stage,
+    User,
 )
 
 
@@ -101,3 +102,4 @@ admin.site.register(Magazine)
 admin.site.register(Section, SectionAdmin)
 admin.site.register(Idea, IdeaAdmin)
 admin.site.register(Attachment, AttachmentAdmin)
+admin.site.register(SitePreferenceModel)

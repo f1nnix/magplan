@@ -9,26 +9,26 @@ import urllib
 from typing import List
 
 import django
-from django.db.models import JSONField
 import html2text
 import requests
 from botocore.exceptions import ClientError
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import (
-    GenericRelation,
     GenericForeignKey,
+    GenericRelation,
 )
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
 from django.core.mail import EmailMultiAlternatives
 from django.db import models
-from django.db.models import Q, QuerySet
+from django.db.models import JSONField, Q, QuerySet
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.utils import timezone
+from dynamic_preferences.models import PerInstancePreferenceModel
 
 from magplan.conf import settings as config
 from magplan.integrations.images import S3Client
@@ -145,9 +145,7 @@ class Profile(AbstractBase):
         User, on_delete=models.CASCADE, related_name="profile"
     )
     f_name = models.CharField("Имя", max_length=255, blank=True, null=True)
-    m_name = models.CharField(
-        "Отчество", max_length=255, blank=True, null=True
-    )
+    m_name = models.CharField("Отчество", max_length=255, blank=True, null=True)
     l_name = models.CharField("Фамилия", max_length=255, blank=True, null=True)
     n_name = models.CharField("Ник", max_length=255, blank=True, null=True)
     bio = models.TextField("Био", blank=True, null=True)
@@ -192,9 +190,7 @@ class Section(AbstractSiteModel, AbstractBase):
         null=False, blank=False, default="000000", max_length=6
     )
     is_archived = models.BooleanField(null=False, blank=False, default=False)
-    is_whitelisted = models.BooleanField(
-        null=False, blank=False, default=False
-    )
+    is_whitelisted = models.BooleanField(null=False, blank=False, default=False)
 
 
 class Magazine(AbstractBase):
@@ -292,9 +288,7 @@ class Idea(AbstractSiteModel, AbstractBase):
     )
 
     def voted(self, user):
-        vote = next(
-            (v for v in self.votes.all() if v.user_id == user.id), None
-        )
+        vote = next((v for v in self.votes.all() if v.user_id == user.id), None)
 
         if vote:
             return True
@@ -920,3 +914,15 @@ def on_post_pre_save(sender, instance: Post, **kwargs):
                     )
                 )
                 instance.published_at = published_datetime
+
+
+class SitePreferenceModel(PerInstancePreferenceModel):
+
+    instance = models.ForeignKey(
+        Site, on_delete=models.CASCADE, related_name="sites"
+    )
+
+    class Meta:
+        # Specifying the app_label here is mandatory for backward
+        # compatibility reasons, see #96
+        app_label = "magplan"

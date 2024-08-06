@@ -1,7 +1,8 @@
 from unittest import TestCase
 
-from tests.plan.tasks.test_utils import get_
 from xmd.lexers import PanelBlockLexer
+
+from tests.plan.tasks.test_utils import get_
 
 
 class TestPanelBlockLexer(TestCase):

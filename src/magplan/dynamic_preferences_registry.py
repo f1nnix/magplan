@@ -1,10 +1,20 @@
 from django import forms
 from django.contrib.sites.models import Site
 from dynamic_preferences.preferences import Section
-from dynamic_preferences.types import ChoicePreference
+from dynamic_preferences.types import ChoicePreference, StringPreference
 from dynamic_preferences.users.registries import user_preferences_registry
 
+from magplan.registries import site_preferences_registry
+
+general = Section("general")
 plan = Section("magplan")
+
+
+@site_preferences_registry.register
+class PrePostContentChunkTemplate(StringPreference):
+    section = general
+    name = "pre_post_content_chunk_template"
+    default = "Content links are places here"
 
 
 @user_preferences_registry.register
@@ -68,7 +78,7 @@ class NewIdeaNotification(ChoicePreference):
     ]
     default = "yes"
     widget = forms.Select(attrs={"class": "form-control"})
-    verbose_name = "Присылать уведомелния о новых идеях?"
+    verbose_name = "Присылать уведомления о новых идеях?"
 
 
 @user_preferences_registry.register
