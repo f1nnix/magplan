@@ -32,8 +32,8 @@ from magplan.models import (
     Post,
     Stage,
     User,
-    current_site_id,
 )
+from magplan.utils import current_site_id
 from magplan.tasks.send_post_comment_notification import (
     send_post_comment_notification,
 )
