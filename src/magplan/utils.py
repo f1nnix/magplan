@@ -6,7 +6,7 @@ from django.http import HttpRequest
 
 
 def safe_cast(value: Any, to: Callable, on_error: Any = None) -> Any:
-    """ "Safe casts value to type with provided casting constructor.
+    """Safe casts value to type with provided casting constructor.
 
     If cast falls for some reason, default on_error value is returned.*
 
@@ -38,3 +38,7 @@ def get_current_site(request: HttpRequest, safe: bool = True) -> Site:
 
     # Should exists, don't handle exceptions
     return Site.objects.get(id=DEFAULT_SITE_ID)
+
+
+def current_site_id() -> int:
+    return settings.SITE_ID
