@@ -19,4 +19,5 @@ version:
 		patch) new_version=$$major.$$minor.$$((patch + 1)) ;; \
 	esac; \
 	git tag -a $$new_version -m "Version $$new_version"; \
-	echo "Created new tag: $$new_version" 
+	sed -i '' "s/version = \".*\"/version = \"$$new_version\"/" pyproject.toml; \
+	echo "Created new tag: $$new_version and updated pyproject.toml" 
