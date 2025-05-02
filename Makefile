@@ -3,12 +3,12 @@ SHELL := /bin/bash
 devel:
 	uv sync --dev
 
-version:
+bump-version:
 	@if [ "$(filter $(TYPE),major minor patch)" = "" ]; then \
-		echo "Usage: make version TYPE=major|minor|patch"; \
+		echo "Usage: make bump-version TYPE=major|minor|patch"; \
 		exit 1; \
 	fi
-	@current_version=$$(git tag -l | sort -V | tail -n1 | sed 's/^v//' || echo "0.0.0"); \
+	@current_version=$$(grep 'version = ' pyproject.toml | sed 's/version = "\(.*\)"/\1/'); \
 	IFS='.' read -ra version_parts <<< "$$current_version"; \
 	major=$${version_parts[0]:-0}; \
 	minor=$${version_parts[1]:-0}; \
@@ -18,6 +18,10 @@ version:
 		minor) new_version=$$major.$$((minor + 1)).0 ;; \
 		patch) new_version=$$major.$$minor.$$((patch + 1)) ;; \
 	esac; \
-	git tag -a $$new_version -m "Version $$new_version"; \
 	sed -i '' "s/version = \".*\"/version = \"$$new_version\"/" pyproject.toml; \
-	echo "Created new tag: $$new_version and updated pyproject.toml" 
+	echo "Updated version in pyproject.toml to: $$new_version"
+
+create-tag:
+	@version=$$(grep 'version = ' pyproject.toml | sed 's/version = "\(.*\)"/\1/'); \
+	git tag -a $$version -m "Version $$version"; \
+	echo "Created git tag: $$version" 

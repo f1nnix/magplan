@@ -218,24 +218,31 @@ To create a new version, follow these steps:
 
 1. Make sure all your changes are committed and pushed to the repository
 
-2. Run one of the following commands to create a new version tag:
+2. Run one of the following commands to bump the version in pyproject.toml:
 
 For a major version bump (e.g., 1.0.0 -> 2.0.0)
 ```bash
-make version TYPE=major
+make bump-version TYPE=major
 ```
 
 For a minor version bump (e.g., 1.0.0 -> 1.1.0)
 ```bash
-make version TYPE=minor
+make bump-version TYPE=minor
 ```
 
 For a patch version bump (e.g., 1.0.0 -> 1.0.1)
 ```bash
-make version TYPE=patch
+make bump-version TYPE=patch
 ```
 
-5. Push the new tag to trigger the CI/CD pipeline:
+**Commit the changes to the repository.*
+
+3. Create a git tag with the new version:
+```bash
+make create-tag
+```
+
+4. Push the changes and new tag to trigger the CI/CD pipeline:
 ```bash
 git push origin
 git push origin --tags
@@ -253,5 +260,5 @@ The CI/CD pipeline will automatically build and deploy the new version when it d
 
 The current version can be checked by running:
 ```bash
-git describe --tags --abbrev=0
+grep 'version = ' pyproject.toml
 ```
