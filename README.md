@@ -237,6 +237,7 @@ make version TYPE=patch
 
 5. Push the new tag to trigger the CI/CD pipeline:
 ```bash
+git push origin
 git push origin --tags
 ```
 
