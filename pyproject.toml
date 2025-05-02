@@ -2,7 +2,9 @@
 name = "magplan"
 version = "3.4.1"
 description = ""
-authors = ["Ilya Rusanen <ilya@rusanen.co.uk>"]
+authors = [
+    { name = "Ilya Rusanen", email = "ilya@rusanen.co.uk" }
+]
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
