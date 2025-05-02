@@ -216,21 +216,9 @@ make devel
 
 To create a new version, follow these steps:
 
-1. Generate updated production requirements:
-```bash
-make requirements
-```
+1. Make sure all your changes are committed and pushed to the repository
 
-2. Commit any changes to requirements.txt:
-```bash
-git add requirements.txt
-git commit -m "Update requirements"
-git push
-```
-
-3. Make sure all your changes are committed and pushed to the repository
-
-4. Run one of the following commands to create a new version tag:
+2. Run one of the following commands to create a new version tag:
 
 For a major version bump (e.g., 1.0.0 -> 2.0.0)
 ```bash
