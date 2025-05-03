@@ -219,8 +219,8 @@ def advert(request):
 
 @login_required
 def search(request):
-    if request.method == "POST":
-        q = request.POST["search_query"]
+    if request.method == "GET":
+        q = request.GET.get("q", "")
         posts = Post.objects.prefetch_related(
             "section", "stage", "issues__magazine", "editor__profile"
         ).filter(Q(title__icontains=q) | Q(kicker__icontains=q))
